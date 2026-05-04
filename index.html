@@ -1,0 +1,4562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=280, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="theme-color" content="#000000"/>
+  <title>Mon Métro Paris</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html,body{overflow:hidden;width:100%;height:100%;margin:0;padding:0;}
+    body{background:#000;color:#fff;font-family:Arial,sans-serif;}
+    #root{height:100vh;display:flex;flex-direction:column;overflow:hidden;width:100%;}
+    #loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;z-index:9999;gap:20px;}
+    .progress-bar{width:220px;height:6px;background:#222;border-radius:3px;overflow:hidden;}
+    .progress-fill{height:100%;background:#FFD700;border-radius:3px;transition:width 0.3s ease;width:0%;}
+    .progress-text{color:#666;font-size:12px;}
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <svg width="56" height="56" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="26" fill="#003F87"/>
+      <circle cx="26" cy="26" r="22" fill="none" stroke="#FFD700" stroke-width="2"/>
+      <text x="26" y="34" text-anchor="middle" fill="white" font-size="26"
+        font-weight="900" font-family="Arial Black,sans-serif">M</text>
+    </svg>
+    <div style="color:#fff;font-size:20px;font-weight:900;">Mon Métro Paris</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">Chargement... 0%</div>
+  </div>
+  <div id="root"></div>
+  <script>
+    function setProgress(p,msg){
+      document.getElementById('progressFill').style.width=p+'%';
+      document.getElementById('progressText').textContent=(msg||'Chargement...')+' '+p+'%';
+    }
+    setProgress(10,'Démarrage');
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"
+    onload="setProgress(50,'React chargé')"
+    onerror="loadFallback()"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+    onload="setProgress(80,'Presque prêt')"
+    onerror="loadFallback()"></script>
+  <script>
+const { useState, useEffect, useMemo, useCallback, useRef } = React;
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+
+const METRO_LINES = [
+  { id: "1", color: "#FFBE00", text: "#000" },
+  // Jaune officiel
+  { id: "2", color: "#003CA6", text: "#fff" },
+  // Bleu foncé
+  { id: "3", color: "#9F971A", text: "#fff" },
+  // Kaki/olive
+  { id: "3bis", color: "#98D4E2", text: "#000" },
+  // Bleu ciel clair
+  { id: "4", color: "#C800A1", text: "#fff" },
+  // Magenta/rose fuchsia
+  { id: "5", color: "#FF7E2E", text: "#fff" },
+  // Orange
+  { id: "6", color: "#6ECA97", text: "#000" },
+  // Vert menthe
+  { id: "7", color: "#F4A7B9", text: "#000" },
+  // Rose clair officiel
+  { id: "7bis", color: "#98D4E2", text: "#000" },
+  // Bleu ciel clair (même que 3bis)
+  { id: "8", color: "#E19BDF", text: "#000" },
+  // Lilas/mauve clair
+  { id: "9", color: "#B6A925", text: "#fff" },
+  // Jaune-vert
+  { id: "10", color: "#C9910A", text: "#fff" },
+  // Ocre/brun doré
+  { id: "11", color: "#704B1C", text: "#fff" },
+  // Brun chocolat
+  { id: "12", color: "#007852", text: "#fff" },
+  // Vert foncé
+  { id: "13", color: "#4DA1C8", text: "#fff" },
+  // Bleu azur prononcé
+  { id: "14", color: "#662483", text: "#fff" },
+  // Violet
+  { id: "15", color: "#B90845", text: "#fff", future: true },
+  { id: "16", color: "#F3A002", text: "#000", future: true },
+  { id: "17", color: "#D5C900", text: "#000", future: true },
+  { id: "18", color: "#00A88F", text: "#fff", future: true }
+];
+const RER_LINES = [
+  { id: "A", color: "#E2231A", text: "#fff" },
+  // Rouge vif
+  { id: "B", color: "#4B92D4", text: "#fff" },
+  // Bleu moyen vif
+  { id: "C", color: "#F5C400", text: "#000" },
+  // Jaune vif
+  { id: "D", color: "#00A850", text: "#fff" },
+  // Vert
+  { id: "E", color: "#C2308A", text: "#fff" }
+  // Rose chaud/fuschia vif
+];
+const CABLE_LINES = [
+  { id: "C1", color: "#0055A4", text: "#fff" }
+  // Bleu - câble téléphérique
+];
+const CABLE_STATIONS = {
+  "C1": [
+    { n: "Villeneuve-Saint-Georges - Villa Nova" },
+    { n: "La V\xE9g\xE9tale - La Fontaine Saint-Martin" },
+    { n: "Valenton - Le Ch\xE2teau" },
+    { n: "Limeil-Br\xE9vannes - Plage Bleue" },
+    { n: "Cr\xE9teil - Pointe du Lac", c: ["8"] }
+  ]
+};
+const TRAM_LINES = [
+  { id: "T1", color: "#003CA6", text: "#fff" },
+  // Bleu foncé officiel
+  { id: "T2", color: "#7B3CA0", text: "#fff" },
+  // Violet/mauve officiel
+  { id: "T3a", color: "#F4A900", text: "#000" },
+  // Orange doré
+  { id: "T3b", color: "#007A53", text: "#fff" },
+  // Vert foncé
+  { id: "T4", color: "#D4A900", text: "#000" },
+  // Jaune doré
+  { id: "T5", color: "#7B2D8B", text: "#fff" },
+  // Violet foncé vif
+  { id: "T6", color: "#E3000F", text: "#fff" },
+  // Rouge
+  { id: "T7", color: "#6B4226", text: "#fff" },
+  // Brun
+  { id: "T8", color: "#6E7B2A", text: "#fff" },
+  // Vert olive kaki
+  { id: "T9", color: "#00A0E3", text: "#fff" },
+  // Bleu clair
+  { id: "T10", color: "#9B8C00", text: "#fff" },
+  // Jaune olive doré
+  { id: "T11", color: "#F4A900", text: "#000" },
+  // Orange
+  { id: "T12", color: "#C0006A", text: "#fff" },
+  // Bordeaux/cramoisi vif
+  { id: "T13", color: "#6B4226", text: "#fff" },
+  // Brun
+  { id: "T14", color: "#00A88F", text: "#fff" }
+  // Turquoise/vert
+];
+const PICTOS = {
+  escalator_up: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "18", x2: "19", y2: "6", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "15", x2: "11", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "15", x2: "11", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "12", x2: "14", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "14", y1: "12", x2: "14", y2: "9", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "17", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "16,10 19,7 16,4", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
+    label: "Escalator mont\xE9e"
+  },
+  escalator_down: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "6", x2: "19", y2: "18", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "9", x2: "13", y2: "9", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "9", x2: "10", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "12", x2: "13", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "13", y1: "12", x2: "13", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "7", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "8,14 5,17 8,20", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
+    label: "Escalator descente"
+  },
+  elevator: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#0D3B8C" }), /* @__PURE__ */ React.createElement("rect", { x: "4", y: "7", width: "16", height: "12", rx: "2", fill: "none", stroke: "white", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,11 12,8 14,11", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,15 12,18 14,15", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "13", x2: "20", y2: "13", stroke: "white", strokeWidth: "1", strokeLinecap: "round", opacity: "0.5" })),
+    label: "Ascenseur"
+  },
+  // Anciens codes conservés pour compatibilité
+  escalator: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "18", x2: "19", y2: "6", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "15", x2: "11", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "15", x2: "11", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "12", x2: "14", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "17", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "16,10 19,7 16,4", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
+    label: "Escalator"
+  },
+  ascenseur: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#0D3B8C" }), /* @__PURE__ */ React.createElement("rect", { x: "4", y: "7", width: "16", height: "12", rx: "2", fill: "none", stroke: "white", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,11 12,8 14,11", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,15 12,18 14,15", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" })),
+    label: "Ascenseur"
+  },
+  escalier: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "1", y: "1", width: "22", height: "22", rx: "4", fill: "#37474F" }), /* @__PURE__ */ React.createElement(
+      "polyline",
+      {
+        points: "4,20 4,16 8,16 8,12 12,12 12,8 16,8 16,4 20,4",
+        fill: "none",
+        stroke: "white",
+        strokeWidth: "2.2",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }
+    ), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "20", x2: "20", y2: "20", stroke: "white", strokeWidth: "2", strokeLinecap: "round" })),
+    label: "Escalier"
+  }
+};
+function PictoIcon({ type, size = 22 }) {
+  const p = PICTOS[type];
+  if (!p) return null;
+  return /* @__PURE__ */ React.createElement("span", { title: p.label, style: { display: "inline-block", width: size, height: size, flexShrink: 0 } }, p.svg);
+}
+const STATIONS = {
+  "1": [
+    { n: "La D\xE9fense - Grande Arche", c: ["A", "E"], walk: ["T2"] },
+    { n: "Esplanade de la D\xE9fense" },
+    { n: "Pont de Neuilly" },
+    { n: "Les Sablons" },
+    { n: "Porte Maillot", c: ["C", "E", "T3b"] },
+    { n: "Argentine" },
+    { n: "Charles de Gaulle - \xC9toile", c: ["2", "6", "A"] },
+    { n: "George V" },
+    { n: "Franklin D. Roosevelt", c: ["9"] },
+    { n: "Champs-\xC9lys\xE9es - Clemenceau", c: ["13"] },
+    { n: "Concorde", c: ["8", "12"] },
+    { n: "Tuileries" },
+    { n: "Palais Royal - Mus\xE9e du Louvre", c: ["7", "14"] },
+    { n: "Louvre - Rivoli" },
+    { n: "Ch\xE2telet", c: ["4", "7", "11", "14", "A", "B", "D"] },
+    { n: "H\xF4tel de Ville", c: ["11"] },
+    { n: "Saint-Paul" },
+    { n: "Bastille", c: ["5", "8"] },
+    { n: "Gare de Lyon", c: ["14", "A", "D"] },
+    { n: "Reuilly - Diderot", c: ["8"] },
+    { n: "Nation", c: ["2", "6", "9", "A"] },
+    { n: "Porte de Vincennes", c: ["T3a", "T3b"] },
+    { n: "Saint-Mand\xE9" },
+    { n: "B\xE9rault" },
+    { n: "Ch\xE2teau de Vincennes", walk: ["A"] }
+  ],
+  "2": [
+    { n: "Porte Dauphine", walk: ["C", "T3b"] },
+    { n: "Victor Hugo" },
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "6", "A"] },
+    { n: "Ternes" },
+    { n: "Courcelles" },
+    { n: "Monceau" },
+    { n: "Villiers", c: ["3"] },
+    { n: "Rome" },
+    { n: "Place de Clichy", c: ["13"] },
+    { n: "Blanche" },
+    { n: "Pigalle", c: ["12"] },
+    { n: "Anvers" },
+    { n: "Barb\xE8s - Rochechouart", c: ["4"] },
+    { n: "La Chapelle" },
+    { n: "Stalingrad", c: ["5", "7"] },
+    { n: "Jaur\xE8s", c: ["5", "7bis"] },
+    { n: "Colonel Fabien" },
+    { n: "Belleville", c: ["11"] },
+    { n: "Couronnes" },
+    { n: "M\xE9nilmontant" },
+    { n: "P\xE8re Lachaise", c: ["3"] },
+    { n: "Philippe Auguste" },
+    { n: "Alexandre Dumas" },
+    { n: "Avron" },
+    { n: "Nation", c: ["1", "6", "9", "A"] }
+  ],
+  "3": [
+    { n: "Pont de Levallois - B\xE9con" },
+    { n: "Anatole France" },
+    { n: "Louise Michel" },
+    { n: "Porte de Champerret", c: ["T3b"] },
+    { n: "Pereire", c: ["C"] },
+    { n: "Wagram" },
+    { n: "Malesherbes" },
+    { n: "Villiers", c: ["2"] },
+    { n: "Europe" },
+    { n: "Saint-Lazare", c: ["12", "13", "14", "E"], walk: ["9"] },
+    { n: "Havre - Caumartin", c: ["9", "A"] },
+    { n: "Op\xE9ra", c: ["7", "8", "A"] },
+    { n: "Quatre-Septembre" },
+    { n: "Bourse" },
+    { n: "Sentier" },
+    { n: "R\xE9aumur - S\xE9bastopol", c: ["4"] },
+    { n: "Arts et M\xE9tiers", c: ["11"] },
+    { n: "Temple" },
+    { n: "R\xE9publique", c: ["5", "8", "9", "11"] },
+    { n: "Parmentier" },
+    { n: "Rue Saint-Maur" },
+    { n: "P\xE8re Lachaise", c: ["2"] },
+    { n: "Gambetta", c: ["3bis"] },
+    { n: "Porte de Bagnolet", c: ["T3b"] },
+    { n: "Gallieni" }
+  ],
+  "3bis": [
+    { n: "Porte des Lilas", c: ["11", "T3b"] },
+    { n: "Saint-Fargeau" },
+    { n: "Pelleport" },
+    { n: "Gambetta", c: ["3"] }
+  ],
+  "4": [
+    { n: "Porte de Clignancourt", c: ["T3b"] },
+    { n: "Simplon" },
+    { n: "Marcadet - Poissonniers", c: ["12"] },
+    { n: "Ch\xE2teau Rouge" },
+    { n: "Barb\xE8s - Rochechouart", c: ["2"] },
+    { n: "Gare du Nord", c: ["5", "B", "D", "E"] },
+    { n: "Gare de l'Est", c: ["5", "7"] },
+    { n: "Ch\xE2teau d'Eau" },
+    { n: "Strasbourg - Saint-Denis", c: ["8", "9"] },
+    { n: "R\xE9aumur - S\xE9bastopol", c: ["3"] },
+    { n: "\xC9tienne Marcel" },
+    { n: "Les Halles", c: ["A", "B", "D"] },
+    { n: "Ch\xE2telet", c: ["1", "7", "11", "14", "A", "B", "D"] },
+    { n: "Cit\xE9" },
+    { n: "Saint-Michel", c: ["B", "C"] },
+    { n: "Od\xE9on", c: ["10"] },
+    { n: "Saint-Germain-des-Pr\xE9s" },
+    { n: "Saint-Sulpice" },
+    { n: "Saint-Placide" },
+    { n: "Montparnasse - Bienven\xFCe", c: ["6", "12", "13"] },
+    { n: "Vavin" },
+    { n: "Raspail", c: ["6"] },
+    { n: "Denfert-Rochereau", c: ["6", "B"] },
+    { n: "Mouton-Duvernet" },
+    { n: "Al\xE9sia" },
+    { n: "Porte d'Orl\xE9ans", c: ["T3a"] },
+    { n: "Mairie de Montrouge" },
+    { n: "Barbara" },
+    { n: "Bagneux - Lucie Aubrac", c: ["B"] }
+  ],
+  "5": [
+    { n: "Bobigny - Pablo Picasso", c: ["T1"] },
+    { n: "\xC9glise de Pantin" },
+    { n: "Hoche" },
+    { n: "Porte de Pantin", walk: ["T3b"] },
+    { n: "Ourcq" },
+    { n: "Laumi\xE8re" },
+    { n: "Jaur\xE8s", c: ["2", "7bis"] },
+    { n: "Stalingrad", c: ["2", "7"] },
+    { n: "Gare du Nord", c: ["4", "B", "D", "E"] },
+    { n: "Gare de l'Est", c: ["4", "7"] },
+    { n: "Jacques Bonsergent" },
+    { n: "R\xE9publique", c: ["3", "8", "9", "11"] },
+    { n: "Oberkampf", c: ["9"] },
+    { n: "Richard-Lenoir" },
+    { n: "Br\xE9guet - Sabin" },
+    { n: "Bastille", c: ["1", "8"] },
+    { n: "Quai de la Rap\xE9e" },
+    { n: "Gare d'Austerlitz", c: ["10", "C"] },
+    { n: "Saint-Marcel" },
+    { n: "Campo-Formio" },
+    { n: "Place d'Italie", c: ["6", "7"] }
+  ],
+  "6": [
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "A"] },
+    { n: "Kl\xE9ber" },
+    { n: "Boissi\xE8re" },
+    { n: "Trocad\xE9ro", c: ["9"] },
+    { n: "Passy" },
+    { n: "Bir-Hakeim", c: ["C"] },
+    { n: "Dupleix" },
+    { n: "La Motte-Picquet - Grenelle", c: ["8", "10"] },
+    { n: "Cambronne" },
+    { n: "S\xE8vres - Lecourbe" },
+    { n: "Pasteur", c: ["12"] },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "12", "13"] },
+    { n: "Edgar Quinet" },
+    { n: "Raspail", c: ["4"] },
+    { n: "Denfert-Rochereau", c: ["4", "B"] },
+    { n: "Saint-Jacques" },
+    { n: "Glaci\xE8re" },
+    { n: "Corvisart" },
+    { n: "Place d'Italie", c: ["5", "7"] },
+    { n: "Nationale" },
+    { n: "Chevaleret" },
+    { n: "Quai de la Gare" },
+    { n: "Bercy", c: ["14"] },
+    { n: "Dugommier" },
+    { n: "Daumesnil", c: ["8"] },
+    { n: "Bel-Air" },
+    { n: "Picpus" },
+    { n: "Nation", c: ["1", "2", "9", "A"] }
+  ],
+  "7": [
+    { n: "La Courneuve - 8 Mai 1945", c: ["T1"] },
+    { n: "Fort d'Aubervilliers" },
+    { n: "Aubervilliers - Pantin - Quatre Chemins" },
+    { n: "Porte de la Villette", c: ["T3b"] },
+    { n: "Corentin Cariou" },
+    { n: "Crim\xE9e" },
+    { n: "Riquet" },
+    { n: "Stalingrad", c: ["2", "5"] },
+    { n: "Louis Blanc", c: ["7bis"] },
+    { n: "Ch\xE2teau-Landon" },
+    { n: "Gare de l'Est", c: ["4", "5"] },
+    { n: "Poissonni\xE8re" },
+    { n: "Cadet" },
+    { n: "Le Peletier" },
+    { n: "Chauss\xE9e d'Antin - La Fayette", c: ["9"] },
+    { n: "Op\xE9ra", c: ["3", "8", "A"] },
+    { n: "Pyramides", c: ["14"] },
+    { n: "Palais Royal - Mus\xE9e du Louvre", c: ["1"] },
+    { n: "Pont Neuf" },
+    { n: "Ch\xE2telet", c: ["1", "4", "11", "14", "A", "B", "D"] },
+    { n: "Pont Marie" },
+    { n: "Sully - Morland" },
+    { n: "Jussieu", c: ["10"] },
+    { n: "Place Monge" },
+    { n: "Censier - Daubenton" },
+    { n: "Les Gobelins" },
+    { n: "Place d'Italie", c: ["5", "6"] },
+    { n: "Tolbiac" },
+    // FOURCHE — station pivot
+    { n: "Maison Blanche", fork: true },
+    // Branche V : Villejuif
+    { n: "Maison Blanche", c: ["14"], walk: ["T3a"], branch: "V" },
+    { n: "Le Kremlin-Bic\xEAtre", branch: "V" },
+    { n: "Villejuif - L\xE9o Lagrange", branch: "V" },
+    { n: "Villejuif - Paul Vaillant-Couturier", branch: "V" },
+    { n: "Villejuif - Louis Aragon", c: ["T7"], branch: "V" },
+    // Branche I : Ivry
+    { n: "Maison Blanche", c: ["14"], walk: ["T3a"], branch: "I" },
+    { n: "Porte d'Italie", c: ["T3a"], branch: "I" },
+    { n: "Porte de Choisy", c: ["T3a", "T9"], branch: "I" },
+    { n: "Porte d'Ivry", c: ["T3a"], branch: "I" },
+    { n: "Pierre et Marie Curie", branch: "I" },
+    { n: "Mairie d'Ivry", branch: "I" }
+  ],
+  "7bis": [
+    { n: "Louis Blanc", c: ["7"] },
+    { n: "Jaur\xE8s", c: ["2", "5"] },
+    { n: "Bolivar" },
+    { n: "Buttes Chaumont" },
+    { n: "Botzaris" },
+    { n: "Place des F\xEAtes", c: ["11"] },
+    { n: "Danube" },
+    { n: "Pr\xE9 Saint-Gervais", walk: ["T3b"] }
+  ],
+  "8": [
+    { n: "Balard", walk: ["T2", "T3a"] },
+    { n: "Lourmel" },
+    { n: "Boucicaut" },
+    { n: "F\xE9lix Faure" },
+    { n: "Commerce" },
+    { n: "La Motte-Picquet - Grenelle", c: ["6", "10"] },
+    { n: "\xC9cole Militaire" },
+    { n: "La Tour-Maubourg" },
+    { n: "Invalides", c: ["13", "C"] },
+    { n: "Concorde", c: ["1", "12"] },
+    { n: "Madeleine", c: ["12", "14"] },
+    { n: "Op\xE9ra", c: ["3", "7", "A"] },
+    { n: "Richelieu - Drouot", c: ["9"] },
+    { n: "Grands Boulevards" },
+    { n: "Bonne Nouvelle" },
+    { n: "Strasbourg - Saint-Denis", c: ["4", "9"] },
+    { n: "R\xE9publique", c: ["3", "5", "9", "11"] },
+    { n: "Filles du Calvaire" },
+    { n: "Saint-S\xE9bastien - Froissart" },
+    { n: "Chemin Vert" },
+    { n: "Bastille", c: ["1", "5"] },
+    { n: "Ledru-Rollin" },
+    { n: "Faidherbe - Chaligny" },
+    { n: "Reuilly - Diderot", c: ["1"] },
+    { n: "Montgallet" },
+    { n: "Daumesnil", c: ["6"] },
+    { n: "Michel Bizot" },
+    { n: "Porte Dor\xE9e", c: ["T3a"] },
+    { n: "Porte de Charenton", c: ["T3a"] },
+    { n: "Libert\xE9" },
+    { n: "Charenton - \xC9coles" },
+    { n: "\xC9cole V\xE9t\xE9rinaire de Maisons-Alfort" },
+    { n: "Maisons-Alfort - Stade" },
+    { n: "Maisons-Alfort - Les Juilliottes" },
+    { n: "Cr\xE9teil - L'\xC9chat" },
+    { n: "Cr\xE9teil - Universit\xE9" },
+    { n: "Cr\xE9teil - Pr\xE9fecture" },
+    { n: "Cr\xE9teil - Pointe du Lac", c: ["C1"] }
+  ],
+  "9": [
+    { n: "Pont de S\xE8vres", walk: ["T2"] },
+    { n: "Billancourt" },
+    { n: "Marcel Sembat" },
+    { n: "Porte de Saint-Cloud", c: ["10"] },
+    { n: "Exelmans" },
+    { n: "Michel-Ange - Molitor", c: ["10"] },
+    { n: "Michel-Ange - Auteuil", c: ["10"] },
+    { n: "Jasmin" },
+    { n: "Ranelagh" },
+    { n: "La Muette" },
+    { n: "Rue de la Pompe" },
+    { n: "Trocad\xE9ro", c: ["6"] },
+    { n: "I\xE9na" },
+    { n: "Alma - Marceau", walk: ["C"] },
+    { n: "Franklin D. Roosevelt", c: ["1"] },
+    { n: "Saint-Philippe du Roule" },
+    { n: "Miromesnil", c: ["13"] },
+    { n: "Saint-Augustin" },
+    { n: "Havre - Caumartin", c: ["3", "A"] },
+    { n: "Chauss\xE9e d'Antin - La Fayette", c: ["7"] },
+    { n: "Richelieu - Drouot", c: ["8"] },
+    { n: "Grands Boulevards", c: ["8", "9"] },
+    { n: "Bonne Nouvelle", c: ["8", "9"] },
+    { n: "Strasbourg - Saint-Denis", c: ["4", "8"] },
+    { n: "R\xE9publique", c: ["3", "5", "8", "11"] },
+    { n: "Oberkampf", c: ["5"] },
+    { n: "Saint-Ambroise" },
+    { n: "Voltaire" },
+    { n: "Charonne" },
+    { n: "Rue des Boulets" },
+    { n: "Nation", c: ["1", "2", "6", "9", "A"] },
+    { n: "Buzenval" },
+    { n: "Mara\xEEchers" },
+    { n: "Porte de Montreuil", c: ["T3b"] },
+    { n: "Robespierre" },
+    { n: "Croix de Chavaux" },
+    { n: "Mairie de Montreuil" }
+  ],
+  "10": [
+    { n: "Boulogne - Pont de Saint-Cloud", walk: ["T2"] },
+    { n: "Boulogne - Jean Jaur\xE8s" },
+    { n: "Michel-Ange - Molitor", c: ["9"] },
+    { n: "Michel-Ange - Auteuil", c: ["9"] },
+    { n: "\xC9glise d'Auteuil" },
+    { n: "Chardon-Lagache" },
+    { n: "Mirabeau" },
+    { n: "Javel - Andr\xE9 Citro\xEBn", c: ["C"] },
+    { n: "Charles Michels" },
+    { n: "Avenue \xC9mile Zola" },
+    { n: "La Motte-Picquet - Grenelle", c: ["6", "8"] },
+    { n: "S\xE9gur" },
+    { n: "Duroc", c: ["13"] },
+    { n: "Vaneau" },
+    { n: "S\xE8vres - Babylone", c: ["12"] },
+    { n: "Mabillon" },
+    { n: "Od\xE9on", c: ["4"] },
+    { n: "Cluny - La Sorbonne", c: ["B", "C"] },
+    { n: "Maubert - Mutualit\xE9" },
+    { n: "Cardinal Lemoine" },
+    { n: "Jussieu", c: ["7"] },
+    { n: "Gare d'Austerlitz", c: ["5", "C"] }
+  ],
+  "11": [
+    { n: "Ch\xE2telet", c: ["1", "4", "7", "14", "A", "B", "D"] },
+    { n: "H\xF4tel de Ville", c: ["1"] },
+    { n: "Rambuteau" },
+    { n: "Arts et M\xE9tiers", c: ["3"] },
+    { n: "R\xE9publique", c: ["3", "5", "8", "9"] },
+    { n: "Goncourt" },
+    { n: "Belleville", c: ["2"] },
+    { n: "Pyr\xE9n\xE9es" },
+    { n: "Jourdain" },
+    { n: "Place des F\xEAtes", c: ["7bis"] },
+    { n: "T\xE9l\xE9graphe" },
+    { n: "Porte des Lilas", c: ["3bis", "T3b"] },
+    // Historique jusqu'à Mairie des Lilas
+    { n: "Mairie des Lilas" },
+    // Prolongement juin 2024 vers Rosny-sous-Bois
+    { n: "Serge Gainsbourg" },
+    { n: "Romainville - Carnot" },
+    { n: "Montreuil - H\xF4pital" },
+    { n: "La Dhuys" },
+    { n: "Coteaux Beauclair" },
+    { n: "Rosny - Bois-Perrier", c: ["E"] }
+  ],
+  "12": [
+    { n: "Mairie d'Aubervilliers", c: ["T8"] },
+    { n: "Aim\xE9 C\xE9saire" },
+    { n: "Front Populaire" },
+    { n: "Porte de la Chapelle" },
+    { n: "Marx Dormoy" },
+    { n: "Marcadet - Poissonniers", c: ["4"] },
+    { n: "Jules Joffrin" },
+    { n: "Lamarck - Caulaincourt" },
+    { n: "Abbesses" },
+    { n: "Pigalle", c: ["2"] },
+    { n: "Saint-Georges" },
+    { n: "Notre-Dame-de-Lorette" },
+    { n: "Trinit\xE9 - d'Estienne d'Orves" },
+    { n: "Saint-Lazare", c: ["3", "13", "14", "E"], walk: ["9"] },
+    { n: "Madeleine", c: ["8", "14"] },
+    { n: "Concorde", c: ["1", "8"] },
+    { n: "Assembl\xE9e Nationale" },
+    { n: "Solf\xE9rino", walk: ["C"] },
+    { n: "Rue du Bac" },
+    { n: "S\xE8vres - Babylone", c: ["10"] },
+    { n: "Rennes" },
+    { n: "Notre-Dame-des-Champs" },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "6", "13"] },
+    { n: "Falgui\xE8re" },
+    { n: "Pasteur", c: ["6"] },
+    { n: "Volontaires" },
+    { n: "Vaugirard" },
+    { n: "Convention" },
+    { n: "Porte de Versailles", c: ["T2", "T3a"] },
+    { n: "Corentin Celton" },
+    { n: "Mairie d'Issy", c: ["T2"] }
+  ],
+  "13": [
+    // Tronc commun Sud
+    { n: "Ch\xE2tillon - Montrouge", c: ["T6"] },
+    { n: "Malakoff - Rue \xC9tienne Dolet" },
+    { n: "Malakoff - Plateau de Vanves" },
+    { n: "Porte de Vanves", c: ["T3a"] },
+    { n: "Plaisance" },
+    { n: "Pernety" },
+    { n: "Ga\xEEt\xE9" },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "6", "12"] },
+    { n: "Duroc", c: ["10"] },
+    { n: "Saint-Fran\xE7ois-Xavier" },
+    { n: "Varenne" },
+    { n: "Invalides", c: ["8", "C"] },
+    { n: "Champs-\xC9lys\xE9es - Clemenceau", c: ["1"] },
+    { n: "Miromesnil", c: ["9"] },
+    { n: "Saint-Lazare", c: ["3", "12", "14", "E"], walk: ["9"] },
+    { n: "Li\xE8ge" },
+    { n: "Place de Clichy", c: ["2"] },
+    // FOURCHE — station pivot
+    { n: "La Fourche", fork: true },
+    // Branche A : Asnières-Gennevilliers
+    { n: "La Fourche", branch: "A" },
+    { n: "Brochant", branch: "A" },
+    { n: "Porte de Clichy", c: ["C", "14", "T3b"], branch: "A" },
+    { n: "Mairie de Clichy", branch: "A" },
+    { n: "Gabriel P\xE9ri", branch: "A" },
+    { n: "Les Agnettes", branch: "A" },
+    { n: "Asni\xE8res - Gennevilliers - Les Courtilles", c: ["T1"], branch: "A" },
+    // Branche B : Saint-Denis
+    { n: "La Fourche", branch: "B" },
+    { n: "Guy M\xF4quet", branch: "B" },
+    { n: "Porte de Saint-Ouen", c: ["T3b"], branch: "B" },
+    { n: "Garibaldi", branch: "B" },
+    { n: "Mairie de Saint-Ouen", c: ["14"], branch: "B" },
+    { n: "Carrefour Pleyel", c: ["14"], branch: "B" },
+    { n: "Saint-Denis - Porte de Paris", c: ["T8"], branch: "B" },
+    { n: "Basilique de Saint-Denis", walk: ["T1", "T5"], branch: "B" },
+    { n: "Saint-Denis - Universit\xE9", walk: ["T5"], branch: "B" }
+  ],
+  "14": [
+    { n: "Saint-Denis - Pleyel", c: ["13", "D", "T8"] },
+    { n: "Mairie de Saint-Ouen", c: ["13"] },
+    { n: "Saint-Ouen", c: ["C"] },
+    { n: "Clichy - Saint-Ouen" },
+    { n: "Porte de Clichy", c: ["13", "C", "T3b"] },
+    { n: "Pont Cardinet" },
+    { n: "Saint-Lazare", c: ["3", "12", "13", "E"], walk: ["9"] },
+    { n: "Madeleine", c: ["8", "12"] },
+    { n: "Pyramides", c: ["7"] },
+    { n: "Ch\xE2telet", c: ["1", "4", "7", "11", "A", "B", "D"] },
+    { n: "Gare de Lyon", c: ["1", "A", "D"] },
+    { n: "Bercy", c: ["6"] },
+    { n: "Cour Saint-\xC9milion", walk: ["T3a"] },
+    { n: "Biblioth\xE8que Fran\xE7ois Mitterrand", c: ["C"], walk: ["T3a"] },
+    { n: "Olympiades" },
+    { n: "Maison Blanche", c: ["7"], walk: ["T3a"] },
+    { n: "H\xF4pital Bic\xEAtre" },
+    { n: "Villejuif - Gustave Roussy" },
+    { n: "L'Ha\xFF-les-Roses", c: ["C"] },
+    { n: "Chevilly-Larue", c: ["T7"] },
+    { n: "Thiais - Orly", c: ["C"] },
+    { n: "A\xE9roport d'Orly", c: ["T7"] }
+  ],
+  "A": [
+    // Branche Cergy (C) — Cergy-Le Haut terminus en dernier
+    { n: "Conflans - Fin d'Oise", branch: "C" },
+    { n: "Ach\xE8res - Ville", branch: "C" },
+    { n: "Neuville - Universit\xE9", branch: "C" },
+    { n: "Cergy - Saint-Christophe", branch: "C" },
+    { n: "Cergy - Pr\xE9fecture", branch: "C" },
+    { n: "Cergy - Le Haut", branch: "C" },
+    // Branche Poissy (P) — Poissy terminus en dernier
+    { n: "Ach\xE8res - Grand Cormier", branch: "P" },
+    { n: "Maisons-Laffitte", branch: "P" },
+    { n: "Sartrouville", branch: "P" },
+    { n: "Houilles - Carri\xE8res-sur-Seine", branch: "P" },
+    { n: "Poissy", branch: "P" },
+    // Branche Saint-Germain (G) — Saint-Germain est le terminus = en dernier
+    { n: "Nanterre - Universit\xE9", branch: "G" },
+    { n: "Rueil-Malmaison", branch: "G" },
+    { n: "Chatou - Croissy", branch: "G" },
+    { n: "Le V\xE9sinet - Centre", branch: "G" },
+    { n: "Le V\xE9sinet - Le Pecq", branch: "G" },
+    { n: "Saint-Germain-en-Laye", c: ["T13"], branch: "G" },
+    // FOURCHE OUEST — point de séparation
+    { n: "Nanterre - Pr\xE9fecture", fork: true },
+    // Tronc commun
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"] },
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "6"] },
+    { n: "Auber", c: ["E"] },
+    { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "B", "D"] },
+    { n: "Gare de Lyon", c: ["1", "14", "D"] },
+    // FOURCHE EST — point de séparation
+    { n: "Nation", c: ["1", "2", "6", "9"], fork: true },
+    // Branche Boissy (B) — Boissy est le terminus = en dernier
+    { n: "Vincennes", branch: "B" },
+    { n: "Fontenay-sous-Bois", branch: "B" },
+    { n: "Val de Fontenay", c: ["E"], branch: "B" },
+    { n: "Nogent-sur-Marne", branch: "B" },
+    { n: "Le Perreux - Nogent", branch: "B" },
+    { n: "Neuilly-Plaisance", branch: "B" },
+    { n: "Bry-sur-Marne", branch: "B" },
+    { n: "Villiers-sur-Marne - Le Plessis-Tr\xE9vise", branch: "B" },
+    { n: "Sucy - Bonneuil", branch: "B" },
+    { n: "La Varenne - Chennevi\xE8res", branch: "B" },
+    { n: "Saint-Maur - Cr\xE9teil", branch: "B" },
+    { n: "Le Parc de Saint-Maur", branch: "B" },
+    { n: "Champigny", branch: "B" },
+    { n: "La Borne Blanche", branch: "B" },
+    { n: "Boissy-Saint-L\xE9ger", branch: "B" },
+    // Branche Marne-la-Vallée (M) — Chessy est le terminus = en dernier
+    { n: "Noisy-le-Grand - Mont d'Est", branch: "M" },
+    { n: "Noisy - Champs", branch: "M" },
+    { n: "Noisiel", branch: "M" },
+    { n: "Lognes", branch: "M" },
+    { n: "Torcy", branch: "M" },
+    { n: "Bussy - Saint-Georges", branch: "M" },
+    { n: "Val d'Europe", branch: "M" },
+    { n: "Chessy - Marne-la-Vall\xE9e (Disneyland)", branch: "M" }
+  ],
+  "B": [
+    // Branche Nord CDG (D) — Aéroport CDG 2 terminus en dernier
+    { n: "Sevran - Beaudottes", branch: "D" },
+    { n: "Villepinte", branch: "D" },
+    { n: "Le Parc des Expositions", branch: "D" },
+    { n: "A\xE9roport CDG 1", branch: "D" },
+    { n: "A\xE9roport CDG 2 - TGV", branch: "D" },
+    // Branche Nord Mitry (Y) — Mitry-Claye terminus en dernier
+    { n: "Sevran - Livry", branch: "Y" },
+    { n: "Vert Galant", branch: "Y" },
+    { n: "Villeparisis - Mitry-le-Neuf", branch: "Y" },
+    { n: "Mitry - Claye", branch: "Y" },
+    // FOURCHE NORD
+    { n: "Aulnay-sous-Bois", c: ["T4"], fork: true },
+    // Tronc commun
+    { n: "Le Blanc-Mesnil" },
+    { n: "Drancy" },
+    { n: "Le Bourget", c: ["T11"] },
+    { n: "La Courneuve - Aubervilliers" },
+    { n: "La Plaine - Stade de France" },
+    { n: "Stade de France - Saint-Denis" },
+    { n: "Gare du Nord", c: ["4", "5", "D", "E"] },
+    { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "A", "D"] },
+    { n: "Saint-Michel - Notre-Dame", c: ["4", "C"] },
+    { n: "Luxembourg", c: ["C"] },
+    { n: "Port-Royal" },
+    { n: "Denfert-Rochereau", c: ["4", "6", "T3a"] },
+    { n: "Cit\xE9 Universitaire", c: ["T3a"] },
+    { n: "Gentilly" },
+    { n: "Laplace" },
+    { n: "Arcueil - Cachan" },
+    { n: "Bagneux - Lucie Aubrac", c: ["4"], fork: true },
+    // Branche Robinson (R) — Robinson terminus en dernier
+    { n: "Bourg-la-Reine", branch: "R" },
+    { n: "Parc de Sceaux", branch: "R" },
+    { n: "Sceaux", branch: "R" },
+    { n: "Fontenay-aux-Roses", branch: "R" },
+    { n: "Robinson", branch: "R" },
+    // Branche Saint-Rémy (S) — Saint-Rémy terminus en dernier
+    { n: "Bourg-la-Reine", branch: "S" },
+    { n: "La Croix de Berny", c: ["T10"], branch: "S" },
+    { n: "Antony", c: ["T10"], branch: "S" },
+    { n: "Fontaine-Michalon", branch: "S" },
+    { n: "Les Baconnets", branch: "S" },
+    { n: "Massy - Verri\xE8res", branch: "S" },
+    { n: "Massy - Palaiseau", c: ["C", "T12"], branch: "S" },
+    { n: "Palaiseau", branch: "S" },
+    { n: "Palaiseau - Villebon", branch: "S" },
+    { n: "Loz\xE8re", branch: "S" },
+    { n: "Le Guichet", branch: "S" },
+    { n: "Orsay - Ville", branch: "S" },
+    { n: "Bures-sur-Yvette", branch: "S" },
+    { n: "La Hacquini\xE8re", branch: "S" },
+    { n: "Gif-sur-Yvette", branch: "S" },
+    { n: "Courcelle-sur-Yvette", branch: "S" },
+    { n: "Saint-R\xE9my-l\xE8s-Chevreuse", branch: "S" }
+  ],
+  "C": [
+    // Branche Pontoise (PT) — terminus en dernier
+    { n: "Saint-Ouen-l'Aum\xF4ne - Liesse", branch: "PT" },
+    { n: "Saint-Ouen-l'Aum\xF4ne", branch: "PT" },
+    { n: "Pierrelaye", branch: "PT" },
+    { n: "Montigny - Beauchamp", branch: "PT" },
+    { n: "Franconville - Le Plessis-Bouchard", branch: "PT" },
+    { n: "Cernay", branch: "PT" },
+    { n: "Ermont - Eaubonne", branch: "PT" },
+    { n: "Saint-Gratien", branch: "PT" },
+    { n: "\xC9pinay-sur-Seine", c: ["T8", "T11"], branch: "PT" },
+    { n: "Gennevilliers", branch: "PT" },
+    { n: "Les Gr\xE9sillons", branch: "PT" },
+    { n: "Saint-Ouen", c: ["14"], branch: "PT" },
+    { n: "Porte de Clichy", c: ["13", "14", "T3b"], branch: "PT" },
+    { n: "Pereire - Levallois", c: ["3"], branch: "PT" },
+    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "PT" },
+    { n: "Avenue Foch", branch: "PT" },
+    { n: "Avenue Henri Martin", branch: "PT" },
+    { n: "Boulainvilliers", branch: "PT" },
+    { n: "Avenue du Pdt Kennedy", c: ["6", "9"], branch: "PT" },
+    { n: "Champ de Mars - Tour Eiffel", branch: "PT" },
+    { n: "Pont de l'Alma", branch: "PT" },
+    { n: "Pontoise", branch: "PT" },
+    // Branche Versailles Château (VC) — terminus en dernier
+    { n: "Versailles - Ch\xE2teau - Rive Gauche", branch: "VC" },
+    { n: "Porchefontaine", branch: "VC" },
+    // Branche Saint-Quentin (SQ) — terminus en dernier
+    { n: "Saint-Quentin-en-Yvelines", branch: "SQ" },
+    { n: "Saint-Cyr", c: ["T13"], branch: "SQ" },
+    { n: "Versailles - Chantiers", branch: "SQ" },
+    // FOURCHE OUEST — Viroflay
+    { n: "Viroflay - Rive Gauche", c: ["T6"], fork: true },
+    // Tronc commun Ouest → Paris
+    { n: "Chaville - V\xE9lizy" },
+    { n: "Meudon - Val Fleury" },
+    { n: "Issy" },
+    { n: "Issy - Val de Seine", c: ["T2"] },
+    { n: "Pont du Garigliano - H\xF4pital Europ\xE9en Georges Pompidou" },
+    { n: "Javel", c: ["10"] },
+    // Tronc commun Paris
+    { n: "Invalides", c: ["8", "13"] },
+    { n: "Mus\xE9e d'Orsay", walk: ["12"] },
+    { n: "Saint-Michel - Notre-Dame", c: ["4", "B"] },
+    { n: "Paris - Austerlitz", c: ["5", "10"] },
+    { n: "Biblioth\xE8que Fran\xE7ois Mitterrand", c: ["14", "T3a"] },
+    // Tronc commun Sud
+    { n: "Ivry-sur-Seine" },
+    { n: "Vitry-sur-Seine" },
+    { n: "Les Ardoines" },
+    { n: "Choisy-le-Roi" },
+    { n: "Villeneuve-le-Roi" },
+    { n: "Ablon" },
+    { n: "Athis-Mons" },
+    { n: "Juvisy", c: ["D"] },
+    // Branche Massy-Orly (MY) — Massy-Palaiseau terminus en dernier
+    { n: "Les Saules", branch: "MY" },
+    { n: "Orly - Ville", c: ["T7"], branch: "MY" },
+    { n: "Pont de Rungis - A\xE9roport d'Orly", c: ["T9"], branch: "MY" },
+    { n: "Rungis - La Fraternelle", branch: "MY" },
+    { n: "Chemin d'Antony", branch: "MY" },
+    { n: "Massy - Verri\xE8res", branch: "MY" },
+    { n: "Massy - Palaiseau", c: ["B", "T12"], branch: "MY" },
+    // Suite tronc commun Sud
+    { n: "Savigny-sur-Orge" },
+    { n: "\xC9pinay-sur-Orge", c: ["T12"] },
+    { n: "Sainte-Genevi\xE8ve-des-Bois" },
+    { n: "Saint-Michel-sur-Orge" },
+    // FOURCHE SUD — Brétigny
+    { n: "Br\xE9tigny", fork: true },
+    // Branche Étampes (ET) — terminus en dernier
+    { n: "Marolles-en-Hurepoix", branch: "ET" },
+    { n: "Bouray", branch: "ET" },
+    { n: "Lardy", branch: "ET" },
+    { n: "Chamarande", branch: "ET" },
+    { n: "\xC9tr\xE9chy", branch: "ET" },
+    { n: "\xC9tampes", branch: "ET" },
+    { n: "Saint-Martin-d'\xC9tampes", branch: "ET" },
+    // Branche Dourdan (DO) — terminus en dernier
+    { n: "La Norville - Saint-Germain-l\xE8s-Arpajon", branch: "DO" },
+    { n: "Arpajon", branch: "DO" },
+    { n: "\xC9gly", branch: "DO" },
+    { n: "Breuillet - Bruy\xE8res-le-Ch\xE2tel", branch: "DO" },
+    { n: "Breuillet - Village", branch: "DO" },
+    { n: "Saint-Ch\xE9ron", branch: "DO" },
+    { n: "Sermaise", branch: "DO" },
+    { n: "Dourdan", branch: "DO" },
+    { n: "Dourdan - La For\xEAt", branch: "DO" }
+  ],
+  "D": [
+    // Branche Nord Creil — terminus en dernier
+    { n: "Orry-la-Ville - Coye-la-For\xEAt", branch: "CR" },
+    { n: "Chantilly - Gouvieux", branch: "CR" },
+    { n: "Creil", branch: "CR" },
+    // Branche Nord Goussainville — terminus en dernier
+    { n: "La Borne Blanche", branch: "GO" },
+    { n: "Survilliers - Fosses", branch: "GO" },
+    { n: "Louvres", branch: "GO" },
+    { n: "Les Noues", branch: "GO" },
+    { n: "Goussainville", branch: "GO" },
+    { n: "Villiers-le-Bel - Gonesse - Arnouville", branch: "GO" },
+    { n: "Garges - Sarcelles", c: ["T5"], branch: "GO" },
+    { n: "Pierrefitte - Stains", c: ["T11"], branch: "GO" },
+    // FOURCHE NORD
+    { n: "Saint-Denis", c: ["13", "T1", "T5", "T8"], fork: true },
+    // Tronc commun
+    { n: "Stade de France - Saint-Denis" },
+    { n: "Gare du Nord", c: ["2", "4", "5", "B", "E"] },
+    { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "A", "B"] },
+    { n: "Paris - Gare de Lyon", c: ["1", "14", "A"] },
+    // FOURCHE SUD
+    { n: "Maisons-Alfort - Alfortville", fork: true },
+    // Tronc commun Sud
+    { n: "Le Vert de Maisons" },
+    { n: "Cr\xE9teil - Pompadour" },
+    { n: "Villeneuve - Triage" },
+    { n: "Villeneuve - Saint-Georges" },
+    { n: "Montgeron - Crosne" },
+    { n: "Yerres" },
+    { n: "Brunoy" },
+    { n: "Boussy - Saint-Antoine" },
+    { n: "Combs-la-Ville - Quincy" },
+    { n: "Lieusaint - Moissy" },
+    { n: "Savigny-le-Temple - Nandy" },
+    { n: "Cesson" },
+    { n: "Le M\xE9e-sur-Seine" },
+    // Branche Melun (ME) — terminus en dernier
+    { n: "Melun", branch: "ME" },
+    // Branche Corbeil (CO) — depuis Vigneux, terminus en dernier
+    { n: "Vigneux-sur-Seine", branch: "CO" },
+    { n: "Viry-Ch\xE2tillon", branch: "CO" },
+    { n: "Juvisy", c: ["C"], branch: "CO" },
+    { n: "Ris-Orangis", branch: "CO" },
+    { n: "Grand Bourg", branch: "CO" },
+    { n: "\xC9vry - Val de Seine", branch: "CO" },
+    { n: "Corbeil-Essonnes", branch: "CO" },
+    { n: "Essonnes - Robinson", branch: "CO" },
+    { n: "Villab\xE9", branch: "CO" },
+    { n: "Le Plessis-Chenet", branch: "CO" },
+    { n: "Le Coudray - Montceaux", branch: "CO" },
+    { n: "Saint-Fargeau", branch: "CO" },
+    { n: "Ponthierry - Pringy", branch: "CO" },
+    { n: "Boissise-le-Roi", branch: "CO" },
+    { n: "Vosves", branch: "CO" },
+    // Sous-branche Évry Centre (EC) — terminus en dernier
+    { n: "Grigny Centre", branch: "EC" },
+    { n: "Orangis - Bois de l'\xC9pine", branch: "EC" },
+    { n: "\xC9vry - Courcouronnes", c: ["T12"], branch: "EC" },
+    { n: "Le Bras de Fer - \xC9vry G\xE9nopole", branch: "EC" },
+    // Branche Malesherbes (MA) — terminus en dernier
+    { n: "Moulin Galant", branch: "MA" },
+    { n: "Mennecy", branch: "MA" },
+    { n: "Ballancourt", branch: "MA" },
+    { n: "La Fert\xE9-Alais", branch: "MA" },
+    { n: "Boutigny", branch: "MA" },
+    { n: "Maisse", branch: "MA" },
+    { n: "Buno - Gironville", branch: "MA" },
+    { n: "Boigneville", branch: "MA" },
+    { n: "Malesherbes", branch: "MA" }
+  ],
+  "E": [
+    // Terminus Ouest
+    { n: "Nanterre - La Folie", c: ["A"] },
+    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"] },
+    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"] },
+    // Tronc commun
+    { n: "Haussmann - Saint-Lazare", c: ["3", "9", "12", "13", "14"], walk: ["A"] },
+    { n: "Magenta - Gare du Nord", c: ["2", "4", "5", "B", "D"] },
+    { n: "Rosa Parks", c: ["T3b"] },
+    { n: "Pantin", c: ["T1", "T3b"] },
+    // FOURCHE EST
+    { n: "Noisy-le-Sec", c: ["T1"], fork: true },
+    // Branche Chelles (CH) — terminus en dernier
+    { n: "Bondy", c: ["T4"], branch: "CH" },
+    { n: "Le Raincy - Villemomble - Montfermeil", branch: "CH" },
+    { n: "Gagny", branch: "CH" },
+    { n: "Le Ch\xE9nay - Gagny", branch: "CH" },
+    { n: "Chelles - Gournay", branch: "CH" },
+    // Branche Tournan (TO) — terminus en dernier
+    { n: "Rosny - Bois-Perrier", c: ["11"], branch: "TO" },
+    { n: "Rosny - sous-Bois", branch: "TO" },
+    { n: "Val de Fontenay", c: ["A"], branch: "TO" },
+    { n: "Nogent - Le Perreux", branch: "TO" },
+    { n: "Les Boullereaux - Champigny", branch: "TO" },
+    { n: "Villiers-sur-Marne - Le Plessis-Tr\xE9vise", branch: "TO" },
+    { n: "Les Yvris - Noisy-le-Grand", branch: "TO" },
+    { n: "\xC9merainville - Pontault-Combault", branch: "TO" },
+    { n: "Roissy-en-Brie", branch: "TO" },
+    { n: "Ozoir-la-Ferri\xE8re", branch: "TO" },
+    { n: "Gretz - Armainvilliers", branch: "TO" },
+    { n: "Tournan-en-Brie", branch: "TO" }
+  ],
+  "T1": [
+    { n: "Asni\xE8res - Quatre Routes", c: ["13"] },
+    { n: "Les Courtilles" },
+    { n: "Le Luth" },
+    { n: "Le Village" },
+    { n: "Timbaud" },
+    { n: "Gare de Gennevilliers", c: ["C"] },
+    { n: "Parc des Chanteraines" },
+    { n: "Chemin des Reniers" },
+    { n: "La Noue" },
+    { n: "Mairie de Villeneuve-la-Garenne" },
+    { n: "L'\xCEle Saint-Denis" },
+    { n: "Gare de Saint-Denis", c: ["D", "T8"] },
+    { n: "Th\xE9\xE2tre G\xE9rard Philipe", c: ["T5"] },
+    { n: "March\xE9 de Saint-Denis", c: ["13", "T5"] },
+    { n: "Basilique de Saint-Denis" },
+    { n: "Cimeti\xE8re de Saint-Denis" },
+    { n: "H\xF4pital Delafontaine" },
+    { n: "Cosmonautes" },
+    { n: "La Courneuve - Six Routes" },
+    { n: "H\xF4tel de Ville de La Courneuve" },
+    { n: "Stade G\xE9o Andr\xE9" },
+    { n: "Danton" },
+    { n: "La Courneuve - 8 Mai 1945", c: ["7"] },
+    { n: "Maurice Lach\xE2tre" },
+    { n: "Drancy - Avenir" },
+    { n: "H\xF4pital Avicenne" },
+    { n: "Gaston Roulaud" },
+    { n: "Escadrille" },
+    { n: "Normandie-Ni\xE9men" },
+    { n: "La Ferme" },
+    { n: "Lib\xE9ration" },
+    { n: "H\xF4tel de Ville de Bobigny", c: ["5"] },
+    { n: "Bobigny - Pablo Picasso", c: ["5", "T1"] },
+    { n: "Auguste Delaune" },
+    { n: "Pont de Bondy" },
+    { n: "Petit Noisy" },
+    { n: "Gare de Noisy-le-Sec", c: ["E"] }
+  ],
+  "T2": [
+    { n: "Pont de Bezons" },
+    { n: "Parc Pierre Lagrav\xE8re" },
+    { n: "Victor Basch" },
+    { n: "Jacqueline Auriol" },
+    { n: "Charlebourg", c: ["1"] },
+    { n: "Les Fauvelles" },
+    { n: "Faubourg de l'Arche" },
+    { n: "La D\xE9fense - Grande Arche", c: ["A", "E", "1"] },
+    { n: "Puteaux" },
+    { n: "Belv\xE9d\xE8re" },
+    { n: "Suresnes - Longchamp" },
+    { n: "Les Coteaux" },
+    { n: "Les Milons", c: ["10"] },
+    { n: "Parc de Saint-Cloud", c: ["9"] },
+    { n: "Mus\xE9e de S\xE8vres" },
+    { n: "Brimborion" },
+    { n: "Meudon-sur-Seine" },
+    { n: "Les Moulineaux" },
+    { n: "Jacques-Henri Lartigue" },
+    { n: "Issy - Val de Seine", c: ["C"] },
+    { n: "Henri Farman", c: ["8", "T3a"] },
+    { n: "Suzanne Lenglen" },
+    { n: "Porte d'Issy", c: ["12", "T3a"] },
+    { n: "Porte de Versailles", c: ["12"] }
+  ],
+  "T3a": [
+    { n: "Pont du Garigliano", c: ["C", "8", "T2"] },
+    { n: "Balard", c: ["8", "T2"] },
+    { n: "Desnouettes" },
+    { n: "Porte de Versailles", c: ["12", "T2"] },
+    { n: "Georges Brassens" },
+    { n: "Brancion" },
+    { n: "Porte de Vanves", c: ["13"] },
+    { n: "Didot" },
+    { n: "Jean Moulin" },
+    { n: "Porte d'Orl\xE9ans", c: ["4"] },
+    { n: "Montsouris" },
+    { n: "Cit\xE9 Universitaire", c: ["B"] },
+    { n: "Stade Charl\xE9ty" },
+    { n: "Poterne des Peupliers", c: ["7", "14", "T9"] },
+    { n: "Porte d'Italie", c: ["7", "T9"] },
+    { n: "Porte de Choisy", c: ["7"] },
+    { n: "Porte d'Ivry", c: ["7"] },
+    { n: "Maryse Basti\xE9", c: ["C", "4"] },
+    { n: "Avenue de France", c: ["8"] },
+    { n: "Baron Le Roy", c: ["8"] },
+    { n: "Porte de Charenton", c: ["8"] },
+    { n: "Porte Dor\xE9e", c: ["8"] },
+    { n: "Montempoivre" },
+    { n: "Alexandra David-N\xE9el" },
+    { n: "Porte de Vincennes", c: ["1", "T3b"] }
+  ],
+  "T3b": [
+    { n: "Porte de Vincennes", c: ["1", "T3a"] },
+    { n: "Porte de Montreuil", c: ["9"] },
+    { n: "Marie de Miribel" },
+    { n: "Porte de Bagnolet", c: ["3"] },
+    { n: "S\xE9verine" },
+    { n: "Adrienne Bolland" },
+    { n: "Porte des Lilas", c: ["3bis", "11"] },
+    { n: "H\xF4pital Robert Debr\xE9" },
+    { n: "Butte du Chapeau Rouge" },
+    { n: "Porte de Pantin", walk: ["E"] },
+    { n: "Delphine Seyrig", c: ["7"] },
+    { n: "Ella Fitzgerald" },
+    { n: "Porte de la Villette", c: ["7"] },
+    { n: "Canal Saint-Denis" },
+    { n: "Rosa Parks", c: ["E"] },
+    { n: "Porte d'Aubervilliers" },
+    { n: "Colette Besson" },
+    { n: "Porte de la Chapelle", c: ["4", "12"] },
+    { n: "Diane Arbus" },
+    { n: "Porte de Clignancourt", c: ["4"] },
+    { n: "Ang\xE9lique Compoint" },
+    { n: "Porte de Saint-Ouen", c: ["C", "13"] },
+    { n: "\xC9pinettes - Pouchet" },
+    { n: "Honor\xE9 de Balzac" },
+    { n: "Porte de Clichy", c: ["C", "13", "14"] },
+    { n: "Marguerite Long" },
+    { n: "Square Sainte-Odile", c: ["3"] },
+    { n: "Porte de Champerret", c: ["3"] },
+    { n: "Th\xE9r\xE8se Pierre" },
+    { n: "Anny Flore" },
+    { n: "Porte Maillot", c: ["C", "E", "1"] },
+    { n: "Anna de Noailles" },
+    { n: "Porte Dauphine", c: ["2"] }
+  ],
+  "T4": [
+    // Terminus Bondy
+    { n: "Bondy", c: ["E"] },
+    { n: "La Remise \xE0 Jorelle" },
+    { n: "Les Coquetiers" },
+    { n: "All\xE9e de la Tour-Rendez-vous" },
+    { n: "Les Pavillons-sous-Bois" },
+    // FOURCHE
+    { n: "Gargan", fork: true },
+    { n: "Gargan", branch: "A" },
+    { n: "Gargan", branch: "M" },
+    // Branche Aulnay (A) — terminus en dernier
+    { n: "Lyc\xE9e Henri Sellier", branch: "A" },
+    { n: "L'Abbaye", branch: "A" },
+    { n: "Freinville - Sevran", branch: "A" },
+    { n: "Rougemont - Chanteloup", branch: "A" },
+    { n: "Aulnay-sous-Bois", c: ["B"], branch: "A" },
+    // Branche Montfermeil (M) — terminus en dernier
+    { n: "R\xE9publique - Marx Dormoy", branch: "M" },
+    { n: "L\xE9on Blum", branch: "M" },
+    { n: "Maurice Audin", branch: "M" },
+    { n: "Clichy-sous-Bois - Mairie", branch: "M" },
+    { n: "Romain Rolland", branch: "M" },
+    { n: "Clichy - Montfermeil", branch: "M" },
+    { n: "Notre-Dame-des-Anges", branch: "M" },
+    { n: "Arboretum", branch: "M" },
+    { n: "H\xF4pital de Montfermeil", branch: "M" }
+  ],
+  "T5": [
+    { n: "March\xE9 de Saint-Denis", c: ["13", "T1"] },
+    { n: "Baudelaire" },
+    { n: "Roger S\xE9mat" },
+    { n: "Guynemer", c: ["13"] },
+    { n: "Petit Pierrefitte" },
+    { n: "Joncherolles" },
+    { n: "Suzanne Valadon" },
+    { n: "Mairie de Pierrefitte" },
+    { n: "Alcide d'Orbigny" },
+    { n: "Jacques Pr\xE9vert" },
+    { n: "Butte Pinson" },
+    { n: "Les Cholettes" },
+    { n: "Les Flanades" },
+    { n: "Paul Val\xE9ry" },
+    { n: "Loch\xE8res" },
+    { n: "Garges - Sarcelles", c: ["D"] }
+  ],
+  "T6": [
+    { n: "Viroflay - Rive Droite" },
+    { n: "Viroflay - Rive Gauche", c: ["C"] },
+    { n: "Robert Wagner" },
+    { n: "L'Onde" },
+    { n: "Mairie de V\xE9lizy" },
+    { n: "Louvois" },
+    { n: "Inovel Parc Nord" },
+    { n: "Dewoitine" },
+    { n: "V\xE9lizy 2" },
+    { n: "Meudon-la-For\xEAt" },
+    { n: "Georges Millandy" },
+    { n: "Georges Pompidou" },
+    { n: "Pav\xE9 Blanc" },
+    { n: "Mail de la Plaine" },
+    { n: "H\xF4pital B\xE9cl\xE8re", c: ["T10"] },
+    { n: "Soleil Levant" },
+    { n: "Division Leclerc" },
+    { n: "Parc Andr\xE9 Malraux" },
+    { n: "Centre de Ch\xE2tillon" },
+    { n: "Vauban" },
+    { n: "Ch\xE2tillon - Montrouge", c: ["13"] }
+  ],
+  "T7": [
+    { n: "Villejuif - Louis Aragon", c: ["7"] },
+    { n: "Lamartine" },
+    { n: "Domaine Ch\xE9rioux" },
+    { n: "Moulin Vert" },
+    { n: "Bretagne" },
+    { n: "Auguste Perret" },
+    { n: "Chevilly-Larue", c: ["14"] },
+    { n: "La Belle \xC9pine" },
+    { n: "Place de la Logistique" },
+    { n: "Porte de Rungis" },
+    { n: "Saarinen" },
+    { n: "Robert Schuman", c: ["C"] },
+    { n: "La Fraternelle" },
+    { n: "H\xE9l\xE8ne Boucher" },
+    { n: "Caroline Aigle" },
+    { n: "C\u0153ur d'Orly" },
+    { n: "A\xE9roport d'Orly", c: ["14"] },
+    { n: "Porte de l'Essonne" }
+  ],
+  "T8": [
+    { n: "\xC9pinay - Orgemont" },
+    { n: "\xC9pinay-sur-Seine - Gare", c: ["C", "T11"] },
+    { n: "Gilbert Bonnemaison" },
+    { n: "Lac\xE9p\xE8de" },
+    { n: "Rose Bertin" },
+    { n: "Les B\xE9atus" },
+    { n: "Les Mobiles" },
+    { n: "Blumenthal", c: ["T11"] },
+    { n: "Villetaneuse Universit\xE9", c: ["T11"] },
+    { n: "Pablo Neruda" },
+    { n: "Jean Vilar" },
+    { n: "C\xE9sar" },
+    { n: "Delaunay-Belleville" },
+    { n: "Paul \xC9luard" },
+    { n: "Saint-Denis - Gare", c: ["D", "T1"] },
+    { n: "Pierre De Geyter" },
+    { n: "Saint-Denis - Porte de Paris", c: ["13"] }
+  ],
+  "T9": [
+    { n: "Porte de Choisy", c: ["T3a", "7"] },
+    { n: "Ch\xE2teaudun - Barb\xE8s" },
+    { n: "Cimeti\xE8re Parisien d'Ivry" },
+    { n: "La Briqueterie" },
+    { n: "Germaine Tailleferre" },
+    { n: "Beethoven - Concorde" },
+    { n: "Mus\xE9e MAC VAL" },
+    { n: "Mairie de Vitry-sur-Seine" },
+    { n: "Camille Groult" },
+    { n: "Constant Coquelin" },
+    { n: "Watteau - Rondenay" },
+    { n: "Trois Communes" },
+    { n: "Verdun - Hoche", c: ["C"] },
+    { n: "Rouget de Lisle" },
+    { n: "Carle - Darth\xE9" },
+    { n: "Four - Peary", c: ["C"] },
+    { n: "Christophe Colomb" },
+    { n: "Les Saules" },
+    { n: "Orly - Gaston Viens", c: ["C"] }
+  ],
+  "T10": [
+    { n: "Jardin Parisien" },
+    { n: "H\xF4pital B\xE9cl\xE8re", c: ["T6"] },
+    { n: "Le Hameau" },
+    { n: "Parc des Sports" },
+    { n: "Noveos" },
+    { n: "Malabry" },
+    { n: "Vall\xE9e aux Loups" },
+    { n: "Cit\xE9-Jardin" },
+    { n: "Les Peintres" },
+    { n: "Th\xE9\xE2tre La Piscine" },
+    { n: "Petit-Ch\xE2tenay" },
+    { n: "La Vall\xE9e" },
+    { n: "La Croix de Berny", c: ["B"] }
+  ],
+  "T11": [
+    { n: "\xC9pinay-sur-Seine", c: ["C", "T8"] },
+    { n: "\xC9pinay - Villetaneuse Montmagny" },
+    { n: "Villetaneuse Universit\xE9", c: ["T8"] },
+    { n: "Pierrefitte - Stains", c: ["D"] },
+    { n: "Stains - La Cerisaie" },
+    { n: "Dugny La Courneuve - Parc Georges Valbon" },
+    { n: "Le Bourget", c: ["B"] }
+  ],
+  "T12": [
+    { n: "Massy - Palaiseau", c: ["B", "C"] },
+    { n: "Massy Europe" },
+    { n: "Champlan" },
+    { n: "Longjumeau" },
+    { n: "Chilly - Mazarin" },
+    { n: "Gravigny - Balizy" },
+    { n: "Petit Vaux" },
+    { n: "\xC9pinay-sur-Orge", c: ["C"] },
+    { n: "Parc du Ch\xE2teau" },
+    { n: "Coteaux de l'Orge" },
+    { n: "Am\xE9d\xE9e Gordini" },
+    { n: "Ferme Neuve" },
+    { n: "Bois de Saint-Eutrope" },
+    { n: "Trait\xE9 de Rome" },
+    { n: "Bois Briard" },
+    { n: "\xC9vry - Courcouronnes", c: ["D"] }
+  ],
+  "T13": [
+    { n: "Saint-Germain-en-Laye", c: ["A"] },
+    { n: "Camp des Loges" },
+    { n: "Lisi\xE8re Pereire" },
+    { n: "Fourqueux - Bel Air" },
+    { n: "Mareil-Marly" },
+    { n: "L'\xC9tang - Les Sablons" },
+    { n: "Saint-Nom-la-Bret\xE8che - For\xEAt de Marly" },
+    { n: "Noisy-le-Roi" },
+    { n: "Bailly" },
+    { n: "All\xE9e Royale" },
+    { n: "Les Portes de Saint-Cyr" },
+    { n: "Saint-Cyr", c: ["C"] }
+  ],
+  "T14": [
+    { n: "Esbly" },
+    { n: "Montry - Cond\xE9" },
+    { n: "Couilly - Saint-Germain - Quincy" },
+    { n: "Villiers Montbarbin" },
+    { n: "Cr\xE9cy-la-Chapelle" }
+  ]
+};
+const TRAIN_DATA = {
+  "E::Haussmann - Saint-Lazare": {
+    voitures: 8,
+    direction: "Est",
+    groups: [
+      {
+        voitures: [3, 4, 5],
+        type: "sortie",
+        sorties: [
+          { num: "31", label: "\u2192 Tournan / Villiers-sur-Marne" },
+          { num: "33", label: "\u2192 Chelles - Gournay" }
+        ],
+        pictos: ["escalator"],
+        corr: []
+      },
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [
+          { num: "32", label: "\u2192 Nanterre" },
+          { num: "34", label: "\u2192 Nanterre" }
+        ],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "E::Magenta - Gare du Nord": {
+    voitures: 8,
+    direction: "Est",
+    groups: [
+      {
+        voitures: [3, 4, 5],
+        type: "sortie",
+        sorties: [
+          { num: "51", label: "\u2192 Chelles / Villiers" },
+          { num: "53", label: "\u2192 Chelles / Villiers" }
+        ],
+        pictos: ["escalator"],
+        corr: []
+      },
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [
+          { num: "52", label: "\u2192 Nanterre / Haussmann" },
+          { num: "54", label: "\u2192 Nanterre / Haussmann" }
+        ],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // T13 — Citadis Dualis, 2 caisses
+  "T13::Saint-Germain-en-Laye": {
+    voitures: 2,
+    direction: "Saint-Cyr",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "RER A / Gare de Saint-Germain" }],
+        pictos: ["escalator"],
+        corr: ["A"]
+      }
+    ]
+  },
+  "T13::Saint-Cyr": {
+    voitures: 2,
+    direction: "Saint-Germain-en-Laye",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "RER C / Transilien N \xB7 U" }],
+        pictos: ["escalator"],
+        corr: ["C", "N", "U"]
+      }
+    ]
+  },
+  "T13::Saint-Nom-la-Bret\xE8che - For\xEAt de Marly": {
+    voitures: 2,
+    direction: "Saint-Germain-en-Laye",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Transilien L" }],
+        pictos: [],
+        corr: ["L"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // T14 — tram-train, 2 caisses
+  "T14::Esbly": {
+    voitures: 2,
+    direction: "Cr\xE9cy-la-Chapelle",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "RER P / Gare d'Esbly" }],
+        pictos: ["escalator"],
+        corr: ["P"]
+      }
+    ]
+  },
+  "T14::Cr\xE9cy-la-Chapelle": {
+    voitures: 2,
+    direction: "Esbly",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Centre-ville / Bus 8A \xB7 8B" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // C1 — Câble téléphérique (1 cabine)
+  "C1::Villeneuve-Saint-Georges - Villa Nova": {
+    voitures: 1,
+    direction: "Cr\xE9teil - Pointe du Lac",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Villeneuve-Saint-Georges / Bus 427" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "C1::La V\xE9g\xE9tale - La Fontaine Saint-Martin": {
+    voitures: 1,
+    direction: "Cr\xE9teil - Pointe du Lac",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "La Fontaine Saint-Martin / Bus 429 \xB7 430 \xB7 4120" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "C1::Valenton - Le Ch\xE2teau": {
+    voitures: 1,
+    direction: "Cr\xE9teil - Pointe du Lac",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Le Ch\xE2teau / Bus 427 \xB7 428" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "C1::Limeil-Br\xE9vannes - Plage Bleue": {
+    voitures: 1,
+    direction: "Cr\xE9teil - Pointe du Lac",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Plage Bleue / Bus 430" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "C1::Cr\xE9teil - Pointe du Lac": {
+    voitures: 1,
+    direction: "Villeneuve-Saint-Georges - Villa Nova",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Cr\xE9teil Pointe du Lac / Bus 423 \xB7 428 \xB7 393 \xB7 117" }],
+        pictos: [],
+        corr: ["8"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  "13::Gare de Lyon (via ligne 13)": {
+    voitures: 10,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      { voitures: [1, 2], type: "corr", sorties: [], pictos: ["escalator"], corr: ["1", "14"] },
+      { voitures: [4, 5], type: "corr", sorties: [], pictos: ["escalator"], corr: ["A"] },
+      { voitures: [7, 8], type: "corr", sorties: [], pictos: [], corr: ["1", "14"] },
+      { voitures: [9], type: "corr", sorties: [], pictos: ["escalator"], corr: ["A"] },
+      { voitures: [10], type: "corr", sorties: [], pictos: [], corr: ["1", "14"] }
+    ]
+  },
+  "13::Saint-Lazare": {
+    voitures: 5,
+    direction: "Asni\xE8res / Saint-Denis",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "2", label: "pl. du Havre" }, { num: "3", label: "passage du Havre" }, { num: "5", label: "r. Int\xE9rieure" }, { num: "8", label: "r. d'Amsterdam" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["12"]
+      },
+      { voitures: [3], type: "corr", sorties: [], pictos: ["escalier"], corr: ["E"] },
+      {
+        voitures: [5],
+        type: "sortie",
+        sorties: [{ num: "1", label: "cour de Rome" }, { num: "6", label: "pl. Gabriel P\xE9ri" }],
+        pictos: ["escalier", "pmr"],
+        corr: ["3", "9", "14"]
+      }
+    ]
+  },
+  "13::Montparnasse - Bienven\xFCe": {
+    voitures: 5,
+    direction: "Asni\xE8res / Saint-Denis",
+    groups: [
+      {
+        voitures: [5],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Porte Oc\xE9ane" }, { num: "2", label: "pl. Bienven\xFCe" }, { num: "4", label: "Tour Montparnasse" }, { num: "5", label: "bd du Montparnasse" }, { num: "6", label: "r. d'Odessa" }, { num: "7", label: "r. du D\xE9part" }, { num: "8", label: "r. de Rennes" }],
+        pictos: ["escalator", "ascenseur", "pmr"],
+        corr: ["4", "6", "12"]
+      }
+    ]
+  },
+  "13::Carrefour Pleyel": {
+    voitures: 5,
+    direction: "Saint-Denis Universit\xE9",
+    groups: [
+      {
+        voitures: [1],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Noctilien / Bus" }, { num: "2", label: "Carrefour Pleyel" }],
+        pictos: ["escalier", "noctilien", "bus"],
+        corr: []
+      }
+    ]
+  },
+  "13::Invalides": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd de la Tour-Maubourg" }, { num: "2", label: "pl. des Invalides" }],
+        pictos: ["escalator"],
+        corr: ["8", "C"]
+      }
+    ]
+  },
+  "13::Champs-\xC9lys\xE9es - Clemenceau": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3, 4],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. des Champs-\xC9lys\xE9es" }, { num: "2", label: "av. de Marigny" }, { num: "3", label: "av. Winston Churchill" }],
+        pictos: ["escalator"],
+        corr: ["1"]
+      }
+    ]
+  },
+  "13::Miromesnil": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. de Miromesnil" }, { num: "2", label: "r. de la Bienfaisance" }],
+        pictos: [],
+        corr: ["9"]
+      }
+    ]
+  },
+  "13::Varenne": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd des Invalides" }, { num: "2", label: "r. de Varenne" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "13::Saint-Fran\xE7ois-Xavier": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd des Invalides" }, { num: "2", label: "r. Duroc" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "13::Duroc": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd du Montparnasse" }, { num: "2", label: "r. de S\xE8vres" }],
+        pictos: [],
+        corr: ["10"]
+      }
+    ]
+  },
+  "13::Ga\xEEt\xE9": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. de la Ga\xEEt\xE9" }, { num: "2", label: "av. du Maine" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "13::Pernety": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. Raymond Losserand" }, { num: "2", label: "r. Pernety" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "13::Plaisance": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. Raymond Losserand" }, { num: "2", label: "r. de Plaisance" }],
+        pictos: [],
+        corr: []
+      }
+    ]
+  },
+  "13::Porte de Vanves": {
+    voitures: 5,
+    direction: "Ch\xE2tillon - Montrouge",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. Marc Sangnier" }, { num: "2", label: "av. Georges Lafenestre" }],
+        pictos: ["bus"],
+        corr: ["T3a"]
+      }
+    ]
+  },
+  "13::Ch\xE2tillon - Montrouge": {
+    voitures: 5,
+    direction: "terminus",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. de la R\xE9publique" }, { num: "2", label: "r. de la R\xE9volution" }],
+        pictos: ["bus"],
+        corr: ["T6"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 1
+  // ══════════════════════════════════════════════════════════
+  "1::Ch\xE2telet": {
+    voitures: 5,
+    direction: "Ch\xE2teau de Vincennes",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "11", label: "r. de Rivoli" }, { num: "14", label: "r. Saint-Denis" }, { num: "15", label: "Th\xE9\xE2tre du Ch\xE2telet" }, { num: "16", label: "pl. du Ch\xE2telet" }, { num: "17", label: "Th\xE9\xE2tre de la Ville" }, { num: "18", label: "av. Victoria" }, { num: "19", label: "r. Saint-Martin" }],
+        pictos: ["escalator"],
+        corr: ["4", "7", "11", "14", "A", "B", "D"]
+      }
+    ]
+  },
+  "1::Gare de Lyon": {
+    voitures: 5,
+    direction: "Ch\xE2teau de Vincennes",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd Diderot" }, { num: "13", label: "r. Van Gogh / r. de Bercy" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["14", "A", "D"]
+      }
+    ]
+  },
+  "1::Nation": {
+    voitures: 5,
+    direction: "Ch\xE2teau de Vincennes",
+    groups: [
+      {
+        voitures: [1, 2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. du Tr\xF4ne" }, { num: "2", label: "av. Dorian" }, { num: "3", label: "bd Diderot" }, { num: "4", label: "bd Voltaire" }, { num: "5", label: "av. de Taillebourg" }, { num: "6", label: "av. du Bel-Air" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["2", "6", "9", "A"]
+      }
+    ]
+  },
+  "1::Saint-Lazare": {
+    voitures: 5,
+    direction: "La D\xE9fense",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "cour de Rome" }, { num: "2", label: "pl. du Havre" }, { num: "3", label: "passage du Havre" }, { num: "4", label: "galerie des Marchands" }, { num: "5", label: "r. Int\xE9rieure" }, { num: "6", label: "pl. Gabriel P\xE9ri" }, { num: "7", label: "r. de l'Arcade" }, { num: "8", label: "r. d'Amsterdam" }, { num: "9", label: "cour du Havre" }, { num: "10", label: "r. de Caumartin" }, { num: "11", label: "r. Saint-Lazare" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["3", "9", "12", "13", "14", "A", "E"]
+      }
+    ]
+  },
+  "1::Bastille": {
+    voitures: 5,
+    direction: "Ch\xE2teau de Vincennes",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. de la Roquette" }, { num: "2", label: "r. du Fg Saint-Antoine" }, { num: "3", label: "Op\xE9ra Bastille" }, { num: "4", label: "r. de Lyon" }, { num: "5", label: "bd Bourdon" }, { num: "6", label: "bd Henri IV" }, { num: "7", label: "pl. de la Bastille" }, { num: "8", label: "bd Beaumarchais" }, { num: "9", label: "bd Richard Lenoir" }],
+        pictos: ["escalator"],
+        corr: ["5", "8"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 4
+  // ══════════════════════════════════════════════════════════
+  "4::Gare du Nord": {
+    voitures: 6,
+    direction: "Bagneux",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "r. du Fg Saint-Denis" }, { num: "2", label: "r. de Saint-Quentin" }, { num: "3", label: "r. de Dunkerque" }, { num: "4", label: "bd de Denain" }, { num: "5", label: "Gare routi\xE8re" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["5", "B", "D", "E"]
+      }
+    ]
+  },
+  "4::Ch\xE2telet": {
+    voitures: 6,
+    direction: "Bagneux",
+    groups: [
+      {
+        voitures: [2, 3, 4],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Porte Marguerite de Navarre" }, { num: "2", label: "Porte Berger Forum" }, { num: "3", label: "Porte Lescot Forum" }, { num: "4", label: "Porte Rambuteau Forum" }, { num: "9", label: "r. Montorgueil" }, { num: "10", label: "pl. Sainte-Opportune" }, { num: "11", label: "r. de Rivoli" }, { num: "16", label: "pl. du Ch\xE2telet" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "7", "11", "14", "A", "B", "D"]
+      }
+    ]
+  },
+  "4::Montparnasse - Bienven\xFCe": {
+    voitures: 6,
+    direction: "Bagneux",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Porte Oc\xE9ane" }, { num: "2", label: "pl. Bienven\xFCe" }, { num: "4", label: "Tour Montparnasse" }, { num: "5", label: "bd du Montparnasse" }, { num: "7", label: "r. du D\xE9part" }, { num: "8", label: "r. de Rennes" }],
+        pictos: ["escalator", "ascenseur", "pmr"],
+        corr: ["6", "12", "13"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 14
+  // ══════════════════════════════════════════════════════════
+  "14::Saint-Lazare": {
+    voitures: 8,
+    direction: "A\xE9roport d'Orly",
+    groups: [
+      {
+        voitures: [3, 4],
+        type: "sortie",
+        sorties: [{ num: "1", label: "cour de Rome" }, { num: "2", label: "pl. du Havre" }, { num: "9", label: "cour du Havre" }, { num: "10", label: "r. de Caumartin" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["3", "9", "12", "13", "A", "E"]
+      }
+    ]
+  },
+  "14::Gare de Lyon": {
+    voitures: 8,
+    direction: "A\xE9roport d'Orly",
+    groups: [
+      {
+        voitures: [4, 5],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd Diderot" }, { num: "2", label: "r. de Bercy / Maison RATP" }, { num: "13", label: "r. Van Gogh" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "A", "D"]
+      }
+    ]
+  },
+  "14::Ch\xE2telet": {
+    voitures: 8,
+    direction: "A\xE9roport d'Orly",
+    groups: [
+      {
+        voitures: [3, 4, 5],
+        type: "sortie",
+        sorties: [{ num: "15", label: "Th\xE9\xE2tre du Ch\xE2telet" }, { num: "16", label: "pl. du Ch\xE2telet" }, { num: "18", label: "av. Victoria" }, { num: "19", label: "r. Saint-Martin" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "4", "7", "11", "A", "B", "D"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 3
+  // ══════════════════════════════════════════════════════════
+  "3::Saint-Lazare": {
+    voitures: 5,
+    direction: "Gallieni",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "cour de Rome" }, { num: "2", label: "pl. du Havre" }, { num: "3", label: "passage du Havre" }, { num: "8", label: "r. d'Amsterdam" }, { num: "10", label: "r. de Caumartin" }],
+        pictos: ["escalator"],
+        corr: ["9", "12", "13", "14", "A", "E"]
+      }
+    ]
+  },
+  "3::Op\xE9ra": {
+    voitures: 5,
+    direction: "Gallieni",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "pl. de l'Op\xE9ra" }, { num: "2", label: "r. de la Paix" }, { num: "3", label: "r. Scribe" }, { num: "4", label: "av. de l'Op\xE9ra" }],
+        pictos: ["escalator"],
+        corr: ["7", "8"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 9
+  // ══════════════════════════════════════════════════════════
+  "9::Nation": {
+    voitures: 5,
+    direction: "Mairie de Montreuil",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. du Tr\xF4ne" }, { num: "4", label: "bd Voltaire" }, { num: "5", label: "av. de Taillebourg" }],
+        pictos: ["escalator"],
+        corr: ["1", "2", "6", "A"]
+      }
+    ]
+  },
+  "9::Op\xE9ra": {
+    voitures: 5,
+    direction: "Mairie de Montreuil",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "pl. de l'Op\xE9ra" }, { num: "2", label: "r. de la Paix" }, { num: "3", label: "r. Scribe" }],
+        pictos: [],
+        corr: ["3", "7", "8"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNE 12
+  // ══════════════════════════════════════════════════════════
+  "12::Saint-Lazare": {
+    voitures: 5,
+    direction: "Mairie d'Aubervilliers",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "cour de Rome" }, { num: "2", label: "pl. du Havre" }, { num: "7", label: "r. de l'Arcade" }, { num: "8", label: "r. d'Amsterdam" }, { num: "11", label: "r. Saint-Lazare" }],
+        pictos: ["escalator"],
+        corr: ["3", "9", "13", "14", "A", "E"]
+      }
+    ]
+  },
+  "12::Montparnasse - Bienven\xFCe": {
+    voitures: 5,
+    direction: "Mairie d'Aubervilliers",
+    groups: [
+      {
+        voitures: [2, 3],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Porte Oc\xE9ane" }, { num: "5", label: "bd du Montparnasse" }, { num: "6", label: "r. d'Odessa" }, { num: "7", label: "r. du D\xE9part" }],
+        pictos: ["escalator"],
+        corr: ["4", "6", "13"]
+      }
+    ]
+  },
+  // ══════════════════════════════════════════════════════════
+  // LIGNES RER A
+  // ══════════════════════════════════════════════════════════
+  "A::Ch\xE2telet - Les Halles": {
+    voitures: 10,
+    direction: "Marne-la-Vall\xE9e / Boissy",
+    groups: [
+      {
+        voitures: [1, 2],
+        type: "sortie",
+        sorties: [{ num: "1", label: "Porte Marguerite de Navarre" }, { num: "3", label: "Porte Lescot" }, { num: "9", label: "r. Montorgueil" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "4", "7", "11", "14", "B", "D"]
+      },
+      {
+        voitures: [8, 9, 10],
+        type: "sortie",
+        sorties: [{ num: "11", label: "r. de Rivoli" }, { num: "16", label: "pl. du Ch\xE2telet" }, { num: "17", label: "Th\xE9\xE2tre de la Ville" }],
+        pictos: ["escalator"],
+        corr: []
+      }
+    ]
+  },
+  "A::Gare de Lyon": {
+    voitures: 10,
+    direction: "Marne-la-Vall\xE9e / Boissy",
+    groups: [
+      {
+        voitures: [4, 5, 6],
+        type: "sortie",
+        sorties: [{ num: "1", label: "bd Diderot" }, { num: "2", label: "r. de Bercy" }, { num: "13", label: "r. Van Gogh" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "14", "D"]
+      }
+    ]
+  },
+  "A::Nation": {
+    voitures: 10,
+    direction: "Marne-la-Vall\xE9e / Boissy",
+    groups: [
+      {
+        voitures: [3, 4, 5],
+        type: "sortie",
+        sorties: [{ num: "1", label: "av. du Tr\xF4ne" }, { num: "4", label: "bd Voltaire" }, { num: "5", label: "av. de Taillebourg" }, { num: "6", label: "av. du Bel-Air" }],
+        pictos: ["escalator", "ascenseur"],
+        corr: ["1", "2", "6", "9"]
+      }
+    ]
+  }
+};
+const ALL_LINES = [...METRO_LINES, ...RER_LINES, ...TRAM_LINES, ...CABLE_LINES];
+function getLine(id) {
+  return ALL_LINES.find((l) => l.id === id);
+}
+function getTransportType(id) {
+  if (METRO_LINES.find((l) => l.id === id)) return "metro";
+  if (RER_LINES.find((l) => l.id === id)) return "rer";
+  return "tram";
+}
+function Badge({ id, size = 32 }) {
+  const line = getLine(id);
+  if (!line) return null;
+  const isTram = !!TRAM_LINES.find((l) => l.id === id);
+  const isRER = !!RER_LINES.find((l) => l.id === id);
+  const isCable = !!CABLE_LINES.find((l) => l.id === id);
+  const fs = id.length >= 4 ? size * 0.3 : id.length === 3 ? size * 0.36 : size * 0.52;
+  const strokeColor = line.text === "#000" ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.9)";
+  const sw = Math.max(1.2, size * 0.065);
+  const makeStroke = (c, s) => `
+    -${s}px -${s}px 0 ${c}, ${s}px -${s}px 0 ${c},
+    -${s}px  ${s}px 0 ${c}, ${s}px  ${s}px 0 ${c},
+     ${s}px  0      0 ${c},-${s}px  0      0 ${c},
+     0       ${s}px 0 ${c}, 0      -${s}px  0 ${c}`;
+  const textStroke = makeStroke(strokeColor, sw);
+  function isLightColor(hex) {
+    const h = hex.replace("#", "");
+    const r = parseInt(h.substr(0, 2), 16);
+    const g = parseInt(h.substr(2, 2), 16);
+    const b = parseInt(h.substr(4, 2), 16);
+    return r * 0.299 + g * 0.587 + b * 0.114 > 160;
+  }
+  const badgeBorderColor = isLightColor(line.color) ? "rgba(0,0,0,0.55)" : "rgba(255,255,255,0.7)";
+  const badgeBorder = `1.5px solid ${badgeBorderColor}`;
+  if (isCable) {
+    return /* @__PURE__ */ React.createElement("span", { style: {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      width: size * 1.3,
+      height: size,
+      borderRadius: size * 0.18,
+      background: line.color,
+      color: "#fff",
+      fontWeight: 900,
+      fontSize: size * 0.42,
+      border: "1.5px solid rgba(255,255,255,0.7)",
+      flexShrink: 0,
+      boxSizing: "border-box",
+      boxShadow: "0 1px 4px rgba(0,0,0,0.22)",
+      textShadow: textStroke,
+      letterSpacing: 0
+    } }, "C1");
+  }
+  if (isTram) {
+    const tramSW = Math.max(1.2, size * 0.065);
+    const tramStroke = makeStroke("rgba(255,255,255,0.95)", tramSW);
+    return /* @__PURE__ */ React.createElement("span", { style: {
+      display: "inline-flex",
+      flexDirection: "column",
+      alignItems: "stretch",
+      width: size * 1.3,
+      height: size,
+      borderRadius: size * 0.18,
+      overflow: "hidden",
+      border: `1.5px solid rgba(0,0,0,0.45)`,
+      background: "#fff",
+      flexShrink: 0,
+      boxShadow: `0 0 0 1px ${line.color}55`
+    } }, /* @__PURE__ */ React.createElement("span", { style: { background: line.color, height: "22%", display: "block" } }), /* @__PURE__ */ React.createElement("span", { style: {
+      fontWeight: 900,
+      fontSize: size * 0.38,
+      color: "#111",
+      textAlign: "center",
+      lineHeight: 1,
+      flex: 1,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      textShadow: tramStroke
+    } }, line.id), /* @__PURE__ */ React.createElement("span", { style: { background: line.color, height: "22%", display: "block" } }));
+  }
+  return /* @__PURE__ */ React.createElement("span", { style: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: size,
+    height: size,
+    borderRadius: isRER ? "18%" : "50%",
+    background: line.color,
+    color: line.text,
+    fontWeight: 900,
+    fontSize: fs,
+    letterSpacing: -0.5,
+    flexShrink: 0,
+    border: badgeBorder,
+    boxSizing: "border-box",
+    textShadow: textStroke,
+    boxShadow: `0 1px 4px rgba(0,0,0,0.22)`
+  } }, line.id);
+}
+function Panel({ group, lineColor, zoomed, onToggle }) {
+  var _a, _b;
+  const isCorr = group.type === "corr";
+  const hasPictos = group.pictos && group.pictos.length > 0;
+  const hasCorr = group.corr && group.corr.length > 0;
+  const hasHeader = hasPictos || hasCorr;
+  const hasSorties = group.sorties.length > 0;
+  const count = group.sorties.length;
+  const fs = zoomed ? count > 5 ? 12 : 14 : count > 4 ? 10 : 12;
+  const maxW = zoomed ? 220 : 160;
+  const gap = zoomed ? 5 : 3;
+  const nPictos = ((_a = group.pictos) == null ? void 0 : _a.length) || 0;
+  const nCorr = ((_b = group.corr) == null ? void 0 : _b.length) || 0;
+  const isTramId = (id) => !!TRAM_LINES.find((l) => l.id === id);
+  function calcBadgeSize(startSize) {
+    for (let sz = startSize; sz >= 10; sz -= 1) {
+      const pW = nPictos * (sz + gap);
+      const cW = (group.corr || []).reduce((acc, id) => acc + (isTramId(id) ? sz * 1.8 : sz) + gap, 0);
+      if (pW + cW <= maxW) return sz;
+    }
+    return 12;
+  }
+  const badgeSize = calcBadgeSize(zoomed ? 28 : 22);
+  const pictoSize = Math.min(badgeSize, zoomed ? 24 : 18);
+  return /* @__PURE__ */ React.createElement("div", { onClick: onToggle, style: {
+    background: isCorr ? "rgba(255,255,255,0.06)" : "#111",
+    borderRadius: zoomed ? 10 : 6,
+    padding: zoomed ? "8px 11px" : "5px 7px",
+    // inline-flex pour que le panneau colle EXACTEMENT à son contenu
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    cursor: "pointer",
+    boxShadow: zoomed ? isCorr ? "2px 4px 16px rgba(245,124,0,0.5), -2px 0 10px rgba(245,124,0,0.25)" : "3px 4px 18px rgba(0,0,0,0.55), -2px 0 10px rgba(0,0,0,0.3)" : "none",
+    border: isCorr ? zoomed ? "4px solid #F57C00" : "3px solid #F57C00" : zoomed ? "2px solid rgba(255,255,255,0.75)" : "1.5px solid rgba(255,255,255,0.22)",
+    transition: "all 0.18s ease"
+  } }, hasCorr && /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    flexWrap: "nowrap",
+    alignItems: "center",
+    gap: zoomed ? 5 : 3,
+    marginBottom: hasSorties ? zoomed ? 6 : 3 : 0
+  } }, hasCorr && group.corr.map((c, i) => /* @__PURE__ */ React.createElement(Badge, { key: `c${i}`, id: c, size: badgeSize }))), hasSorties && !zoomed && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3, flexWrap: "nowrap" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 900, color: "#fff", marginRight: 1 } }, "Sortie"), hasPictos && group.pictos.map((p, i) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `ps${i}`, type: p, size: pictoSize })), group.sorties.map((s, i) => /* @__PURE__ */ React.createElement("span", { key: i, style: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 16,
+    height: 16,
+    background: "#FFD54F",
+    color: "#111",
+    borderRadius: 3,
+    fontWeight: 900,
+    fontSize: 9,
+    flexShrink: 0,
+    padding: "0 2px",
+    lineHeight: 1
+  } }, s.num))), hasSorties && zoomed && /* @__PURE__ */ React.createElement(React.Fragment, null, group.sorties.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: fs + 2, fontWeight: 900, color: "#FFD54F" } }, "Sortie"), hasPictos && group.pictos.map((p, j) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `pz${j}`, type: p, size: fs + 4 }))), /* @__PURE__ */ React.createElement("div", { style: {
+    height: 2,
+    background: "#FFD54F",
+    borderRadius: 2,
+    marginBottom: 5,
+    width: "100%",
+    alignSelf: "stretch"
+  } }), group.sorties.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    marginBottom: i < group.sorties.length - 1 ? 3 : 0
+  } }, /* @__PURE__ */ React.createElement("span", { style: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 19,
+    height: 19,
+    background: "#FFD54F",
+    color: "#111",
+    borderRadius: 3,
+    fontWeight: 900,
+    fontSize: 10,
+    flexShrink: 0,
+    padding: "0 2px",
+    lineHeight: 1
+  } }, s.num), /* @__PURE__ */ React.createElement("span", { style: {
+    fontSize: 14,
+    fontWeight: 800,
+    color: "#fff",
+    lineHeight: 1.3,
+    whiteSpace: "nowrap"
+  } }, s.label))))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", marginTop: 2, opacity: 0.25, lineHeight: 1 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 7, color: isCorr ? "#F57C00" : "#fff" } }, zoomed ? "\u25BC" : "\u25B6")));
+}
+function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, onClose }) {
+  const [type, setType] = useState("sortie");
+  const [position, setPosition] = useState("tete");
+  const [corr, setCorr] = useState("");
+  const [pictos, setPictos] = useState([]);
+  const [sorties, setSorties] = useState([{ num: "1", label: "" }]);
+  const [editIndex, setEditIndex] = useState(null);
+  const getVoitures = () => {
+    const n = nVoitures || 5;
+    if (position === "tete") return [1, 2];
+    if (position === "queue") return [n - 1, n];
+    return [Math.ceil(n / 2)];
+  };
+  const addSortie = () => setSorties((s) => [...s, { num: String(s.length + 1), label: "" }]);
+  const removeSortie = (i) => setSorties((s) => s.filter((_, j) => j !== i));
+  const updateSortie = (i, field, val) => setSorties((s) => s.map((x, j) => j === i ? __spreadProps(__spreadValues({}, x), { [field]: val }) : x));
+  const togglePicto = (p) => setPictos((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
+  const loadForEdit = (g, idx) => {
+    var _a;
+    setEditIndex(idx);
+    setType(g.type);
+    const n = nVoitures || 5;
+    const v = g.voitures[0];
+    if (v <= 2) setPosition("tete");
+    else if (v >= n - 1) setPosition("queue");
+    else setPosition("milieu");
+    setCorr((g.corr || []).join(", "));
+    setPictos(g.pictos || []);
+    setSorties(((_a = g.sorties) == null ? void 0 : _a.length) > 0 ? g.sorties : [{ num: "1", label: "" }]);
+  };
+  const handleSave = () => {
+    const corrArr = corr.split(",").map((x) => x.trim()).filter(Boolean);
+    const sortiesClean = sorties.filter((s) => s.label.trim() || s.num.trim());
+    const group = { voitures: getVoitures(), type, sorties: sortiesClean, pictos, corr: corrArr };
+    onSave(group, editIndex);
+    setEditIndex(null);
+    setType("sortie");
+    setPosition("tete");
+    setCorr("");
+    setPictos([]);
+    setSorties([{ num: "1", label: "" }]);
+  };
+  const inputStyle = {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "9px 10px",
+    border: "2px solid #111",
+    borderRadius: 8,
+    fontSize: 13,
+    color: "#111",
+    outline: "none"
+  };
+  const btnPos = (active, color) => ({
+    flex: 1,
+    padding: "7px 4px",
+    border: `2px solid ${active ? color : "#ccc"}`,
+    borderRadius: 8,
+    background: active ? color : "#fff",
+    color: active ? lineText || "#fff" : "#555",
+    fontWeight: 700,
+    fontSize: 11,
+    cursor: "pointer",
+    lineHeight: 1.2
+  });
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.75)",
+    zIndex: 300,
+    display: "flex",
+    alignItems: "flex-end"
+  }, onClick: onClose }, /* @__PURE__ */ React.createElement("div", { style: {
+    background: "#fff",
+    borderRadius: "20px 20px 0 0",
+    width: "100%",
+    maxWidth: 480,
+    margin: "0 auto",
+    maxHeight: "90vh",
+    overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
+    padding: "20px 16px 40px"
+  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), existingGroups && existingGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, "Mes panneaux saisis"), existingGroups.map((g, i) => {
+    var _a;
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      padding: "8px 10px",
+      marginBottom: 6,
+      background: "#f8f8f8",
+      borderRadius: 10,
+      border: "1.5px solid #e0e0e0"
+    } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, fontSize: 13, color: "#111", fontWeight: 600 } }, g.type === "corr" ? "\u{1F500}" : "\u{1F6AA}", " ", g.type === "corr" ? (g.corr || []).join(", ") : (g.sorties || []).map((s) => s.num).join(", "), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: "#888", marginLeft: 6 } }, "voitures ", (_a = g.voitures) == null ? void 0 : _a.join("-"))), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => loadForEdit(g, i),
+        style: {
+          background: "#e3f2fd",
+          border: "none",
+          borderRadius: 8,
+          padding: "6px 10px",
+          color: "#1565C0",
+          fontWeight: 700,
+          fontSize: 13,
+          cursor: "pointer"
+        }
+      },
+      "\u270F\uFE0F"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => onDelete(i),
+        style: {
+          background: "#ffebee",
+          border: "none",
+          borderRadius: 8,
+          padding: "6px 10px",
+          color: "#c00",
+          fontWeight: 700,
+          fontSize: 13,
+          cursor: "pointer"
+        }
+      },
+      "\u2715"
+    ));
+  }), /* @__PURE__ */ React.createElement("div", { style: { height: 1, background: "#eee", margin: "10px 0" } })), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 14 } }, editIndex !== null ? "\u270F\uFE0F Modifier le panneau" : "\u2795 Ajouter un panneau"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Type"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      style: __spreadProps(__spreadValues({}, btnPos(type === "sortie", "#222")), { color: type === "sortie" ? "#fff" : "#555" }),
+      onClick: () => setType("sortie")
+    },
+    "\u{1F6AA} Sortie"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      style: __spreadProps(__spreadValues({}, btnPos(type === "corr", "#F57C00")), { color: type === "corr" ? "#fff" : "#555" }),
+      onClick: () => setType("corr")
+    },
+    "\u{1F500} Correspondance"
+  ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Position \xB7 voitures : ", getVoitures().join(", ")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "tete", lineColor), onClick: () => setPosition("tete") }, "\u2B06 T\xEAte"), /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "milieu", lineColor), onClick: () => setPosition("milieu") }, "\u2195 Milieu"), /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "queue", lineColor), onClick: () => setPosition("queue") }, "\u2B07 Queue"))), type === "sortie" && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Sorties (num\xE9ro + nom)"), sorties.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 6, marginBottom: 7, alignItems: "center" } }, /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: s.num,
+      onChange: (e) => updateSortie(i, "num", e.target.value),
+      placeholder: "N\xB0",
+      style: __spreadProps(__spreadValues({}, inputStyle), { width: 44, textAlign: "center", fontWeight: 900 })
+    }
+  ), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: s.label,
+      onChange: (e) => updateSortie(i, "label", e.target.value),
+      placeholder: "Rue / direction...",
+      style: __spreadProps(__spreadValues({}, inputStyle), { flex: 1 })
+    }
+  ), sorties.length > 1 && /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => removeSortie(i),
+      style: {
+        background: "#ffebee",
+        border: "none",
+        borderRadius: 8,
+        padding: "9px 11px",
+        color: "#c00",
+        fontWeight: 700,
+        cursor: "pointer",
+        fontSize: 14
+      }
+    },
+    "\u2715"
+  ))), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: addSortie,
+      style: {
+        width: "100%",
+        padding: 8,
+        background: "#f5f5f5",
+        border: "2px dashed #bbb",
+        borderRadius: 8,
+        color: "#555",
+        fontWeight: 600,
+        fontSize: 12,
+        cursor: "pointer",
+        marginTop: 2
+      }
+    },
+    "+ Ajouter une sortie"
+  )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Correspondances (s\xE9par\xE9es par virgule)"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: corr,
+      onChange: (e) => setCorr(e.target.value),
+      placeholder: "ex: 3, 9, A, E",
+      style: inputStyle
+    }
+  )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "\xC9quipements"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 7 } }, Object.entries(PICTOS).map(([k, v]) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: k,
+      onClick: () => togglePicto(k),
+      style: {
+        padding: "6px 10px",
+        border: `2px solid ${pictos.includes(k) ? "#1565C0" : "#ccc"}`,
+        borderRadius: 8,
+        background: pictos.includes(k) ? "#e3f2fd" : "#fff",
+        color: pictos.includes(k) ? "#1565C0" : "#555",
+        fontWeight: 600,
+        fontSize: 11,
+        cursor: "pointer"
+      }
+    },
+    v.label
+  )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: onClose,
+      style: {
+        flex: 1,
+        padding: 12,
+        background: "#f0f0f0",
+        border: "2px solid #ddd",
+        borderRadius: 12,
+        color: "#555",
+        fontWeight: 700,
+        fontSize: 14,
+        cursor: "pointer"
+      }
+    },
+    "Annuler"
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: handleSave,
+      style: {
+        flex: 2,
+        padding: 12,
+        background: lineColor,
+        border: "none",
+        borderRadius: 12,
+        color: lineText || "#fff",
+        fontWeight: 700,
+        fontSize: 14,
+        cursor: "pointer"
+      }
+    },
+    "\u2705 ",
+    editIndex !== null ? "Modifier" : "Enregistrer"
+  ))));
+}
+function PhotoAnalyzer({ stKey, lineColor, lineText, nVoitures, onSave, onClose }) {
+  var _a, _b, _c;
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState(null);
+  const analyzePhoto = async (file) => {
+    var _a2;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result.split(",")[1]);
+        r.onerror = () => rej(new Error("Lecture impossible"));
+        r.readAsDataURL(file);
+      });
+      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1e3,
+          messages: [{ role: "user", content: [
+            { type: "image", source: { type: "base64", media_type: file.type || "image/jpeg", data: base64 } },
+            { type: "text", text: `Tu es un expert du m\xE9tro parisien. Analyse ce panneau de quai RATP et extrait les informations suivantes en JSON UNIQUEMENT (pas de markdown, pas d'explication) :
+{
+  "type": "sortie" ou "corr",
+  "position": "tete" ou "milieu" ou "queue",
+  "sorties": [{"num": "1", "label": "nom de rue"}],
+  "corr": ["3","9","A"],
+  "pictos": ["escalator","ascenseur","escalier","pmr","bus","noctilien"]
+}
+Si c'est un panneau de correspondance, mets type "corr" et liste les lignes dans corr.
+Si c'est un panneau de sortie, liste toutes les sorties num\xE9rot\xE9es.
+R\xE9ponds UNIQUEMENT avec le JSON, rien d'autre.` }
+          ] }]
+        })
+      });
+      const data = await resp.json();
+      const text = (_a2 = data.content) == null ? void 0 : _a2.map((b) => b.text || "").join("");
+      const clean = text.replace(/```json|```/g, "").trim();
+      const parsed = JSON.parse(clean);
+      setResult(parsed);
+    } catch (e) {
+      setError("Analyse impossible. V\xE9rifiez la photo et r\xE9essayez.");
+    }
+    setLoading(false);
+  };
+  const handleSave = () => {
+    const n = nVoitures || 5;
+    let voitures = [1, 2];
+    if (result.position === "milieu") voitures = [Math.ceil(n / 2)];
+    if (result.position === "queue") voitures = [n - 1, n];
+    const group = {
+      voitures,
+      type: result.type,
+      sorties: result.sorties || [],
+      pictos: result.pictos || [],
+      corr: result.corr || []
+    };
+    onSave(group);
+  };
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.75)",
+    zIndex: 300,
+    display: "flex",
+    alignItems: "flex-end"
+  }, onClick: onClose }, /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: {
+        background: "#fff",
+        borderRadius: "20px 20px 0 0",
+        width: "100%",
+        maxWidth: 480,
+        margin: "0 auto",
+        padding: "20px 16px 40px"
+      },
+      onClick: (e) => e.stopPropagation()
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })),
+    /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 17, color: "#111", marginBottom: 16 } }, "\u{1F4F8} Analyse par IA"),
+    !result && !loading && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#777", marginBottom: 20, lineHeight: 1.7 } }, "Photographiez un panneau dans la station. L'IA d\xE9tecte automatiquement les sorties, correspondances et \xE9quipements."), /* @__PURE__ */ React.createElement("label", { style: {
+      display: "block",
+      background: lineColor,
+      borderRadius: 12,
+      padding: 14,
+      color: lineText || "#fff",
+      fontWeight: 700,
+      fontSize: 15,
+      cursor: "pointer",
+      textAlign: "center"
+    } }, "\u{1F4F7} Prendre / Choisir une photo", /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        type: "file",
+        accept: "image/*",
+        capture: "environment",
+        style: { display: "none" },
+        onChange: (e) => e.target.files[0] && analyzePhoto(e.target.files[0])
+      }
+    ))),
+    loading && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", padding: "30px 0" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, marginBottom: 12 } }, "\u{1F916}"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 15, color: "#111", marginBottom: 8 } }, "Analyse en cours..."), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#999" } }, "L'IA lit le panneau")),
+    error && /* @__PURE__ */ React.createElement("div", { style: {
+      padding: "16px",
+      background: "#fff3f3",
+      borderRadius: 10,
+      color: "#c00",
+      fontWeight: 600,
+      fontSize: 13,
+      marginBottom: 16
+    } }, "\u274C ", error),
+    result && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { background: "#f0fff4", borderRadius: 10, padding: 14, marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, color: "#2e7d32", marginBottom: 10 } }, "\u2705 D\xE9tect\xE9 :"), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#333", lineHeight: 1.8 } }, /* @__PURE__ */ React.createElement("b", null, "Type :"), " ", result.type === "sortie" ? "Sortie" : "Correspondance", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("b", null, "Position :"), " ", result.position, /* @__PURE__ */ React.createElement("br", null), ((_a = result.sorties) == null ? void 0 : _a.length) > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("b", null, "Sorties :"), " ", result.sorties.map((s) => `${s.num} ${s.label}`).join(", "), /* @__PURE__ */ React.createElement("br", null)), ((_b = result.corr) == null ? void 0 : _b.length) > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("b", null, "Lignes :"), " ", result.corr.join(", "), /* @__PURE__ */ React.createElement("br", null)), ((_c = result.pictos) == null ? void 0 : _c.length) > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("b", null, "\xC9quipements :"), " ", result.pictos.join(", ")))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: onClose,
+        style: {
+          flex: 1,
+          padding: 13,
+          background: "#f0f0f0",
+          border: "none",
+          borderRadius: 12,
+          color: "#555",
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: "pointer"
+        }
+      },
+      "Annuler"
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: handleSave,
+        style: {
+          flex: 2,
+          padding: 13,
+          background: lineColor,
+          border: "none",
+          borderRadius: 12,
+          color: lineText || "#fff",
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: "pointer"
+        }
+      },
+      "\u2705 Int\xE9grer"
+    )))
+  ));
+}
+function getCarH(nVoitures) {
+  const available = 400 - 50;
+  const h = Math.floor(available / nVoitures);
+  return Math.min(72, Math.max(44, h));
+}
+const CAR_W = 64;
+function TrainDiagram({ trainData, lineColor, userDirection }) {
+  const [zoomed, setZoomed] = useState(null);
+  if (!trainData) return /* @__PURE__ */ React.createElement("div", { style: { padding: "28px 16px", textAlign: "center", color: "#999", fontSize: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 40, marginBottom: 10 } }, "\u{1F686}"), /* @__PURE__ */ React.createElement("strong", null, "Aucune donn\xE9e disponible"), " pour cette station.", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 12, color: "#bbb" } }, "Ajoutez via Notes ou Photo."));
+  const { voitures, direction, groups } = trainData;
+  const CAR_H = getCarH(voitures);
+  const cars = Array.from({ length: voitures }, (_, i) => i + 1);
+  const carToGroup = {};
+  groups.forEach((g) => g.voitures.forEach((v) => {
+    carToGroup[v] = g;
+  }));
+  const renderedGroups = /* @__PURE__ */ new Set();
+  return /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 10px 18px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: CAR_W,
+    height: 26,
+    background: "#b0bec5",
+    borderRadius: "28px 28px 0 0",
+    border: "2px solid #90a4ae",
+    borderBottom: "none",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    width: 18,
+    height: 8,
+    background: "#FFEB3B",
+    borderRadius: 3,
+    boxShadow: "0 0 4px rgba(255,235,59,0.6)"
+  } })), cars.map((c) => {
+    const g = carToGroup[c];
+    const isEven = c % 2 === 0;
+    const doorColor = g ? g.type === "sortie" ? "#E53935" : "#F57C00" : "transparent";
+    const hasDoor = !!g;
+    return /* @__PURE__ */ React.createElement("div", { key: c, style: {
+      width: CAR_W,
+      height: CAR_H,
+      background: isEven ? "#e8e8e8" : "#f2f2f2",
+      borderLeft: "2px solid #90a4ae",
+      borderRight: "2px solid #90a4ae",
+      borderTop: c === 1 ? "2px solid #90a4ae" : "1px solid #e0e0e0",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "5px 4px",
+      position: "relative"
+    } }, /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      left: 3,
+      top: 5,
+      bottom: 5,
+      width: 7,
+      background: lineColor,
+      borderRadius: 3,
+      opacity: 0.85
+    } }), /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      right: 3,
+      top: 5,
+      bottom: 5,
+      width: 7,
+      background: lineColor,
+      borderRadius: 3,
+      opacity: 0.85
+    } }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, marginTop: 3 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      width: 11,
+      height: 22,
+      background: hasDoor ? doorColor : "#ccc",
+      borderRadius: "5px 5px 3px 3px",
+      opacity: hasDoor ? 1 : 0.3
+    } }), /* @__PURE__ */ React.createElement("div", { style: {
+      width: 11,
+      height: 22,
+      background: hasDoor ? doorColor : "#ccc",
+      borderRadius: "5px 5px 3px 3px",
+      opacity: hasDoor ? 1 : 0.3
+    } })), /* @__PURE__ */ React.createElement("div", { style: {
+      fontSize: 16,
+      fontWeight: 900,
+      color: "#546e7a",
+      zIndex: 1,
+      lineHeight: 1,
+      textShadow: "0 1px 2px rgba(255,255,255,0.8)"
+    } }, c), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, marginBottom: 3 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      width: 11,
+      height: 22,
+      background: hasDoor ? doorColor : "#ccc",
+      borderRadius: "3px 3px 5px 5px",
+      opacity: hasDoor ? 1 : 0.3
+    } }), /* @__PURE__ */ React.createElement("div", { style: {
+      width: 11,
+      height: 22,
+      background: hasDoor ? doorColor : "#ccc",
+      borderRadius: "3px 3px 5px 5px",
+      opacity: hasDoor ? 1 : 0.3
+    } })));
+  }), /* @__PURE__ */ React.createElement("div", { style: {
+    width: CAR_W,
+    height: 20,
+    background: "#b0bec5",
+    borderRadius: "0 0 24px 24px",
+    border: "2px solid #90a4ae",
+    borderTop: "none"
+  } })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", paddingTop: 26 } }, cars.map((c) => {
+    const g = carToGroup[c];
+    if (!g) {
+      return /* @__PURE__ */ React.createElement("div", { key: c, style: { height: CAR_H } });
+    }
+    const gId = g.voitures.join("-");
+    const isFirst = g.voitures[0] === c;
+    const isLast = g.voitures[g.voitures.length - 1] === c;
+    const isOnly = g.voitures.length === 1;
+    const isZoomed = zoomed === gId;
+    const bracketColor = "#E53935";
+    return /* @__PURE__ */ React.createElement("div", { key: c, style: { height: CAR_H, display: "flex", alignItems: "stretch", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 22, position: "relative", display: "flex", alignItems: "center" } }, !isOnly && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      left: 11,
+      top: isFirst ? CAR_H / 2 : 0,
+      bottom: isLast ? CAR_H / 2 : 0,
+      width: 3,
+      background: bracketColor
+    } }), (isOnly || isFirst || isLast) && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      top: isFirst || isOnly ? CAR_H / 2 - 1.5 : void 0,
+      bottom: isLast && !isFirst && !isOnly ? CAR_H / 2 - 1.5 : void 0,
+      left: 11,
+      width: 11,
+      height: 3,
+      background: bracketColor
+    } }), !isOnly && !isFirst && !isLast && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "absolute",
+      left: 9,
+      top: CAR_H / 2 - 1.5,
+      width: 8,
+      height: 3,
+      background: bracketColor
+    } })), (isOnly || isFirst) && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 2 } }, [0, 1].map((i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+      width: 12,
+      height: 10,
+      background: bracketColor,
+      clipPath: "polygon(0 20%,70% 20%,70% 0,100% 50%,70% 100%,70% 80%,0 80%)"
+    } }))), isFirst && !renderedGroups.has(gId) && (() => {
+      renderedGroups.add(gId);
+      return /* @__PURE__ */ React.createElement("div", { style: { display: "inline-flex", alignItems: "center", marginLeft: 3 } }, /* @__PURE__ */ React.createElement(
+        Panel,
+        {
+          group: g,
+          lineColor,
+          zoomed: isZoomed,
+          onToggle: () => setZoomed(isZoomed ? null : gId)
+        }
+      ));
+    })());
+  }))));
+}
+const SK_FAV = "mpv4_fav", SK_NOTES = "mpv4_notes";
+function App() {
+  var _a, _b, _c, _d, _e;
+  const [screen, setScreen] = useState("home");
+  const [transport, setTransport] = useState(null);
+  const [lineId, setLineId] = useState(null);
+  const [direction, setDirection] = useState(null);
+  const [showDir, setShowDir] = useState(false);
+  const [station, setStation] = useState(null);
+  const [tab, setTab] = useState("train");
+  const [noteText, setNoteText] = useState("");
+  const [favorites, setFavorites] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(SK_FAV)) || [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [notes, setNotes] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(SK_NOTES)) || {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [customTrainData, setCustomTrainData] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("mpv4_train")) || {};
+    } catch (e) {
+      return {};
+    }
+  });
+  const [showEditor, setShowEditor] = useState(false);
+  const [showPhotoAI, setShowPhotoAI] = useState(false);
+  const [branch, setBranch] = useState(null);
+  const [showStationEditor, setShowStationEditor] = useState(false);
+  const [newStationName, setNewStationName] = useState("");
+  const [newStationCorr, setNewStationCorr] = useState("");
+  const [insertAfter, setInsertAfter] = useState("");
+  const [customStations, setCustomStations] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("mpv4_custom_stations")) || {};
+    } catch (e) {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(SK_FAV, JSON.stringify(favorites));
+    } catch (e) {
+    }
+  }, [favorites]);
+  useEffect(() => {
+    try {
+      localStorage.setItem(SK_NOTES, JSON.stringify(notes));
+    } catch (e) {
+    }
+  }, [notes]);
+  useEffect(() => {
+    try {
+      localStorage.setItem("mpv4_train", JSON.stringify(customTrainData));
+    } catch (e) {
+    }
+  }, [customTrainData]);
+  useEffect(() => {
+    try {
+      localStorage.setItem("mpv4_custom_stations", JSON.stringify(customStations));
+    } catch (e) {
+    }
+  }, [customStations]);
+  const [zoomLevel, setZoomLevel] = useState(() => {
+    try { return parseFloat(localStorage.getItem("mpv4_zoom")) || 1.15; } catch(e) { return 1.15; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("mpv4_zoom", zoomLevel); } catch(e) {}
+    const el = document.getElementById('root');
+    if (el) { el.style.zoom = zoomLevel === 1.0 ? '' : String(zoomLevel); }
+  }, [zoomLevel]);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminUnlocked, setAdminUnlocked] = useState(true);
+  const [adminScreen, setAdminScreen] = useState("menu");
+  const [adminLineId, setAdminLineId] = useState(null);
+  const [adminStation, setAdminStation] = useState(null);
+  const [adminEdits, setAdminEdits] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("mpv4_admin_edits")) || {};
+    } catch (e) {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem("mpv4_admin_edits", JSON.stringify(adminEdits));
+    } catch (e) {
+    }
+  }, [adminEdits]);
+  const getAdminStations = (lid) => {
+    const base = lid ? STATIONS[lid] || CABLE_STATIONS[lid] || [] : [];
+    const edits = adminEdits[lid] || {};
+    return base.map((s) => {
+      const edit = edits[s.n];
+      if (edit) return __spreadValues(__spreadValues({}, s), edit);
+      return s;
+    }).filter((s) => {
+      const edit = edits[s.n];
+      return !(edit && edit._deleted);
+    });
+  };
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+  const searchIndex = React.useMemo(() => {
+    const results = [];
+    const allLineGroups = [
+      { lines: METRO_LINES, transport: "metro", stationsMap: STATIONS },
+      { lines: RER_LINES, transport: "rer", stationsMap: STATIONS },
+      { lines: TRAM_LINES, transport: "tram", stationsMap: STATIONS },
+      { lines: CABLE_LINES, transport: "cable", stationsMap: CABLE_STATIONS }
+    ];
+    allLineGroups.forEach(({ lines, transport: tp, stationsMap }) => {
+      lines.forEach((line2) => {
+        const sts = stationsMap[line2.id] || [];
+        sts.forEach((st) => {
+          if (!st.n || st.fork) return;
+          results.push({
+            lineId: line2.id,
+            transport: tp,
+            name: st.n,
+            c: st.c || [],
+            walk: st.walk || []
+          });
+        });
+      });
+    });
+    return results;
+  }, []);
+  const [searchStation, setSearchStation] = useState(null);
+  const searchResults = React.useMemo(() => {
+    if (searchQuery.length < 2) return [];
+    const q = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const groups = {};
+    searchIndex.forEach((s) => {
+      const name = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      if (!name.includes(q)) return;
+      if (!groups[s.name]) groups[s.name] = { name: s.name, lines: [], allC: /* @__PURE__ */ new Set(), allWalk: /* @__PURE__ */ new Set() };
+      groups[s.name].lines.push(s);
+      (s.c || []).forEach((c) => groups[s.name].allC.add(c));
+      (s.walk || []).forEach((c) => groups[s.name].allWalk.add(c));
+    });
+    return Object.values(groups).slice(0, 15).map((g) => __spreadProps(__spreadValues({}, g), {
+      allC: [...g.allC],
+      allWalk: [...g.allWalk]
+    }));
+  }, [searchQuery, searchIndex]);
+  const scrollRef = React.useRef(null);
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+  const handleScroll = React.useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollUp(el.scrollTop > 10);
+    setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 10);
+  }, []);
+  React.useEffect(() => {
+    if (tab === "train") setCanScrollDown(true);
+    setCanScrollUp(false);
+  }, [tab, station, lineId]);
+  const line = lineId ? getLine(lineId) : null;
+  const baseStations = lineId ? transport === "cable" ? CABLE_STATIONS[lineId] || [] : STATIONS[lineId] || [] : [];
+  const stations = React.useMemo(() => {
+    const custom = customStations[lineId] || [];
+    if (custom.length === 0) return baseStations;
+    return baseStations.map((s) => {
+      const idx = custom.findIndex((c) => c._after === s.n);
+      if (idx >= 0) {
+        const toInsert = custom.filter((c) => c._after === s.n);
+        return [s, ...toInsert];
+      }
+      return s;
+    }).flat().concat(custom.filter((c) => !c._after));
+  }, [lineId, baseStations, customStations]);
+  const stKey = station && lineId ? `${lineId}::${station.n}` : null;
+  const builtinTrain = stKey ? TRAIN_DATA[stKey] : null;
+  const customTrain = stKey ? customTrainData[stKey] : null;
+  const trainData = React.useMemo(() => {
+    if (!builtinTrain && !customTrain) return null;
+    if (!customTrain) return builtinTrain;
+    if (!builtinTrain) return customTrain;
+    return __spreadProps(__spreadValues({}, builtinTrain), {
+      groups: [...builtinTrain.groups, ...customTrain.groups || []]
+    });
+  }, [stKey, builtinTrain, customTrain]);
+  const nVoitures = (trainData == null ? void 0 : trainData.voitures) || 5;
+  const saveGroup = (group, editIndex) => {
+    setCustomTrainData((prev) => {
+      const existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
+      const groups = [...existing.groups || []];
+      if (editIndex !== null && editIndex !== void 0) {
+        groups[editIndex] = group;
+      } else {
+        groups.push(group);
+      }
+      return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
+    });
+    setShowEditor(false);
+    setShowPhotoAI(false);
+  };
+  const deleteGroup = (groupIndex) => {
+    setCustomTrainData((prev) => {
+      const existing = prev[stKey];
+      if (!existing) return prev;
+      const groups = existing.groups.filter((_, i) => i !== groupIndex);
+      if (groups.length === 0) {
+        const next = __spreadValues({}, prev);
+        delete next[stKey];
+        return next;
+      }
+      return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
+    });
+  };
+  const termA = (_a = stations[0]) == null ? void 0 : _a.n;
+  const termB = (_b = stations[stations.length - 1]) == null ? void 0 : _b.n;
+  const hasFork = stations.some((s) => s.fork);
+  const forkConfig = React.useMemo(() => {
+    if (!hasFork) return null;
+    if (lineId === "13") return {
+      A: { label: "Asni\xE8res", color: "#DAA520", textActive: "#111", textInactive: "#B8860B" },
+      B: { label: "Saint-Denis", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
+      letter: { A: "A", B: "S" },
+      forkName: "La Fourche"
+    };
+    if (lineId === "7") return {
+      A: { label: "Villejuif - Louis Aragon", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
+      B: { label: "Mairie d'Ivry", color: "#DAA520", textActive: "#111", textInactive: "#B8860B" },
+      letter: { A: "V", B: "I" },
+      branchA: "V",
+      branchB: "I",
+      forkName: "Maison Blanche"
+    };
+    if (lineId === "A") return {
+      branches: [
+        { id: "C", label: "Cergy - Le Haut", letter: "CY", color: "#c0392b" },
+        { id: "P", label: "Poissy", letter: "PO", color: "#c0392b" },
+        { id: "G", label: "Saint-Germain-en-Laye", letter: "SG", color: "#c0392b" },
+        { id: "B", label: "Boissy-Saint-L\xE9ger", letter: "BO", color: "#a93226" },
+        { id: "M", label: "Chessy - Marne-la-Vall\xE9e", letter: "ML", color: "#a93226" }
+      ],
+      forkName: "RER A",
+      multiMode: true,
+      simpleMode: true
+      // ← pas de boutons en haut de liste
+    };
+    if (lineId === "B") return {
+      branches: [
+        { id: "D", label: "A\xE9roport CDG 2", letter: "CDG", color: "#2980b9" },
+        { id: "Y", label: "Mitry - Claye", letter: "MY", color: "#2980b9" },
+        { id: "R", label: "Robinson", letter: "RO", color: "#1a6ea3" },
+        { id: "S", label: "Saint-R\xE9my-l\xE8s-Chevreuse", letter: "SR", color: "#1a6ea3" }
+      ],
+      forkName: "RER B",
+      multiMode: true,
+      simpleMode: true
+    };
+    if (lineId === "C") return {
+      branches: [
+        { id: "PT", label: "Pontoise", letter: "PT", color: "#c9a800" },
+        { id: "VC", label: "Versailles - Ch\xE2teau", letter: "VC", color: "#c9a800" },
+        { id: "SQ", label: "Saint-Quentin-en-Yvelines", letter: "SQ", color: "#c9a800" },
+        { id: "MY", label: "Massy - Palaiseau", letter: "MY", color: "#a08200" },
+        { id: "ET", label: "Saint-Martin-d'\xC9tampes", letter: "ET", color: "#a08200" },
+        { id: "DO", label: "Dourdan - La For\xEAt", letter: "DO", color: "#a08200" }
+      ],
+      forkName: "RER C",
+      multiMode: true,
+      simpleMode: true
+    };
+    if (lineId === "D") return {
+      branches: [
+        { id: "CR", label: "Creil", letter: "CR", color: "#007a52" },
+        { id: "GO", label: "Goussainville", letter: "GO", color: "#007a52" },
+        { id: "ME", label: "Melun", letter: "ME", color: "#005a3c" },
+        { id: "CO", label: "Corbeil-Essonnes", letter: "CO", color: "#005a3c" },
+        { id: "EC", label: "\xC9vry Centre", letter: "EC", color: "#005a3c" },
+        { id: "MA", label: "Malesherbes", letter: "MA", color: "#005a3c" }
+      ],
+      forkName: "RER D",
+      multiMode: true,
+      simpleMode: true
+    };
+    if (lineId === "E") return {
+      branches: [
+        { id: "CH", label: "Chelles - Gournay", letter: "CH", color: "#b0006e" },
+        { id: "TO", label: "Tournan-en-Brie", letter: "TO", color: "#b0006e" }
+      ],
+      forkName: "RER E",
+      multiMode: true,
+      simpleMode: true
+    };
+    return null;
+  }, [lineId, hasFork, stations]);
+  const branchA = (forkConfig == null ? void 0 : forkConfig.branchA) || "A";
+  const branchB = (forkConfig == null ? void 0 : forkConfig.branchB) || "B";
+  const filteredStations = React.useMemo(() => {
+    if (!hasFork || !branch) return stations.filter((s) => !s.branch && !s.fork);
+    return stations.filter((s) => !s.branch || s.branch === branch).filter((s) => !s.fork);
+  }, [stations, hasFork, branch]);
+  const displayed = direction === termB ? [...filteredStations].reverse() : filteredStations;
+  const displayedTerminus = direction;
+  const isFav = stKey ? favorites.includes(stKey) : false;
+  const linesForType = transport === "metro" ? METRO_LINES : transport === "rer" ? RER_LINES : transport === "tram" ? TRAM_LINES : CABLE_LINES;
+  return /* @__PURE__ */ React.createElement("div", { style: {
+    fontFamily: "'Trebuchet MS','Segoe UI',sans-serif",
+    background: "#000",
+    minHeight: "100vh",
+    color: "#fff",
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    fontSize: 14
+  } }, screen === "home" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 20px 24px", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 20 } }, /* @__PURE__ */ React.createElement("svg", { width: "36", height: "36", viewBox: "0 0 52 52" }, /* @__PURE__ */ React.createElement("circle", { cx: "26", cy: "26", r: "26", fill: "#003F87" }), /* @__PURE__ */ React.createElement("circle", { cx: "26", cy: "26", r: "22", fill: "none", stroke: "#FFD700", strokeWidth: "2" }), /* @__PURE__ */ React.createElement(
+    "text",
+    {
+      x: "26",
+      y: "34",
+      textAnchor: "middle",
+      fill: "white",
+      fontSize: "26",
+      fontWeight: "900",
+      fontFamily: "Arial Black,sans-serif"
+    },
+    "M"
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    background: "#f0f0f0",
+    border: `2px solid ${searchFocused ? "#000" : "#555"}`,
+    borderRadius: 14,
+    padding: "10px 14px",
+    transition: "all 0.2s"
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.5 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      value: searchQuery,
+      onChange: (e) => setSearchQuery(e.target.value),
+      onFocus: () => setSearchFocused(true),
+      onBlur: () => setTimeout(() => setSearchFocused(false), 200),
+      placeholder: "Rechercher une station...",
+      style: {
+        flex: 1,
+        background: "none",
+        border: "none",
+        outline: "none",
+        color: "#111",
+        fontSize: 15,
+        fontWeight: 500
+      }
+    }
+  ), searchQuery.length > 0 && /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setSearchQuery((q) => q.slice(0, -1)),
+      style: {
+        background: "none",
+        border: "none",
+        color: "#555",
+        fontSize: 20,
+        cursor: "pointer",
+        padding: 0,
+        lineHeight: 1
+      }
+    },
+    "\u232B"
+  )), searchQuery.length >= 2 && /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 498 },
+      onClick: () => setSearchQuery("")
+    }
+  ), searchResults.length > 0 && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
+    zIndex: 499,
+    background: "#f8f8f8",
+    border: "2px solid #000",
+    borderRadius: 12,
+    marginTop: 6,
+    maxHeight: 340,
+    overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
+  } }, searchResults.map((r, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => {
+    if (r.lines.length === 1) {
+      const l = r.lines[0];
+      setSearchQuery("");
+      setTransport(l.transport);
+      setLineId(l.lineId);
+      setStation({ n: l.name, c: l.c, walk: l.walk });
+      setDirection(null);
+      setNoteText(notes[`${l.lineId}::${l.name}`] || "");
+      setTab("train");
+      setScreen("station");
+    } else {
+      setSearchStation(r);
+      setSearchQuery("");
+    }
+  }, style: {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+    background: "#f8f8f8",
+    border: "none",
+    borderBottom: i < searchResults.length - 1 ? "2px solid #aaa" : "none",
+    padding: "13px 14px",
+    cursor: "pointer",
+    textAlign: "left"
+  } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 700, fontSize: 16, flexShrink: 1 } }, r.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, alignItems: "center", flexWrap: "nowrap", flexShrink: 0 } }, r.lines.map((l, j) => /* @__PURE__ */ React.createElement(Badge, { key: j, id: l.lineId, size: 26 })))))), searchQuery.length >= 2 && searchResults.length === 0 && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "absolute",
+    top: "100%",
+    left: 0,
+    right: 0,
+    zIndex: 499,
+    background: "#fff",
+    border: "2px solid #000",
+    borderRadius: 12,
+    marginTop: 6,
+    padding: "16px",
+    textAlign: "center",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
+  } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#888", fontSize: 13 } }, "Aucune station trouv\xE9e"))), [
+    { k: "metro", label: "M\xC9TRO", bg: "#0d1b2a" },
+    { k: "rer", label: "RER", bg: "#0d2a0d" },
+    { k: "tram", label: "TRAM", bg: "#2a1218" },
+    { k: "cable", label: "C\xC2BLE", bg: "#1a1a2a" }
+  ].map((t) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: t.k,
+      onClick: () => {
+        setTransport(t.k);
+        setScreen("lines");
+      },
+      style: {
+        width: "100%",
+        maxWidth: 360,
+        background: t.bg,
+        border: "1px solid #333",
+        borderRadius: 14,
+        padding: "14px 16px",
+        marginBottom: 8,
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+        textAlign: "left",
+        overflow: "hidden"
+      }
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: 2, flexShrink: 0 } }, t.label),
+    /* @__PURE__ */ React.createElement("div", { style: {
+      display: "flex",
+      gap: 4,
+      alignItems: "center",
+      flexShrink: 1,
+      justifyContent: "flex-end",
+      overflow: "hidden",
+      minWidth: 0
+    } }, (t.k === "metro" ? METRO_LINES : t.k === "rer" ? RER_LINES : t.k === "tram" ? TRAM_LINES : CABLE_LINES).slice(0, 5).map((l) => /* @__PURE__ */ React.createElement(Badge, { key: l.id, id: l.id, size: t.k === "tram" ? 26 : 30 })))
+  )), favorites.length > 0 && /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setScreen("favorites"),
+      style: {
+        marginTop: 8,
+        background: "none",
+        border: "1px solid #444",
+        borderRadius: 12,
+        padding: "8px 20px",
+        color: "#888",
+        cursor: "pointer",
+        fontSize: 13
+      }
+    },
+    "\u2B50 ",
+    favorites.length,
+    " favori",
+    favorites.length > 1 ? "s" : ""
+  ), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowAdmin(true),
+      style: {
+        marginTop: 12,
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        fontSize: 20,
+        opacity: 0.5,
+        lineHeight: 1,
+        alignSelf: "flex-start"
+      }
+    },
+    "\u2699\uFE0F"
+  )), screen === "lines" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "16px 16px 8px", display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 15 } }, transport === "metro" ? "Lignes de M\xE9tro" : transport === "rer" ? "Lignes de RER" : transport === "tram" ? "Lignes de Tramway" : "C\xE2ble")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 } }, linesForType.map((l) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: l.id,
+      onClick: () => {
+        setLineId(l.id);
+        setShowDir(true);
+      },
+      style: {
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: 4,
+        opacity: l.future ? 0.45 : 1,
+        position: "relative"
+      }
+    },
+    /* @__PURE__ */ React.createElement(Badge, { id: l.id, size: transport === "tram" ? 46 : 66 }),
+    l.future && /* @__PURE__ */ React.createElement("span", { style: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      background: "#444",
+      borderRadius: 4,
+      fontSize: 8,
+      color: "#fff",
+      padding: "1px 3px"
+    } }, "Futur")
+  ))))), showDir && line && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.72)",
+    zIndex: 200,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "0 16px"
+  }, onClick: () => setShowDir(false) }, /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: {
+        background: "#f5f5f5",
+        borderRadius: "22px 22px 0 0",
+        width: "100%",
+        maxWidth: 480,
+        margin: "0 auto",
+        padding: "18px 16px 40px",
+        maxHeight: "75vh",
+        overflowY: "auto",
+        touchAction: "pan-y", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
+        boxShadow: "0 -4px 20px rgba(0,0,0,0.22), 4px 0 16px rgba(0,0,0,0.12), -4px 0 16px rgba(0,0,0,0.12)"
+      },
+      onClick: (e) => e.stopPropagation()
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ccc", borderRadius: 4, margin: "0 auto" } })),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 } }, /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 38 }), /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 900, fontSize: 17, letterSpacing: 0.2 } }, "Choisir la direction")),
+    (() => {
+      var _a2, _b2, _c2, _d2, _e2, _f;
+      if (hasFork && (forkConfig == null ? void 0 : forkConfig.multiMode)) {
+        const troncLast = (_a2 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0]) == null ? void 0 : _a2.n;
+        return /* @__PURE__ */ React.createElement(React.Fragment, null, forkConfig.branches.map((br) => {
+          var _a3;
+          const branchLast = (_a3 = stations.filter((s) => s.branch === br.id).slice(-1)[0]) == null ? void 0 : _a3.n;
+          return /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              key: br.id,
+              onClick: () => {
+                setDirection(troncLast || "");
+                setShowDir(false);
+                setScreen("stations");
+                setBranch(br.id);
+              },
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                width: "100%",
+                boxSizing: "border-box",
+                background: "#fff",
+                borderTop: `5px solid ${br.color}`,
+                borderBottom: `5px solid ${br.color}`,
+                borderLeft: `14px solid ${br.color}`,
+                borderRight: `14px solid ${br.color}`,
+                borderRadius: 16,
+                padding: "14px 12px",
+                marginBottom: 10,
+                cursor: "pointer",
+                textAlign: "left",
+                boxShadow: `0 3px 10px rgba(0,0,0,0.10)`
+              }
+            },
+            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22, fontWeight: 900, color: br.color, flexShrink: 0 } }, "\u2192"),
+            /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontSize: 17, fontWeight: 900, lineHeight: 1.25 } }, branchLast)
+          );
+        }));
+      }
+      if (hasFork && forkConfig) {
+        const branchALast = (_b2 = stations.filter((s) => s.branch === branchA).slice(-1)[0]) == null ? void 0 : _b2.n;
+        const branchBLast = (_c2 = stations.filter((s) => s.branch === branchB).slice(-1)[0]) == null ? void 0 : _c2.n;
+        const troncFirst = (_d2 = stations.filter((s) => !s.branch && !s.fork)[0]) == null ? void 0 : _d2.n;
+        const cards = [
+          { label: branchALast, branch: branchA, color: forkConfig.A.color, letter: forkConfig.letter.A },
+          { label: branchBLast, branch: branchB, color: forkConfig.B.color, letter: forkConfig.letter.B },
+          { label: troncFirst, branch: null, color: line.color, letter: "\u21A9" }
+        ];
+        return cards.map((c, i) => /* @__PURE__ */ React.createElement(
+          "button",
+          {
+            key: i,
+            onClick: () => {
+              var _a3, _b3;
+              setDirection(c.branch ? (_a3 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0]) == null ? void 0 : _a3.n : (_b3 = stations.filter((s) => !s.branch && !s.fork)[0]) == null ? void 0 : _b3.n);
+              setShowDir(false);
+              setScreen("stations");
+              setBranch(c.branch);
+            },
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              width: "100%",
+              boxSizing: "border-box",
+              background: "#fff",
+              borderTop: `4px solid ${c.color}`,
+              borderBottom: `4px solid ${c.color}`,
+              borderLeft: `12px solid ${c.color}`,
+              borderRight: `12px solid ${c.color}`,
+              borderRadius: 14,
+              padding: "13px 10px",
+              marginBottom: 10,
+              cursor: "pointer",
+              textAlign: "left",
+              boxShadow: `0 2px 8px rgba(0,0,0,0.10)`
+            }
+          },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 18, fontWeight: 900, color: c.color, flexShrink: 0, minWidth: 22, textAlign: "center" } }, c.letter),
+          /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontSize: 16, fontWeight: 900, lineHeight: 1.2 } }, c.label)
+        ));
+      }
+      return [(_e2 = stations[stations.length - 1]) == null ? void 0 : _e2.n, (_f = stations[0]) == null ? void 0 : _f.n].map((d, i) => /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: i,
+          onClick: () => {
+            setDirection(d);
+            setShowDir(false);
+            setScreen("stations");
+            setBranch(null);
+          },
+          style: {
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            width: "100%",
+            boxSizing: "border-box",
+            background: "#fff",
+            borderTop: `5px solid ${line.color}`,
+            borderBottom: `5px solid ${line.color}`,
+            borderLeft: `14px solid ${line.color}`,
+            borderRight: `14px solid ${line.color}`,
+            borderRadius: 16,
+            padding: "16px 10px",
+            marginBottom: 12,
+            cursor: "pointer",
+            textAlign: "left",
+            boxShadow: `0 3px 10px rgba(0,0,0,0.12)`
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22, fontWeight: 900, color: line.color, flexShrink: 0 } }, "\u2192"),
+        /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontSize: 17, fontWeight: 900, lineHeight: 1.25 } }, d)
+      ));
+    })(),
+    /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setShowDir(false),
+        style: {
+          display: "block",
+          marginTop: 6,
+          color: "#888",
+          background: "none",
+          border: "none",
+          fontSize: 15,
+          fontWeight: 600,
+          cursor: "pointer",
+          width: "100%",
+          textAlign: "center"
+        }
+      },
+      "Annuler"
+    )
+  )), screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", height: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#111" } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
+    "div",
+    { style: { fontWeight: 800, fontSize: 14 } },
+    "\u2192 ",
+    // Pour les RER avec branches, afficher le vrai terminus de la branche
+    hasFork && branch && (forkConfig == null ? void 0 : forkConfig.multiMode) ? (_c = stations.filter((s) => s.branch === branch).slice(-1)[0]) == null ? void 0 : _c.n : displayedTerminus
+  )), hasFork && forkConfig && !forkConfig.simpleMode && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 10 } }, forkConfig.multiMode ? (
+    // Mode multi-branches RER : boutons groupés
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 } }, "Choisir la branche"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } }, forkConfig.branches.map((br) => {
+      const isActive = branch === br.id;
+      return /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: br.id,
+          onClick: () => setBranch(br.id),
+          style: {
+            padding: "7px 10px",
+            borderRadius: 9,
+            border: `3px solid ${br.color}`,
+            background: isActive ? br.color : "#fff",
+            color: isActive ? "#fff" : "#111",
+            fontWeight: 900,
+            fontSize: 12,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: 5
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#fff" : br.color, fontWeight: 900, fontSize: 13 } }, br.letter),
+        /* @__PURE__ */ React.createElement("span", null, br.label)
+      );
+    })))
+  ) : (
+    // Mode 2 branches (lignes 7 et 13)
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, [["A", branchA], ["B", branchB]].map(([key, branchVal]) => {
+      const cfg = forkConfig[key];
+      const isActive = branch === branchVal;
+      return /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key,
+          onClick: () => setBranch(branchVal),
+          style: {
+            flex: 1,
+            padding: "9px 8px",
+            borderRadius: 10,
+            border: `3px solid ${cfg.color}`,
+            background: isActive ? cfg.color : "#fff",
+            color: "#111",
+            fontWeight: 900,
+            fontSize: 13,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6
+          }
+        },
+        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : cfg.textInactive, fontSize: 15, fontWeight: 900 } }, forkConfig.letter[key]),
+        /* @__PURE__ */ React.createElement("span", null, cfg.label)
+      );
+    }))
+  ))), /* @__PURE__ */ React.createElement("div", { style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, displayed.map((st, idx) => {
+    if (st.fork) {
+      return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
+        background: "#FFF3E0",
+        borderTop: "2px solid #FF9800",
+        borderBottom: "2px solid #FF9800",
+        padding: "10px 16px",
+        display: "flex",
+        alignItems: "center",
+        gap: 10
+      } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#E65100" } }, (forkConfig == null ? void 0 : forkConfig.forkName) || st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#F57C00", fontWeight: 700 } }, "Choisissez votre branche ci-dessus")));
+    }
+    const isTerminus = idx === 0 || idx === displayed.length - 1;
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: idx,
+        onClick: () => {
+          setStation(st);
+          setNoteText(notes[`${lineId}::${st.n}`] || "");
+          setTab("train");
+          setScreen("station");
+        },
+        style: {
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          background: isTerminus ? `${line.color}15` : "none",
+          border: "none",
+          borderBottom: "1px solid #f5f5f5",
+          padding: "0 16px",
+          cursor: "pointer",
+          textAlign: "left",
+          minHeight: isTerminus ? 50 : 44,
+          position: "relative"
+        }
+      },
+      /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 28, top: 0, bottom: 0, width: 3, background: `${line.color}55` } }),
+      /* @__PURE__ */ React.createElement("div", { style: {
+        position: "absolute",
+        left: 24,
+        top: "50%",
+        transform: "translateY(-50%)",
+        width: 10,
+        height: 10,
+        borderRadius: "50%",
+        background: line.color,
+        border: "2px solid #fff",
+        zIndex: 1
+      } }),
+      /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 28, flex: 1, paddingTop: 5, paddingBottom: 5, minWidth: 0 } }, (() => {
+        const hasBadges = st.c && st.c.length > 0;
+        if (!hasBadges) {
+          return /* @__PURE__ */ React.createElement("span", { style: {
+            fontWeight: 900,
+            fontSize: 16,
+            color: isTerminus ? line.text || "#fff" : "#111",
+            background: isTerminus ? line.color : "transparent",
+            padding: isTerminus ? "2px 8px" : "0",
+            borderRadius: isTerminus ? 6 : 0,
+            textShadow: isTerminus ? line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.95), 2px -2px 0 rgba(255,255,255,0.95), -2px 2px 0 rgba(255,255,255,0.95), 2px 2px 0 rgba(255,255,255,0.95)" : "-2px -2px 0 rgba(0,0,0,0.95), 2px -2px 0 rgba(0,0,0,0.95), -2px 2px 0 rgba(0,0,0,0.95), 2px 2px 0 rgba(0,0,0,0.95)" : "none",
+            whiteSpace: "normal",
+            lineHeight: 1.25,
+            display: "inline"
+          } }, st.n);
+        }
+        const nameW = st.n.length * 9;
+        const badgesW = st.c.reduce((acc, c) => {
+          const isTram = !!TRAM_LINES.find((l) => l.id === c);
+          return acc + (isTram ? 30 : 24) + 4;
+        }, 0);
+        const fitsOneLine = nameW + badgesW + 10 < 300;
+        const nameStyle = {
+          fontWeight: 900,
+          fontSize: isTerminus ? 16 : 15,
+          color: isTerminus ? line.text || "#fff" : "#111",
+          background: isTerminus ? line.color : "transparent",
+          padding: isTerminus ? "2px 8px" : "0",
+          borderRadius: isTerminus ? 6 : 0,
+          textShadow: isTerminus ? line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.95), 2px -2px 0 rgba(255,255,255,0.95), -2px 2px 0 rgba(255,255,255,0.95), 2px 2px 0 rgba(255,255,255,0.95)" : "-2px -2px 0 rgba(0,0,0,0.95), 2px -2px 0 rgba(0,0,0,0.95), -2px 2px 0 rgba(0,0,0,0.95), 2px 2px 0 rgba(0,0,0,0.95)" : "none",
+          whiteSpace: "nowrap"
+        };
+        if (fitsOneLine) {
+          return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", flexWrap: "nowrap", gap: 4 } }, /* @__PURE__ */ React.createElement("span", { style: nameStyle }, st.n), st.c.filter((c) => c !== lineId).map((c, i) => {
+            const isTram = !!TRAM_LINES.find((l) => l.id === c);
+            const isRer = !!RER_LINES.find((l) => l.id === c);
+            const isCab = !!CABLE_LINES.find((l) => l.id === c);
+            return /* @__PURE__ */ React.createElement("span", { key: i, style: {
+              display: "inline-flex",
+              flexShrink: 0,
+              borderRadius: isTram || isRer || isCab ? "4px" : "50%",
+              outline: "2px solid rgba(0,0,0,0.75)",
+              outlineOffset: "1px"
+            } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: 21 }));
+          }));
+        } else {
+          return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25 }) }, st.n), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } }, st.c.filter((c) => c !== lineId).map((c, i) => {
+            const isTram = !!TRAM_LINES.find((l) => l.id === c);
+            const isRer = !!RER_LINES.find((l) => l.id === c);
+            const isCab = !!CABLE_LINES.find((l) => l.id === c);
+            return /* @__PURE__ */ React.createElement("span", { key: i, style: {
+              display: "inline-flex",
+              flexShrink: 0,
+              borderRadius: isTram || isRer || isCab ? "4px" : "50%",
+              outline: "2px solid rgba(0,0,0,0.75)",
+              outlineOffset: "1px"
+            } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: 22 }));
+          })));
+        }
+      })()),
+      favorites.includes(`${lineId}::${st.n}`) && /* @__PURE__ */ React.createElement("span", { style: { marginRight: 4 } }, "\u2B50")
+    );
+  })), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", padding: "8px 16px 16px" } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowStationEditor(true),
+      style: {
+        background: "#fff",
+        border: "2px solid #333",
+        borderRadius: "50%",
+        width: 34,
+        height: 34,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 16,
+        cursor: "pointer",
+        boxShadow: "0 1px 4px rgba(0,0,0,0.15)"
+      }
+    },
+    "\u270F\uFE0F"
+  ))), showStationEditor && line && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.75)",
+    zIndex: 300,
+    display: "flex",
+    alignItems: "flex-end"
+  }, onClick: () => setShowStationEditor(false) }, /* @__PURE__ */ React.createElement("div", { style: {
+    background: "#fff",
+    borderRadius: "20px 20px 0 0",
+    width: "100%",
+    maxWidth: 480,
+    margin: "0 auto",
+    maxHeight: "90vh",
+    overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
+    padding: "20px 16px 40px"
+  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 16 } }, "\u270F\uFE0F Modifier la liste des stations"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18, padding: 14, background: "#f8f8f8", borderRadius: 12, border: "1.5px solid #e0e0e0" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, "Ajouter une station"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      placeholder: "Nom de la station...",
+      value: newStationName,
+      onChange: (e) => setNewStationName(e.target.value),
+      style: {
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "9px 10px",
+        border: "2px solid #111",
+        borderRadius: 8,
+        fontSize: 13,
+        color: "#111",
+        marginBottom: 8,
+        outline: "none"
+      }
+    }
+  ), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      placeholder: "Correspondances (ex: 4, B, T3a)",
+      value: newStationCorr,
+      onChange: (e) => setNewStationCorr(e.target.value),
+      style: {
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "9px 10px",
+        border: "2px solid #111",
+        borderRadius: 8,
+        fontSize: 13,
+        color: "#111",
+        marginBottom: 8,
+        outline: "none"
+      }
+    }
+  ), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#888", marginBottom: 8 } }, "Ins\xE9rer apr\xE8s la station :"), /* @__PURE__ */ React.createElement(
+    "select",
+    {
+      value: insertAfter,
+      onChange: (e) => setInsertAfter(e.target.value),
+      style: {
+        width: "100%",
+        padding: "9px 10px",
+        border: "2px solid #111",
+        borderRadius: 8,
+        fontSize: 13,
+        color: "#111",
+        marginBottom: 10,
+        background: "#fff"
+      }
+    },
+    /* @__PURE__ */ React.createElement("option", { value: "" }, "\u2014 En d\xE9but de liste \u2014"),
+    displayed.filter((s) => !s.fork).map((s, i) => /* @__PURE__ */ React.createElement("option", { key: i, value: s.n }, s.n))
+  ), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    const corrArr = newStationCorr.split(",").map((x) => x.trim()).filter(Boolean);
+    const newSt = { n: newStationName.trim(), c: corrArr.length > 0 ? corrArr : void 0 };
+    if (!newSt.n) return;
+    setCustomStations((prev) => {
+      const key = lineId;
+      const existing = [...prev[key] || []];
+      const idx = insertAfter ? existing.findIndex((s) => s.n === insertAfter) : -1;
+      existing.splice(idx + 1, 0, newSt);
+      return __spreadProps(__spreadValues({}, prev), { [key]: existing });
+    });
+    setNewStationName("");
+    setNewStationCorr("");
+    setInsertAfter("");
+  }, style: {
+    width: "100%",
+    padding: 11,
+    background: line.color,
+    border: "none",
+    borderRadius: 10,
+    color: line.text || "#fff",
+    fontWeight: 700,
+    fontSize: 14,
+    cursor: "pointer"
+  } }, "\u2795 Ajouter")), ((_d = customStations[lineId]) == null ? void 0 : _d.length) > 0 && /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, "Stations ajout\xE9es"), customStations[lineId].map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    padding: "8px 10px",
+    marginBottom: 6,
+    background: "#f0fff4",
+    borderRadius: 10,
+    border: "1.5px solid #c8e6c9"
+  } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, fontSize: 13, fontWeight: 600, color: "#111" } }, s.n), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setCustomStations((prev) => {
+      const existing = [...prev[lineId] || []];
+      existing.splice(i, 1);
+      return __spreadProps(__spreadValues({}, prev), { [lineId]: existing });
+    });
+  }, style: {
+    background: "#ffebee",
+    border: "none",
+    borderRadius: 8,
+    padding: "6px 10px",
+    color: "#c00",
+    fontWeight: 700,
+    fontSize: 13,
+    cursor: "pointer"
+  } }, "\u2715")))), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowStationEditor(false),
+      style: {
+        width: "100%",
+        padding: 12,
+        marginTop: 10,
+        background: "#f0f0f0",
+        border: "2px solid #ddd",
+        borderRadius: 12,
+        color: "#555",
+        fontWeight: 700,
+        fontSize: 14,
+        cursor: "pointer"
+      }
+    },
+    "Fermer"
+  ))), screen === "station" && line && station && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#f4f4f4", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, /* @__PURE__ */ React.createElement("div", { style: { background: line.color, padding: "12px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setScreen("stations"),
+      style: {
+        background: "rgba(0,0,0,0.15)",
+        border: "none",
+        color: line.text || "#fff",
+        fontSize: 24,
+        cursor: "pointer",
+        borderRadius: 8,
+        width: 34,
+        height: 34,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textShadow: line.text === "#000" ? "-1px -1px 0 rgba(255,255,255,0.95), 1px -1px 0 rgba(255,255,255,0.95), -1px 1px 0 rgba(255,255,255,0.95), 1px 1px 0 rgba(255,255,255,0.95)" : "-1px -1px 0 rgba(0,0,0,0.95), 1px -1px 0 rgba(0,0,0,0.95), -1px 1px 0 rgba(0,0,0,0.95), 1px 1px 0 rgba(0,0,0,0.95)"
+      }
+    },
+    "\u2039"
+  ), /* @__PURE__ */ React.createElement("div", { style: {
+    fontWeight: 900,
+    fontSize: 20,
+    color: line.text || "#fff",
+    flex: 1,
+    textAlign: "center",
+    letterSpacing: 0.3,
+    textShadow: line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.9), 2px -2px 0 rgba(255,255,255,0.9), -2px 2px 0 rgba(255,255,255,0.9), 2px 2px 0 rgba(255,255,255,0.9), 0 2px 0 rgba(255,255,255,0.9), 0 -2px 0 rgba(255,255,255,0.9)" : "-2px -2px 0 rgba(0,0,0,0.9), 2px -2px 0 rgba(0,0,0,0.9), -2px 2px 0 rgba(0,0,0,0.9), 2px 2px 0 rgba(0,0,0,0.9), 0 2px 0 rgba(0,0,0,0.9), 0 -2px 0 rgba(0,0,0,0.9)"
+  } }, station.n), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setFavorites((f) => isFav ? f.filter((x) => x !== stKey) : [...f, stKey]),
+      style: {
+        background: "rgba(0,0,0,0.15)",
+        border: "none",
+        fontSize: 18,
+        cursor: "pointer",
+        borderRadius: 8,
+        width: 34,
+        height: 34,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: line.text || "#fff",
+        textShadow: line.text === "#000" ? "-1px -1px 0 rgba(255,255,255,0.95), 1px -1px 0 rgba(255,255,255,0.95), -1px 1px 0 rgba(255,255,255,0.95), 1px 1px 0 rgba(255,255,255,0.95)" : "-1px -1px 0 rgba(0,0,0,0.95), 1px -1px 0 rgba(0,0,0,0.95), -1px 1px 0 rgba(0,0,0,0.95), 1px 1px 0 rgba(0,0,0,0.95)"
+      }
+    },
+    isFav ? "\u2B50" : "\u2606"
+  ))), (station.c && station.c.length > 0 || station.walk && station.walk.length > 0) && /* @__PURE__ */ React.createElement("div", { style: {
+    background: "#fff",
+    margin: "6px 12px 0",
+    borderRadius: 12,
+    padding: "8px 12px",
+    border: "1.5px solid #ffe0b2"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    fontSize: 10,
+    fontWeight: 900,
+    color: "#E65100",
+    textTransform: "uppercase",
+    marginBottom: 6,
+    letterSpacing: 1
+  } }, "\u{1F500} Correspondances"), (() => {
+    const allC = station.c || [];
+    const allW = station.walk || [];
+    const allIds = [...allC, ...allW];
+    let sz = 34;
+    for (let s = 34; s >= 16; s--) {
+      const totalW = allIds.reduce((acc, c) => {
+        const isTram = !!TRAM_LINES.find((l) => l.id === c);
+        return acc + (isTram ? s * 1.3 : s) + 5;
+      }, 0);
+      if (totalW <= 340) {
+        sz = s;
+        break;
+      }
+      sz = 16;
+    }
+    return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center" } }, allC.map((c, i) => {
+      const isT = !!TRAM_LINES.find((l) => l.id === c);
+      const isR = !!RER_LINES.find((l) => l.id === c);
+      return /* @__PURE__ */ React.createElement("span", { key: "c" + i, style: {
+        display: "inline-flex",
+        flexShrink: 0,
+        borderRadius: isT ? "4px" : isR ? "4px" : "50%",
+        outline: "2px solid rgba(0,0,0,0.7)",
+        outlineOffset: "1px"
+      } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: sz }));
+    }), allW.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("span", { style: {
+      fontSize: 11,
+      color: "#888",
+      fontWeight: 600,
+      borderLeft: "1.5px solid #eee",
+      paddingLeft: 6,
+      marginLeft: 2
+    } }, "\u{1F6B6}"), allW.map((c, i) => {
+      const isT = !!TRAM_LINES.find((l) => l.id === c);
+      const isR = !!RER_LINES.find((l) => l.id === c);
+      return /* @__PURE__ */ React.createElement("span", { key: "w" + i, style: {
+        display: "inline-flex",
+        flexShrink: 0,
+        borderRadius: isT ? "4px" : isR ? "4px" : "50%",
+        outline: "2px solid rgba(0,0,0,0.3)",
+        outlineOffset: "1px",
+        opacity: 0.65
+      } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: sz }));
+    })));
+  })()), /* @__PURE__ */ React.createElement("div", { style: {
+    display: "flex",
+    background: "#fff",
+    margin: "8px 12px 0",
+    borderRadius: 12,
+    overflow: "hidden",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.10)"
+  } }, [
+    ["train", "\u{1F686}", "Train"],
+    ["notes", "\u{1F4DD}", "Notes"],
+    ["photo", "\u{1F4F8}", "Photo IA"],
+    ["manuel", "\u270F\uFE0F", "Saisir"]
+  ].map(([t, icon, label]) => /* @__PURE__ */ React.createElement("button", { key: t, onClick: () => {
+    if (t === "manuel") {
+      setShowEditor(true);
+    } else if (t === "photo") {
+      setShowPhotoAI(true);
+    } else setTab(t);
+  }, style: {
+    flex: 1,
+    padding: "9px 2px 7px",
+    background: tab === t ? "#f0f0f0" : "none",
+    border: "none",
+    borderBottom: tab === t && t !== "manuel" && t !== "photo" ? `3px solid ${line.color}` : "3px solid transparent",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 2
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, lineHeight: 1 } }, icon), /* @__PURE__ */ React.createElement("span", { style: {
+    fontSize: 10,
+    fontWeight: 700,
+    color: tab === t && t !== "manuel" && t !== "photo" ? "#111" : "#888",
+    lineHeight: 1
+  } }, label)))), /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: { position: "relative" },
+      ref: scrollRef,
+      onScroll: (e) => {
+        const el = e.target;
+        setCanScrollUp(el.scrollTop > 10);
+        setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 10);
+      }
+    },
+    canScrollUp && tab === "train" && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "fixed",
+      bottom: 120,
+      right: 16,
+      zIndex: 200,
+      pointerEvents: "none",
+      animation: "bounceUp 1s ease-in-out infinite"
+    } }, /* @__PURE__ */ React.createElement("style", null, `@keyframes bounceUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`), /* @__PURE__ */ React.createElement("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M12 20V4M5 11l7-7 7 7", stroke: "#000", strokeWidth: "6", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M12 20V4M5 11l7-7 7 7", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
+    tab === "train" && canScrollDown && /* @__PURE__ */ React.createElement("div", { style: {
+      position: "fixed",
+      bottom: 76,
+      right: 16,
+      zIndex: 200,
+      pointerEvents: "none",
+      animation: "bounceDown 1s ease-in-out infinite"
+    } }, /* @__PURE__ */ React.createElement("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M12 4v16M5 13l7 7 7-7", stroke: "#000", strokeWidth: "6", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M12 4v16M5 13l7 7 7-7", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
+    tab === "train" && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", margin: "8px 12px", borderRadius: 12 } }, /* @__PURE__ */ React.createElement(TrainDiagram, { trainData, lineColor: line.color, userDirection: displayedTerminus }), customTrainData[stKey] && /* @__PURE__ */ React.createElement("div", { style: { padding: "0 12px 12px" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      if (window.confirm("Supprimer toutes vos donn\xE9es saisies pour cette station ?")) {
+        setCustomTrainData((prev) => {
+          const next = __spreadValues({}, prev);
+          delete next[stKey];
+          return next;
+        });
+      }
+    }, style: {
+      width: "100%",
+      padding: "9px 0",
+      background: "#fff0f0",
+      border: "1.5px solid #ffcdd2",
+      borderRadius: 10,
+      color: "#c00",
+      fontWeight: 700,
+      fontSize: 12,
+      cursor: "pointer"
+    } }, "\u{1F5D1}\uFE0F Supprimer mes donn\xE9es pour cette station"))),
+    tab === "notes" && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", margin: "8px 12px", borderRadius: 12, padding: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#999", marginBottom: 8 } }, "\u{1F4DD} Notes personnelles"), /* @__PURE__ */ React.createElement(
+      "textarea",
+      {
+        value: noteText,
+        onChange: (e) => setNoteText(e.target.value),
+        placeholder: "Ajoutez vos notes pour cette station...",
+        rows: 6,
+        style: {
+          width: "100%",
+          boxSizing: "border-box",
+          border: "1px solid #e0e0e0",
+          borderRadius: 10,
+          padding: 10,
+          fontSize: 14,
+          resize: "none",
+          outline: "none",
+          color: "#111",
+          lineHeight: 1.6
+        }
+      }
+    ), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => {
+          setNotes((n) => __spreadProps(__spreadValues({}, n), { [stKey]: noteText }));
+          alert("\u2705 Sauvegard\xE9 !");
+        },
+        style: {
+          marginTop: 10,
+          width: "100%",
+          background: line.color,
+          border: "none",
+          borderRadius: 10,
+          padding: 12,
+          color: line.text,
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: "pointer"
+        }
+      },
+      "Sauvegarder"
+    ))
+  ), showEditor && /* @__PURE__ */ React.createElement(
+    PanneauEditor,
+    {
+      stKey,
+      lineColor: line.color,
+      lineText: line.text,
+      nVoitures,
+      onSave: saveGroup,
+      onDelete: deleteGroup,
+      existingGroups: ((_e = customTrainData[stKey]) == null ? void 0 : _e.groups) || [],
+      onClose: () => setShowEditor(false)
+    }
+  ), showPhotoAI && /* @__PURE__ */ React.createElement(
+    PhotoAnalyzer,
+    {
+      stKey,
+      lineColor: line.color,
+      lineText: line.text,
+      nVoitures,
+      onSave: saveGroup,
+      onClose: () => setShowPhotoAI(false)
+    }
+  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", height: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 18 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
+    const [lid, sname] = key.split("::");
+    const l = getLine(lid);
+    if (!l) return null;
+    const sts = STATIONS[lid] || [];
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: i,
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          width: "100%",
+          background: "none",
+          border: "none",
+          borderBottom: "1px solid #f5f5f5",
+          padding: "12px 16px",
+          cursor: "pointer",
+          textAlign: "left"
+        },
+        onClick: () => {
+          var _a2;
+          setTransport(getTransportType(lid));
+          setLineId(lid);
+          setStation(sts.find((s) => s.n === sname));
+          setDirection((_a2 = sts[sts.length - 1]) == null ? void 0 : _a2.n);
+          setNoteText(notes[key] || "");
+          setTab("train");
+          setScreen("station");
+        }
+      },
+      /* @__PURE__ */ React.createElement(Badge, { id: lid, size: 32 }),
+      /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 14 } }, sname), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#aaa", marginTop: 1 } }, "Ligne ", lid)),
+      notes[key] && /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", fontSize: 11, color: "#bbb" } }, "\u{1F4DD}")
+    );
+  }))), searchStation && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.75)",
+    zIndex: 300,
+    display: "flex",
+    alignItems: "flex-end"
+  }, onClick: () => setSearchStation(null) }, /* @__PURE__ */ React.createElement(
+    "div",
+    {
+      style: {
+        background: "#111",
+        borderRadius: "22px 22px 0 0",
+        width: "100%",
+        maxWidth: 480,
+        margin: "0 auto",
+        padding: "20px 16px 40px",
+        maxHeight: "80vh",
+        overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
+        boxShadow: "0 -4px 20px rgba(0,0,0,0.5)"
+      },
+      onClick: (e) => e.stopPropagation()
+    },
+    /* @__PURE__ */ React.createElement("div", { style: { width: 40, height: 4, background: "#444", borderRadius: 4, margin: "0 auto 16px" } }),
+    /* @__PURE__ */ React.createElement("div", { style: { color: "#fff", fontWeight: 900, fontSize: 18, marginBottom: 4, textAlign: "center" } }, searchStation.name),
+    /* @__PURE__ */ React.createElement("div", { style: { color: "#666", fontSize: 12, marginBottom: 20, textAlign: "center" } }, "Choisir une ligne"),
+    searchStation.lines.map((l, i) => {
+      var _a2, _b2;
+      const lineObj = getLine(l.lineId);
+      if (!lineObj) return null;
+      const sts = (STATIONS[l.lineId] || CABLE_STATIONS[l.lineId] || []).filter((s) => !s.fork && !s.branch);
+      const termA2 = (_a2 = sts[0]) == null ? void 0 : _a2.n;
+      const termB2 = (_b2 = sts[sts.length - 1]) == null ? void 0 : _b2.n;
+      return /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => {
+        setTransport(l.transport);
+        setLineId(l.lineId);
+        setStation({ n: l.name, c: l.c, walk: l.walk });
+        setDirection(null);
+        setNoteText(notes[`${l.lineId}::${l.name}`] || "");
+        setTab("train");
+        setScreen("station");
+        setSearchStation(null);
+      }, style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        background: "#1a1a1a",
+        border: "1px solid #333",
+        borderRadius: 14,
+        padding: "14px 16px",
+        marginBottom: 10,
+        cursor: "pointer",
+        textAlign: "left"
+      } }, /* @__PURE__ */ React.createElement(Badge, { id: l.lineId, size: 36 }), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#fff", fontWeight: 700, fontSize: 14 } }, "Ligne ", l.lineId), termA2 && termB2 && /* @__PURE__ */ React.createElement("div", { style: { color: "#888", fontSize: 11, marginTop: 2 } }, termA2, " \u2194 ", termB2)), /* @__PURE__ */ React.createElement("span", { style: { color: "#555", fontSize: 20 } }, "\u203A"));
+    }),
+    /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setSearchStation(null),
+        style: {
+          display: "block",
+          marginTop: 6,
+          color: "#666",
+          background: "none",
+          border: "none",
+          fontSize: 14,
+          cursor: "pointer",
+          width: "100%",
+          textAlign: "center"
+        }
+      },
+      "Annuler"
+    )
+  )), "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */}", showAdmin && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.4)",
+    zIndex: 9999,
+    display: "flex",
+    flexDirection: "column"
+  } }, /* @__PURE__ */ React.createElement("div", { style: {
+    background: "#fff",
+    padding: "14px 16px",
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    borderBottom: "1px solid #ccc",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+  } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    if (!adminUnlocked || adminScreen === "menu") {
+      setShowAdmin(false);
+      setAdminScreen("menu");
+    } else if (adminScreen === "editStation") {
+      setAdminScreen("editLine");
+    } else if (adminScreen === "editLine") {
+      setAdminScreen("selectLine");
+    } else {
+      setAdminScreen("menu");
+    }
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setShowAdmin(false);
+    setAdminUnlocked(false);
+    setAdminPassword("");
+    setAdminScreen("menu");
+  }, style: {
+    background: "#f0f0f0",
+    border: "1px solid #ccc",
+    borderRadius: 8,
+    padding: "6px 14px",
+    color: "#555",
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: "pointer"
+  } }, "Annuler")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: 20, background: "#f7f7f7" } }, !adminUnlocked && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 320, margin: "50px auto 0", textAlign: "center" } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 52, marginBottom: 20 } }, "\u{1F510}"), /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontSize: 20, fontWeight: 800, marginBottom: 6 } }, "Acc\xE8s Administration"), /* @__PURE__ */ React.createElement("div", { style: { color: "#777", fontSize: 13, marginBottom: 28 } }, "Entrez votre code d'acc\xE8s"), /* @__PURE__ */ React.createElement(
+    "input",
+    {
+      type: "password",
+      value: adminPassword,
+      onChange: (e) => setAdminPassword(e.target.value),
+      onKeyDown: (e) => {
+        if (e.key === "Enter") {
+          if (adminPassword === "metro75") {
+            setAdminUnlocked(true);
+            setAdminPassword("");
+          } else {
+            alert("\u274C Code incorrect");
+          }
+        }
+      },
+      placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022",
+      style: {
+        width: "100%",
+        boxSizing: "border-box",
+        padding: "14px",
+        background: "#fff",
+        border: "2px solid #000",
+        borderRadius: 8,
+        color: "#111",
+        fontSize: 18,
+        outline: "none",
+        marginBottom: 16,
+        textAlign: "center",
+        letterSpacing: 6
+      }
+    }
+  ), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    if (adminPassword === "metro75") {
+      setAdminUnlocked(true);
+      setAdminPassword("");
+    } else {
+      alert("\u274C Code incorrect");
+    }
+  }, style: {
+    width: "100%",
+    padding: "16px",
+    background: "#111",
+    border: "none",
+    borderRadius: 10,
+    color: "#fff",
+    fontWeight: 800,
+    fontSize: 18,
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22 } }, "\u2705"), " D\xE9verrouiller")), adminUnlocked && adminScreen === "menu" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } }, [
+    {
+      icon: "\u{1F689}",
+      label: "Modifier une station",
+      sub: "Nom, correspondances directes et \xE0 pied",
+      action: () => setAdminScreen("selectLine")
+    },
+    {
+      icon: "🔍",
+      label: "Zoom d'affichage",
+      sub: "Agrandir l'interface",
+      action: () => setAdminScreen("zoom")
+    },
+    {
+      icon: "\u{1F5D1}\uFE0F",
+      label: "R\xE9initialiser toutes les modifications",
+      sub: "Revenir aux donn\xE9es d'origine",
+      action: () => {
+        if (window.confirm("Toutes vos modifications seront supprim\xE9es. Confirmer ?")) {
+          setAdminEdits({});
+          alert("\u2705 Donn\xE9es r\xE9initialis\xE9es !");
+        }
+      }
+    }
+  ].map((item, i) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: i,
+      onClick: item.action,
+      style: {
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 14,
+        background: "#fff",
+        border: "1px solid #ccc",
+        borderRadius: 12,
+        padding: "16px",
+        marginBottom: 10,
+        cursor: "pointer",
+        textAlign: "left",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.06)"
+      }
+    },
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 28 } }, item.icon),
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 700, fontSize: 15 } }, item.label), /* @__PURE__ */ React.createElement("div", { style: { color: "#888", fontSize: 12, marginTop: 2 } }, item.sub)),
+    /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", color: "#bbb", fontSize: 20 } }, "\u203A")
+  ))), adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+      React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "🔍 Zoom"),
+      React.createElement("div", { style: { color: "#888", fontSize: 13, marginBottom: 20 } }, "Agrandissement vertical uniquement."),
+      [1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3].map((z) =>
+        React.createElement("button", { key: z, onClick: () => setZoomLevel(z), style: {
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: zoomLevel === z ? "#111" : "#fff", border: "1.5px solid " + (zoomLevel === z ? "#111" : "#ddd"),
+          borderRadius: 12, padding: "14px 18px", marginBottom: 10, cursor: "pointer"
+        }},
+          React.createElement("span", { style: { color: zoomLevel === z ? "#fff" : "#111", fontWeight: 700, fontSize: 15 } },
+            z === 1.0 ? "100% — Normal" : Math.round(z*100) + "% — Agrandi"),
+          zoomLevel === z && React.createElement("span", { style: { color: "#FFD700", fontSize: 20 } }, "✓")
+        )
+      )
+    ),
+    adminUnlocked && adminScreen === "selectLine" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } }, [
+    { cat: "M\xC9TRO", lines: METRO_LINES },
+    { cat: "RER", lines: RER_LINES },
+    { cat: "TRAM", lines: TRAM_LINES },
+    { cat: "C\xC2BLE", lines: CABLE_LINES }
+  ].map(({ cat, lines }) => /* @__PURE__ */ React.createElement("div", { key: cat, style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
+    color: "#999",
+    fontSize: 11,
+    fontWeight: 800,
+    textTransform: "uppercase",
+    letterSpacing: 2,
+    marginBottom: 10
+  } }, cat), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 8 } }, lines.map((l) => /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      key: l.id,
+      onClick: () => {
+        setAdminLineId(l.id);
+        setAdminScreen("editLine");
+      },
+      style: {
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        padding: 2,
+        borderRadius: "50%",
+        outline: adminEdits[l.id] ? "2px solid #4caf50" : "none"
+      }
+    },
+    /* @__PURE__ */ React.createElement(Badge, { id: l.id, size: 38 })
+  )))))), adminUnlocked && adminScreen === "editLine" && adminLineId && (() => {
+    const sts = STATIONS[adminLineId] || CABLE_STATIONS[adminLineId] || [];
+    const lineEdits = adminEdits[adminLineId] || {};
+    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 400, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 12, marginBottom: 12 } }, "Touchez une station pour la modifier :"), /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #ddd", borderRadius: 10, overflow: "hidden" } }, sts.filter((s) => !s.fork).map((st, i) => {
+      const edited = lineEdits[st.n];
+      return /* @__PURE__ */ React.createElement(
+        "button",
+        {
+          key: i,
+          onClick: () => {
+            setAdminStation(st);
+            setAdminScreen("editStation");
+          },
+          style: {
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: "#fff",
+            border: "none",
+            borderBottom: `1px solid #eee`,
+            borderRadius: 0,
+            padding: "12px 14px",
+            marginBottom: 0,
+            cursor: "pointer",
+            textAlign: "left"
+          }
+        },
+        /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: edited ? "#2e7d32" : "#111", fontWeight: 700, fontSize: 14 } }, edited && edited.n || st.n), (() => {
+          const c = (edited == null ? void 0 : edited.c) !== void 0 ? edited.c : st.c || [];
+          return c.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 3, marginTop: 4, flexWrap: "wrap" } }, c.map((x, j) => /* @__PURE__ */ React.createElement(Badge, { key: j, id: x, size: 16 }))) : null;
+        })()),
+        edited && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: "#4caf50", marginRight: 4 } }, "\u270F\uFE0F"),
+        /* @__PURE__ */ React.createElement("span", { style: { color: "#ccc", fontSize: 18 } }, "\u203A")
+      );
+    })));
+  })(), adminUnlocked && adminScreen === "editStation" && adminStation && adminLineId && (() => {
+    const lineEdits = adminEdits[adminLineId] || {};
+    const currentEdit = lineEdits[adminStation.n] || {};
+    const currentName = currentEdit.n !== void 0 ? currentEdit.n : adminStation.n;
+    const currentC = currentEdit.c !== void 0 ? currentEdit.c : adminStation.c || [];
+    const currentWalk = currentEdit.walk !== void 0 ? currentEdit.walk : adminStation.walk || [];
+    const saveField = (field, value) => {
+      setAdminEdits((prev) => {
+        const le = __spreadValues({}, prev[adminLineId] || {});
+        le[adminStation.n] = __spreadProps(__spreadValues({}, le[adminStation.n] || {}), { [field]: value });
+        return __spreadProps(__spreadValues({}, prev), { [adminLineId]: le });
+      });
+    };
+    return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 400, margin: "0 auto" } }, /* @__PURE__ */ React.createElement("div", { style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 20,
+      background: "#fff",
+      borderRadius: 10,
+      padding: "12px 14px",
+      border: "1px solid #ddd",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.06)"
+    } }, /* @__PURE__ */ React.createElement(Badge, { id: adminLineId, size: 30 }), /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 800, fontSize: 15 } }, adminStation.n)), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      color: "#555",
+      fontSize: 11,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 8
+    } }, "\u270F\uFE0F Nom de la station"), /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        defaultValue: currentName,
+        onBlur: (e) => {
+          const v = e.target.value.trim();
+          if (v) saveField("n", v);
+        },
+        style: {
+          width: "100%",
+          boxSizing: "border-box",
+          padding: "13px 14px",
+          background: "#fff",
+          border: "2px solid #000",
+          borderRadius: 8,
+          color: "#111",
+          fontSize: 15,
+          outline: "none"
+        }
+      }
+    )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      color: "#555",
+      fontSize: 11,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 8
+    } }, "\u{1F500} Correspondances directes"), /* @__PURE__ */ React.createElement("div", { style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 6,
+      marginBottom: 10,
+      minHeight: 40,
+      background: "#fff",
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      padding: "8px"
+    } }, currentC.map((c, i) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: i,
+        onClick: () => saveField("c", currentC.filter((x) => x !== c)),
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          background: "#f5f5f5",
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          padding: "3px 6px",
+          cursor: "pointer"
+        }
+      },
+      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 20 }),
+      /* @__PURE__ */ React.createElement("span", { style: { color: "#e53935", fontSize: 13, fontWeight: 700 } }, "\u2715")
+    )), currentC.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 12, fontStyle: "italic" } }, "Aucune")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        id: "inp_c",
+        placeholder: "Ex: 4, A, T3b...",
+        style: {
+          flex: 1,
+          padding: "11px 12px",
+          background: "#fff",
+          border: "2px solid #000",
+          borderRadius: 8,
+          color: "#111",
+          fontSize: 14,
+          outline: "none"
+        }
+      }
+    ), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      var _a2, _b2;
+      const v = (_b2 = (_a2 = document.getElementById("inp_c")) == null ? void 0 : _a2.value) == null ? void 0 : _b2.trim();
+      if (v && !currentC.includes(v)) {
+        saveField("c", [...currentC, v]);
+        if (document.getElementById("inp_c")) document.getElementById("inp_c").value = "";
+      }
+    }, style: {
+      padding: "11px 16px",
+      background: "#111",
+      border: "none",
+      borderRadius: 8,
+      color: "#fff",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: "pointer"
+    } }, "+ Ajouter"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
+      color: "#555",
+      fontSize: 11,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: 1,
+      marginBottom: 8
+    } }, "\u{1F6B6} Correspondances \xE0 pied"), /* @__PURE__ */ React.createElement("div", { style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 6,
+      marginBottom: 10,
+      minHeight: 40,
+      background: "#fff",
+      border: "1px solid #ddd",
+      borderRadius: 8,
+      padding: "8px"
+    } }, currentWalk.map((c, i) => /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        key: i,
+        onClick: () => saveField("walk", currentWalk.filter((x) => x !== c)),
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 3,
+          background: "#f5f5f5",
+          border: "1px solid #ccc",
+          borderRadius: 6,
+          padding: "3px 6px",
+          cursor: "pointer",
+          opacity: 0.8
+        }
+      },
+      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 20 }),
+      /* @__PURE__ */ React.createElement("span", { style: { color: "#e53935", fontSize: 13, fontWeight: 700 } }, "\u2715")
+    )), currentWalk.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 12, fontStyle: "italic" } }, "Aucune")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      "input",
+      {
+        id: "inp_w",
+        placeholder: "Ex: 9, C, T2...",
+        style: {
+          flex: 1,
+          padding: "11px 12px",
+          background: "#fff",
+          border: "2px solid #000",
+          borderRadius: 8,
+          color: "#111",
+          fontSize: 14,
+          outline: "none"
+        }
+      }
+    ), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      var _a2, _b2;
+      const v = (_b2 = (_a2 = document.getElementById("inp_w")) == null ? void 0 : _a2.value) == null ? void 0 : _b2.trim();
+      if (v && !currentWalk.includes(v)) {
+        saveField("walk", [...currentWalk, v]);
+        if (document.getElementById("inp_w")) document.getElementById("inp_w").value = "";
+      }
+    }, style: {
+      padding: "11px 16px",
+      background: "#555",
+      border: "none",
+      borderRadius: 8,
+      color: "#fff",
+      fontWeight: 700,
+      fontSize: 14,
+      cursor: "pointer"
+    } }, "+ Ajouter"))), lineEdits[adminStation.n] && /* @__PURE__ */ React.createElement("button", { onClick: () => {
+      if (window.confirm(`R\xE9initialiser "${adminStation.n}" ?`)) {
+        setAdminEdits((prev) => {
+          const le = __spreadValues({}, prev[adminLineId] || {});
+          delete le[adminStation.n];
+          return __spreadProps(__spreadValues({}, prev), { [adminLineId]: le });
+        });
+        setAdminScreen("editLine");
+      }
+    }, style: {
+      width: "100%",
+      padding: "12px",
+      background: "#fff",
+      border: "1px solid #e53935",
+      borderRadius: 8,
+      color: "#e53935",
+      fontWeight: 700,
+      fontSize: 13,
+      cursor: "pointer",
+      marginBottom: 10
+    } }, "\u{1F504} R\xE9initialiser cette station"), /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => setAdminScreen("editLine"),
+        style: {
+          width: "100%",
+          padding: "14px",
+          background: "#111",
+          border: "none",
+          borderRadius: 8,
+          color: "#fff",
+          fontWeight: 800,
+          fontSize: 16,
+          cursor: "pointer"
+        }
+      },
+      "\u2705 Enregistrer et retour"
+    ));
+  })())));
+}
+try {
+  setProgress(95,'Lancement');
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(React.createElement(App));
+  setProgress(100,'Prêt !');
+  setTimeout(()=>{ document.getElementById('loading').style.display='none'; },400);
+} catch(e) {
+  document.getElementById('progressText').textContent='Erreur: '+e.message;
+  console.error(e);
+}
+  </script>
+</body>
+</html>
