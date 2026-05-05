@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=280, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="theme-color" content="#000000"/>
@@ -11,13 +11,14 @@
     *{margin:0;padding:0;box-sizing:border-box;}
     html{overflow:hidden;width:100%;height:100%;margin:0;padding:0;}body{overflow:hidden;width:100%;height:100%;margin:0;padding:0;touch-action:pan-y;}
     body{background:#000;color:#fff;font-family:Arial,sans-serif;}
-    #root{height:100vh;display:flex;flex-direction:column;overflow:hidden;width:100%;}
+    #root{height:100vh;display:flex;flex-direction:column;overflow:hidden;width:100%;font-size:calc(var(--app-scale, 1) * 16px);}
     #loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;
       align-items:center;justify-content:center;z-index:9999;gap:20px;}
     .progress-bar{width:220px;height:6px;background:#222;border-radius:3px;overflow:hidden;}
     .progress-fill{height:100%;background:#FFD700;border-radius:3px;transition:width 0.3s ease;width:0%;}
     .progress-text{color:#666;font-size:12px;}
     .scrollable{overflow-y:scroll!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain;}
+    .scroll-list{overflow-y:auto!important;-webkit-overflow-scrolling:touch!important;flex:1 1 0!important;min-height:0!important;}
   </style>
 </head>
 <body>
@@ -39,6 +40,8 @@
       document.getElementById('progressText').textContent=(msg||'Chargement...')+' '+p+'%';
     }
     setProgress(10,'Démarrage');
+  const savedScale = localStorage.getItem('appScale');
+  if (savedScale) document.documentElement.style.setProperty('--app-scale', savedScale);
   </script>
   <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"
     onload="setProgress(50,'React chargé')"
@@ -2784,12 +2787,12 @@ function App() {
     }
   }, [customStations]);
   const [zoomLevel, setZoomLevel] = useState(() => {
-    try { return parseFloat(localStorage.getItem("mpv4_zoom")) || 1.15; } catch(e) { return 1.15; }
+    try { return parseFloat(localStorage.getItem("mpv4_zoom")) || 1.0; } catch(e) { return 1.0; }
   });
   useEffect(() => {
     try { localStorage.setItem("mpv4_zoom", zoomLevel); } catch(e) {}
-    const el = document.getElementById('root');
-    if (el) { el.style.zoom = zoomLevel === 1.0 ? '' : String(zoomLevel); }
+    document.documentElement.style.setProperty('--app-scale', String(zoomLevel));
+    localStorage.setItem('appScale', String(zoomLevel));
   }, [zoomLevel]);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
@@ -3044,7 +3047,7 @@ function App() {
       fontFamily: "Arial Black,sans-serif"
     },
     "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris v2.1")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
     gap: 8,
@@ -3475,7 +3478,7 @@ function App() {
         /* @__PURE__ */ React.createElement("span", null, cfg.label)
       );
     }))
-  ))), /* @__PURE__ */ React.createElement("div", { style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, displayed.map((st, idx) => {
+  ))), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, displayed.map((st, idx) => {
     if (st.fork) {
       return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
         background: "#FFF3E0",
