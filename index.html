@@ -9,7 +9,7 @@
   <title>Mon Métro Paris</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    html,body{overflow:hidden;width:100%;height:100%;margin:0;padding:0;}
+    html{overflow:hidden;width:100%;height:100%;margin:0;padding:0;}body{overflow:hidden;width:100%;height:100%;margin:0;padding:0;touch-action:pan-y;}
     body{background:#000;color:#fff;font-family:Arial,sans-serif;}
     #root{height:100vh;display:flex;flex-direction:column;overflow:hidden;width:100%;}
     #loading{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;
@@ -17,6 +17,7 @@
     .progress-bar{width:220px;height:6px;background:#222;border-radius:3px;overflow:hidden;}
     .progress-fill{height:100%;background:#FFD700;border-radius:3px;transition:width 0.3s ease;width:0%;}
     .progress-text{color:#666;font-size:12px;}
+    .scrollable{overflow-y:scroll!important;-webkit-overflow-scrolling:touch!important;overscroll-behavior:contain;}
   </style>
 </head>
 <body>
@@ -3411,7 +3412,7 @@ function App() {
       },
       "Annuler"
     )
-  )), screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#111" } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
+  )), screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#111" } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
     "div",
     { style: { fontWeight: 800, fontSize: 14 } },
     "\u2192 ",
@@ -3474,7 +3475,7 @@ function App() {
         /* @__PURE__ */ React.createElement("span", null, cfg.label)
       );
     }))
-  ))), /* @__PURE__ */ React.createElement("div", { style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", position: "relative" } }, displayed.map((st, idx) => {
+  ))), /* @__PURE__ */ React.createElement("div", { style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, displayed.map((st, idx) => {
     if (st.fork) {
       return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
         background: "#FFF3E0",
@@ -3741,7 +3742,7 @@ function App() {
       }
     },
     "Fermer"
-  ))), screen === "station" && line && station && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#f4f4f4", minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, /* @__PURE__ */ React.createElement("div", { style: { background: line.color, padding: "12px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(
+  ))), screen === "station" && line && station && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#f4f4f4", minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" } }, /* @__PURE__ */ React.createElement("div", { style: { background: line.color, padding: "12px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setScreen("stations"),
@@ -3991,7 +3992,7 @@ function App() {
       onSave: saveGroup,
       onClose: () => setShowPhotoAI(false)
     }
-  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 18 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
+  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 18 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
     const [lid, sname] = key.split("::");
     const l = getLine(lid);
     if (!l) return null;
