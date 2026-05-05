@@ -2818,6 +2818,86 @@ function formatPath(path) {
 
 setProgress(96,'Chargement...');
 
+function getUniqueStations() {
+  var seen = {};
+  var result = [];
+  var allLines = (typeof ALL_LINES !== 'undefined' ? ALL_LINES : []);
+  allLines.forEach(function(line) {
+    (line.stations || []).forEach(function(st) {
+      if (st.n && !seen[st.n]) {
+        seen[st.n] = true;
+        result.push({ name: st.n, corr: st.c || [] });
+      }
+    });
+  });
+  return result.sort(function(a,b) { return a.name.localeCompare(b.name, 'fr'); });
+}
+
+function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
+  var queryState = React.useState(value || "");
+  var query = queryState[0]; var setQuery = queryState[1];
+  var openState = React.useState(false);
+  var open = openState[0]; var setOpen = openState[1];
+
+  var suggestions = React.useMemo(function() {
+    if (query.length < 2) return [];
+    var q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return getUniqueStations().filter(function(s) {
+      return s.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q);
+    }).slice(0, 8);
+  }, [query]);
+
+  function handleChange(e) {
+    setQuery(e.target.value);
+    onChange(e.target.value);
+    setOpen(true);
+  }
+
+  function handleSelect(name) {
+    setQuery(name);
+    onChange(name);
+    setOpen(false);
+  }
+
+  return React.createElement("div", { style: { position: "relative", width: "100%" } },
+    React.createElement("input", {
+      value: query,
+      onChange: handleChange,
+      onFocus: function() { setOpen(true); },
+      onBlur: function() { setTimeout(function() { setOpen(false); }, 200); },
+      placeholder: placeholder,
+      autoComplete: "off",
+      style: inputStyle
+    }),
+    open && suggestions.length > 0 && React.createElement("div", {
+      style: {
+        position: "absolute", top: "100%", left: 0, right: 0,
+        background: "#fff", border: "2px solid #111",
+        borderRadius: 10, zIndex: 999, maxHeight: 220,
+        overflowY: "auto", boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+      }
+    }, suggestions.map(function(s, i) {
+      return React.createElement("div", {
+        key: i,
+        onMouseDown: function() { handleSelect(s.name); },
+        style: {
+          padding: "10px 14px", cursor: "pointer",
+          borderBottom: i < suggestions.length-1 ? "1px solid #eee" : "none",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          fontSize: 14, fontWeight: 600, color: "#111"
+        }
+      },
+        React.createElement("span", null, s.name),
+        s.corr.length > 0 && React.createElement("div", { style: { display: "flex", gap: 3, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: 120 } },
+          s.corr.slice(0,4).map(function(c) {
+            return React.createElement(Badge, { key: c, id: c, size: 18 });
+          })
+        )
+      );
+    }))
+  );
+}
+
 function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setItiArrivee, itiEtapes, setItiEtapes, itiResult, setItiResult }) {
   var loading = React.useState(false);
   var setLoading = loading[1]; loading = loading[0];
@@ -2875,7 +2955,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
       !itiResult ? React.createElement("div", { onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd },
         React.createElement("div", { style: { marginBottom: 10 } },
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#2e7d32", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
-          React.createElement("input", { value: itiDepart, onChange: function(e) { setItiDepart(e.target.value); }, placeholder: "Station de d\u00E9part...", style: inputStyle })
+          React.createElement(StationAutocomplete, { value: itiDepart, onChange: function(v) { setItiDepart(v); }, placeholder: "Station de d\u00E9part...", inputStyle: inputStyle })
         ),
         itiEtapes.map(function(etape, i) {
           return React.createElement(React.Fragment, { key: i },
@@ -2884,7 +2964,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
             React.createElement("div", { onTouchStart: handleTouchStart(i), style: { fontSize: 20, color: "#bbb", cursor: "grab", padding: "0 4px", touchAction: "none" } }, "\u2630"),
             React.createElement("div", { style: { flex: 1 } },
               React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#1565C0", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF \u00C9tape " + (i+1)),
-              React.createElement("input", { "data-eidx": i, value: etape, onChange: function(e) { updateEtape(i, e.target.value); }, placeholder: "Station...", style: inputStyle })
+              React.createElement(StationAutocomplete, { value: etape, onChange: function(v) { updateEtape(i, v); }, placeholder: "Station...", inputStyle: inputStyle })
             ),
             React.createElement("button", { onClick: function() { removeEtape(i); }, style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "8px 11px", color: "#c00", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 16 } }, "\u00D7")
           ));
@@ -2894,7 +2974,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
         ),
         React.createElement("div", { style: { marginBottom: 12 } },
           React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#c62828", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
-          React.createElement("input", { value: itiArrivee, onChange: function(e) { setItiArrivee(e.target.value); }, placeholder: "Station d'arriv\u00E9e...", style: inputStyle })
+          React.createElement(StationAutocomplete, { value: itiArrivee, onChange: function(v) { setItiArrivee(v); }, placeholder: "Station d'arriv\u00E9e...", inputStyle: inputStyle })
         ),
         React.createElement("button", { onClick: addEtape, style: { width: "100%", padding: 10, background: "#fff", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 14 } }, "+ Ajouter une \u00E9tape"),
         error && React.createElement("div", { style: { background: "#ffebee", borderRadius: 10, padding: "10px 14px", color: "#c00", fontSize: 13, fontWeight: 600, marginBottom: 12 } }, "\u26A0\uFE0F ", error),
@@ -3288,7 +3368,7 @@ function App() {
       onChange: (e) => setSearchQuery(e.target.value),
       onFocus: () => setSearchFocused(true),
       onBlur: () => setTimeout(() => setSearchFocused(false), 200),
-      placeholder: "Rechercher une station...",
+      placeholder: "Rechercher une station...", autoComplete: "off",
       style: {
         flex: 1,
         background: "none",
@@ -3333,9 +3413,9 @@ function App() {
     maxHeight: 340,
     overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
     boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
-  } }, searchResults.map((r, i) => /* @__PURE__ */ React.createElement("button", { key: i, onClick: () => {
-    if (r.lines.length === 1) {
-      const l = r.lines[0];
+  } }, searchResults.flatMap((r, ri) => r.lines.map((l, li) => /* @__PURE__ */ React.createElement("button", {
+    key: ri + "-" + li,
+    onClick: () => {
       setSearchQuery("");
       setTransport(l.transport);
       setLineId(l.lineId);
@@ -3343,24 +3423,30 @@ function App() {
       setDirection(null);
       setNoteText(notes[`${l.lineId}::${l.name}`] || "");
       setTab("train");
-      setScreen("station");
-    } else {
-      setSearchStation(r);
-      setSearchQuery("");
+      setScreen("stations");
+      setShowDir(true);
+    },
+    style: {
+      width: "100%", display: "flex", alignItems: "center",
+      gap: 10, background: "#f8f8f8", border: "none",
+      borderBottom: "2px solid #ddd",
+      padding: "12px 14px", cursor: "pointer", textAlign: "left"
     }
-  }, style: {
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "wrap",
-    gap: 6,
-    background: "#f8f8f8",
-    border: "none",
-    borderBottom: i < searchResults.length - 1 ? "2px solid #aaa" : "none",
-    padding: "13px 14px",
-    cursor: "pointer",
-    textAlign: "left"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 700, fontSize: 16, flexShrink: 1 } }, r.name), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, alignItems: "center", flexWrap: "nowrap", flexShrink: 0 } }, r.lines.map((l, j) => /* @__PURE__ */ React.createElement(Badge, { key: j, id: l.lineId, size: 26 })))))), searchQuery.length >= 2 && searchResults.length === 0 && /* @__PURE__ */ React.createElement("div", { style: {
+  },
+  /* @__PURE__ */ React.createElement(Badge, { id: l.lineId, size: 30 }),
+  /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 700, fontSize: 15, flex: 1 } }, r.name),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 3, flexShrink: 0, flexWrap: "wrap", maxWidth: 100 } },
+    Array.from(r.allC).filter(function(c) { return c !== l.lineId; }).sort(function(a, b) {
+      var isNumA = !isNaN(parseInt(a)), isNumB = !isNaN(parseInt(b));
+      if (isNumA && isNumB) return parseInt(a) - parseInt(b);
+      if (isNumA) return -1;
+      if (isNumB) return 1;
+      return a.localeCompare(b);
+    }).slice(0, 4).map(function(c, j) {
+      return /* @__PURE__ */ React.createElement(Badge, { key: j, id: c, size: 20 });
+    })
+  )
+)))), searchQuery.length >= 2 && searchResults.length === 0 && /* @__PURE__ */ React.createElement("div", { style: {
     position: "absolute",
     top: "100%",
     left: 0,
@@ -4344,7 +4430,7 @@ function App() {
       },
       "Annuler"
     )
-  )), "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */}", showItineraire && React.createElement(ItineraireScreen, {
+  )), showItineraire && React.createElement(ItineraireScreen, {
     onClose: function() { setShowItineraire(false); setItiResult(null); },
     itiDepart: itiDepart, setItiDepart: setItiDepart,
     itiArrivee: itiArrivee, setItiArrivee: setItiArrivee,
@@ -4377,7 +4463,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v3"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
