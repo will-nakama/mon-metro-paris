@@ -2727,7 +2727,7 @@ function buildGraph() {
   }
   var allLineStations = Object.assign({}, STATIONS, CABLE_STATIONS);
   Object.keys(allLineStations).forEach(function(lineId) {
-    var stations = allLineStations[lineId].filter(function(s) { return s.n && !s.fork; });
+    var stations = allLineStations[lineId].filter(function(s) { return s.n; });
     for (var i = 0; i < stations.length - 1; i++) {
       var s1 = stations[i], s2 = stations[i+1];
       if (s1.branch && s2.branch && s1.branch !== s2.branch) continue;
@@ -2908,7 +2908,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   var dragOverState = React.useState(null);
   var setDragOver = dragOverState[1]; var dragOver = dragOverState[0];
 
-  var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #ddd", borderRadius: 10, fontSize: 14, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
+  var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 15, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
 
   function addEtape() { setItiEtapes(function(p) { return p.concat([""]); }); }
   function removeEtape(i) { setItiEtapes(function(p) { return p.filter(function(_,j) { return j!==i; }); }); }
@@ -2954,7 +2954,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
       ),
       !itiResult ? React.createElement("div", { onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd },
         React.createElement("div", { style: { marginBottom: 10 } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#2e7d32", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#2e7d32", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
           React.createElement(StationAutocomplete, { value: itiDepart, onChange: function(v) { setItiDepart(v); }, placeholder: "Station de d\u00E9part...", inputStyle: inputStyle })
         ),
         itiEtapes.map(function(etape, i) {
@@ -2973,7 +2973,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
           React.createElement("button", { onClick: function() { var tmp = itiDepart; setItiDepart(itiArrivee); setItiArrivee(tmp); }, style: { background: "#f0f0f0", border: "2px solid #ddd", borderRadius: "50%", width: 36, height: 36, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontWeight: 700 } }, "\u21C5")
         ),
         React.createElement("div", { style: { marginBottom: 12 } },
-          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#c62828", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#c62828", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
           React.createElement(StationAutocomplete, { value: itiArrivee, onChange: function(v) { setItiArrivee(v); }, placeholder: "Station d'arriv\u00E9e...", inputStyle: inputStyle })
         ),
         React.createElement("button", { onClick: addEtape, style: { width: "100%", padding: 10, background: "#fff", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 14 } }, "+ Ajouter une \u00E9tape"),
@@ -3144,7 +3144,7 @@ function App() {
       lines.forEach((line2) => {
         const sts = stationsMap[line2.id] || [];
         sts.forEach((st) => {
-          if (!st.n || st.fork) return;
+          if (!st.n) return;
           results.push({
             lineId: line2.id,
             transport: tp,
@@ -3160,17 +3160,17 @@ function App() {
   const [searchStation, setSearchStation] = useState(null);
   const searchResults = React.useMemo(() => {
     if (searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const q = searchQuery.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/-/g, " ");
     const groups = {};
     searchIndex.forEach((s) => {
-      const name = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      if (!name.includes(q)) return;
+      const name = s.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/-/g, " ");
+      if (!name.includes(q.trim())) return;
       if (!groups[s.name]) groups[s.name] = { name: s.name, lines: [], allC: /* @__PURE__ */ new Set(), allWalk: /* @__PURE__ */ new Set() };
       groups[s.name].lines.push(s);
       (s.c || []).forEach((c) => groups[s.name].allC.add(c));
       (s.walk || []).forEach((c) => groups[s.name].allWalk.add(c));
     });
-    return Object.values(groups).slice(0, 15).map((g) => __spreadProps(__spreadValues({}, g), {
+    return Object.values(groups).slice(0, 30).map((g) => __spreadProps(__spreadValues({}, g), {
       allC: [...g.allC],
       allWalk: [...g.allWalk]
     }));
@@ -3352,23 +3352,23 @@ function App() {
       fontFamily: "Arial Black,sans-serif"
     },
     "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative", background: "#fff", borderRadius: 16, padding: 2 } }, /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    background: "#f0f0f0",
-    border: `2px solid ${searchFocused ? "#000" : "#555"}`,
+    background: "#ffffff",
+    border: `2px solid ${searchFocused ? "#000" : "#aaa"}`,
     borderRadius: 14,
     padding: "10px 14px",
     transition: "all 0.2s"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.5 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.8 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
     "input",
     {
       value: searchQuery,
       onChange: (e) => setSearchQuery(e.target.value),
       onFocus: () => setSearchFocused(true),
       onBlur: () => setTimeout(() => setSearchFocused(false), 200),
-      placeholder: "Rechercher une station...", autoComplete: "off",
+      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", autoCorrect: "off", autoCapitalize: "off", spellCheck: false,
       style: {
         flex: 1,
         background: "none",
@@ -3405,7 +3405,7 @@ function App() {
     top: "100%",
     left: 0,
     right: 0,
-    zIndex: 499,
+    zIndex: 999,
     background: "#f8f8f8",
     border: "2px solid #000",
     borderRadius: 12,
@@ -3740,7 +3740,7 @@ function App() {
       },
       "Annuler"
     )
-  )), screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer", color: "#111" } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
+  )), screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 44, fontWeight: 900, cursor: "pointer", color: "#111", padding: "4px 12px 4px 4px", minWidth: 52, minHeight: 52, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
     "div",
     { style: { fontWeight: 800, fontSize: 14 } },
     "\u2192 ",
@@ -3803,7 +3803,7 @@ function App() {
         /* @__PURE__ */ React.createElement("span", null, cfg.label)
       );
     }))
-  ))), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, displayed.map((st, idx) => {
+  ))), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", paddingBottom: 80 } }, displayed.map((st, idx) => {
     if (st.fork) {
       return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
         background: "#FFF3E0",
@@ -4105,7 +4105,9 @@ function App() {
       style: {
         background: "rgba(0,0,0,0.15)",
         border: "none",
-        fontSize: 18,
+        fontSize: 28,
+        minWidth: 48,
+        minHeight: 48,
         cursor: "pointer",
         borderRadius: 8,
         width: 34,
@@ -4463,7 +4465,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v3"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v10"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
