@@ -2717,6 +2717,226 @@ function TrainDiagram({ trainData, lineColor, userDirection }) {
   }))));
 }
 const SK_FAV = "mpv4_fav", SK_NOTES = "mpv4_notes";
+function buildGraph() {
+  var graph = {};
+  function addEdge(s1, s2, lineId) {
+    if (!graph[s1]) graph[s1] = [];
+    if (!graph[s2]) graph[s2] = [];
+    graph[s1].push({ station: s2, line: lineId, cost: 1 });
+    graph[s2].push({ station: s1, line: lineId, cost: 1 });
+  }
+  var allLineStations = Object.assign({}, STATIONS, CABLE_STATIONS);
+  Object.keys(allLineStations).forEach(function(lineId) {
+    var stations = allLineStations[lineId].filter(function(s) { return s.n && !s.fork; });
+    for (var i = 0; i < stations.length - 1; i++) {
+      var s1 = stations[i], s2 = stations[i+1];
+      if (s1.branch && s2.branch && s1.branch !== s2.branch) continue;
+      addEdge(s1.n, s2.n, lineId);
+    }
+  });
+  Object.keys(allLineStations).forEach(function(lineId) {
+    allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
+      var corrs = (s.c || []).concat(s.walk || []);
+      corrs.forEach(function(corrLine) {
+        var corrSts = allLineStations[corrLine] || [];
+        if (corrSts.find(function(cs) { return cs.n === s.n; })) {
+          if (!graph[s.n]) graph[s.n] = [];
+          graph[s.n].push({ station: s.n, line: corrLine, cost: 3, transfer: true });
+        }
+      });
+    });
+  });
+  return graph;
+}
+
+function dijkstra(graph, start, end) {
+  var dist = {}, prev = {}, visited = {};
+  var pq = [[0, start, ""]];
+  dist[start + "|"] = 0;
+  while (pq.length > 0) {
+    pq.sort(function(a,b) { return a[0]-b[0]; });
+    var item = pq.shift();
+    var cost = item[0], node = item[1], line = item[2];
+    var key = node + "|" + line;
+    if (visited[key]) continue;
+    visited[key] = true;
+    if (node === end) {
+      var path = [];
+      var cur = node, curLine = line;
+      while (cur !== undefined) {
+        path.unshift({ station: cur, line: curLine });
+        var p = prev[cur + "|" + curLine];
+        if (!p) break;
+        cur = p.station; curLine = p.line;
+      }
+      return path;
+    }
+    var neighbors = graph[node] || [];
+    neighbors.forEach(function(nb) {
+      var nc = cost + nb.cost;
+      var nk = nb.station + "|" + nb.line;
+      if (dist[nk] === undefined || nc < dist[nk]) {
+        dist[nk] = nc;
+        prev[nk] = { station: node, line: line };
+        pq.push([nc, nb.station, nb.line]);
+      }
+    });
+  }
+  return null;
+}
+
+function findPath(start, end, viaList) {
+  var graph = buildGraph();
+  var waypoints = [start].concat(viaList.filter(function(v) { return v && v.trim(); })).concat([end]);
+  var fullPath = [];
+  for (var w = 0; w < waypoints.length - 1; w++) {
+    var seg = dijkstra(graph, waypoints[w], waypoints[w+1]);
+    if (!seg) return null;
+    fullPath = w === 0 ? seg : fullPath.concat(seg.slice(1));
+  }
+  return fullPath;
+}
+
+function formatPath(path) {
+  if (!path || path.length === 0) return [];
+  var segs = [];
+  var curLine = path[0].line;
+  var curStations = [path[0].station];
+  for (var i = 1; i < path.length; i++) {
+    if (path[i].line !== curLine) {
+      segs.push({ line: curLine, stations: curStations });
+      curLine = path[i].line;
+      curStations = [path[i-1].station, path[i].station];
+    } else {
+      if (curStations[curStations.length-1] !== path[i].station)
+        curStations.push(path[i].station);
+    }
+  }
+  segs.push({ line: curLine, stations: curStations });
+  return segs.filter(function(s) { return s.stations.length >= 1; });
+}
+
+setProgress(96,'Chargement...');
+
+function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setItiArrivee, itiEtapes, setItiEtapes, itiResult, setItiResult }) {
+  var loading = React.useState(false);
+  var setLoading = loading[1]; loading = loading[0];
+  var errorState = React.useState(null);
+  var setError = errorState[1]; var error = errorState[0];
+  var dragState = React.useState(null);
+  var setDragIdx = dragState[1]; var dragIdx = dragState[0];
+  var dragOverState = React.useState(null);
+  var setDragOver = dragOverState[1]; var dragOver = dragOverState[0];
+
+  var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #ddd", borderRadius: 10, fontSize: 14, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
+
+  function addEtape() { setItiEtapes(function(p) { return p.concat([""]); }); }
+  function removeEtape(i) { setItiEtapes(function(p) { return p.filter(function(_,j) { return j!==i; }); }); }
+  function updateEtape(i, v) { setItiEtapes(function(p) { return p.map(function(e,j) { return j===i ? v : e; }); }); }
+
+  function handleTouchStart(i) { return function(e) { e.stopPropagation(); setDragIdx(i); }; }
+  function handleTouchMove(e) {
+    if (dragIdx === null) return;
+    e.preventDefault();
+    var t = e.touches[0];
+    var el = document.elementFromPoint(t.clientX, t.clientY);
+    if (el && el.dataset && el.dataset.eidx !== undefined) setDragOver(parseInt(el.dataset.eidx));
+  }
+  function handleTouchEnd() {
+    if (dragIdx !== null && dragOver !== null && dragIdx !== dragOver) {
+      setItiEtapes(function(p) {
+        var a = p.slice();
+        var m = a.splice(dragIdx, 1)[0];
+        a.splice(dragOver, 0, m);
+        return a;
+      });
+    }
+    setDragIdx(null); setDragOver(null);
+  }
+
+  function calculer() {
+    if (!itiDepart.trim() || !itiArrivee.trim()) { setError("Renseignez le d\u00E9part et l'arriv\u00E9e."); return; }
+    setLoading(true); setError(null);
+    setTimeout(function() {
+      var path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes);
+      if (!path) { setError("Itin\u00E9raire introuvable. V\u00E9rifiez les noms de stations."); setLoading(false); return; }
+      setItiResult(formatPath(path));
+      setLoading(false);
+    }, 50);
+  }
+
+  return React.createElement("div", { style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 300, display: "flex", alignItems: "flex-end" }, onClick: onClose },
+    React.createElement("div", { style: { background: "#f5f5f5", borderRadius: "22px 22px 0 0", width: "100%", maxWidth: 480, margin: "0 auto", padding: "16px 16px 40px", maxHeight: "92vh", overflowY: "auto", touchAction: "pan-y" }, onClick: function(e) { e.stopPropagation(); } },
+      React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } },
+        React.createElement("button", { onClick: onClose, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", fontWeight: 900, padding: "0 10px 0 0" } }, "\u2039"),
+        React.createElement("div", { style: { fontWeight: 900, fontSize: 18, color: "#111" } }, "\uD83D\uDCCD It\u00E9n\u00E9raire"),
+        itiResult && React.createElement("button", { onClick: function() { setItiResult(null); setError(null); }, style: { marginLeft: "auto", background: "#111", border: "none", borderRadius: 8, padding: "6px 12px", color: "#fff", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Modifier")
+      ),
+      !itiResult ? React.createElement("div", { onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd },
+        React.createElement("div", { style: { marginBottom: 10 } },
+          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#2e7d32", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
+          React.createElement("input", { value: itiDepart, onChange: function(e) { setItiDepart(e.target.value); }, placeholder: "Station de d\u00E9part...", style: inputStyle })
+        ),
+        itiEtapes.map(function(etape, i) {
+          return React.createElement(React.Fragment, { key: i },
+            React.createElement("div", { style: { height: 1, background: "#e0e0e0", margin: "0 0 8px 0" } }),
+            React.createElement("div", { "data-eidx": i, style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: dragOver === i ? "#e3f2fd" : "transparent", borderRadius: 10, padding: "0 4px", opacity: dragIdx === i ? 0.4 : 1 } },
+            React.createElement("div", { onTouchStart: handleTouchStart(i), style: { fontSize: 20, color: "#bbb", cursor: "grab", padding: "0 4px", touchAction: "none" } }, "\u2630"),
+            React.createElement("div", { style: { flex: 1 } },
+              React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#1565C0", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF \u00C9tape " + (i+1)),
+              React.createElement("input", { "data-eidx": i, value: etape, onChange: function(e) { updateEtape(i, e.target.value); }, placeholder: "Station...", style: inputStyle })
+            ),
+            React.createElement("button", { onClick: function() { removeEtape(i); }, style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "8px 11px", color: "#c00", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 16 } }, "\u00D7")
+          ));
+        }),
+        React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 8 } },
+          React.createElement("button", { onClick: function() { var tmp = itiDepart; setItiDepart(itiArrivee); setItiArrivee(tmp); }, style: { background: "#f0f0f0", border: "2px solid #ddd", borderRadius: "50%", width: 36, height: 36, cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center", color: "#333", fontWeight: 700 } }, "\u21C5")
+        ),
+        React.createElement("div", { style: { marginBottom: 12 } },
+          React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#c62828", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
+          React.createElement("input", { value: itiArrivee, onChange: function(e) { setItiArrivee(e.target.value); }, placeholder: "Station d'arriv\u00E9e...", style: inputStyle })
+        ),
+        React.createElement("button", { onClick: addEtape, style: { width: "100%", padding: 10, background: "#fff", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 14 } }, "+ Ajouter une \u00E9tape"),
+        error && React.createElement("div", { style: { background: "#ffebee", borderRadius: 10, padding: "10px 14px", color: "#c00", fontSize: 13, fontWeight: 600, marginBottom: 12 } }, "\u26A0\uFE0F ", error),
+        React.createElement("button", { onClick: calculer, disabled: loading, style: { width: "100%", padding: 14, background: loading ? "#999" : "#111", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, fontSize: 15, cursor: loading ? "default" : "pointer" } }, loading ? "Calcul..." : "Calculer l'itin\u00E9raire")
+      )
+      : React.createElement("div", null,
+        React.createElement("div", { style: { background: "#fff", borderRadius: 12, padding: "12px 14px", marginBottom: 14, border: "1px solid #e0e0e0" } },
+          React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 4 } }, itiDepart, " \u2192 ", itiArrivee),
+          React.createElement("div", { style: { fontSize: 12, color: "#888" } }, itiResult.length <= 1 ? "Direct \u2014 sans correspondance" : (itiResult.length - 1) + " correspondance" + (itiResult.length > 2 ? "s" : ""))
+        ),
+        itiResult.map(function(seg, i) {
+          var lineObj = getLine(seg.line);
+          var lc = lineObj ? lineObj.color : "#999";
+          return React.createElement("div", { key: i, style: { marginBottom: 12 } },
+            React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 8 } },
+              React.createElement(Badge, { id: seg.line, size: 28 }),
+              React.createElement("div", null,
+                React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: "#111" } }, "Ligne " + seg.line),
+                React.createElement("div", { style: { fontSize: 11, color: "#888" } }, (seg.stations.length - 1) + " station" + (seg.stations.length > 2 ? "s" : ""))
+              )
+            ),
+            React.createElement("div", { style: { background: "#fff", borderRadius: 10, border: "1px solid #e0e0e0", overflow: "hidden" } },
+              seg.stations.map(function(st, j) {
+                var isFirst = j === 0, isLast = j === seg.stations.length - 1;
+                var isCorr = isLast && i < itiResult.length - 1;
+                return React.createElement("div", { key: j, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderBottom: j < seg.stations.length - 1 ? "1px solid #f5f5f5" : "none", background: (isFirst || isLast) ? lc + "20" : "#fff" } },
+                  React.createElement("div", { style: { width: 9, height: 9, borderRadius: "50%", background: (isFirst || isLast) ? lc : "#ddd", border: "2px solid " + lc, flexShrink: 0 } }),
+                  React.createElement("div", { style: { flex: 1 } },
+                    React.createElement("div", { style: { fontWeight: (isFirst || isLast) ? 700 : 400, fontSize: 13, color: "#111" } }, st),
+                    isCorr && React.createElement("div", { style: { fontSize: 11, color: "#E65100", fontWeight: 600, marginTop: 2 } }, "\uD83D\uDD04 Correspondance \u2192 ligne " + itiResult[i+1].line)
+                  )
+                );
+              })
+            )
+          );
+        })
+      )
+    )
+  );
+}
+
+
 function App() {
   var _a, _b, _c, _d, _e;
   const [screen, setScreen] = useState("home");
@@ -2794,6 +3014,11 @@ function App() {
     document.documentElement.style.setProperty('--app-scale', String(zoomLevel));
     localStorage.setItem('appScale', String(zoomLevel));
   }, [zoomLevel]);
+  const [showItineraire, setShowItineraire] = useState(false);
+  const [itiDepart, setItiDepart] = useState("");
+  const [itiArrivee, setItiArrivee] = useState("");
+  const [itiEtapes, setItiEtapes] = useState([]);
+  const [itiResult, setItiResult] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
   const [adminUnlocked, setAdminUnlocked] = useState(true);
@@ -3047,7 +3272,7 @@ function App() {
       fontFamily: "Arial Black,sans-serif"
     },
     "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 22, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris v2.1")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
     gap: 8,
@@ -3188,7 +3413,21 @@ function App() {
       overflow: "hidden",
       minWidth: 0
     } }, (t.k === "metro" ? METRO_LINES : t.k === "rer" ? RER_LINES : t.k === "tram" ? TRAM_LINES : CABLE_LINES).slice(0, 5).map((l) => /* @__PURE__ */ React.createElement(Badge, { key: l.id, id: l.id, size: t.k === "tram" ? 26 : 30 })))
-  )), favorites.length > 0 && /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement(
+    "button",
+    {
+      onClick: () => setShowItineraire(true),
+      style: {
+        width: "100%", maxWidth: 360, marginBottom: 10,
+        background: "#1a1a2e", border: "2px solid #333",
+        borderRadius: 14, padding: "12px 16px",
+        cursor: "pointer", display: "flex",
+        alignItems: "center", gap: 10, color: "#fff"
+      }
+    },
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F4CD}"),
+    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, fontWeight: 700 } }, "Calculer un itin\xE9raire")
+  ), favorites.length > 0 && /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setScreen("favorites"),
@@ -4105,7 +4344,14 @@ function App() {
       },
       "Annuler"
     )
-  )), "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */}", showAdmin && /* @__PURE__ */ React.createElement("div", { style: {
+  )), "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 */}", showItineraire && React.createElement(ItineraireScreen, {
+    onClose: function() { setShowItineraire(false); setItiResult(null); },
+    itiDepart: itiDepart, setItiDepart: setItiDepart,
+    itiArrivee: itiArrivee, setItiArrivee: setItiArrivee,
+    itiEtapes: itiEtapes, setItiEtapes: setItiEtapes,
+    itiResult: itiResult, setItiResult: setItiResult
+  }),
+  showAdmin && /* @__PURE__ */ React.createElement("div", { style: {
     position: "fixed",
     inset: 0,
     background: "rgba(0,0,0,0.4)",
