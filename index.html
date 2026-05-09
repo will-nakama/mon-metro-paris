@@ -6,7 +6,7 @@
   <meta name="mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="theme-color" content="#000000"/>
-  <title>Mon Métro Paris</title>
+  <title>Mon Paris Express</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     html{overflow:hidden;width:100%;height:100%;margin:0;padding:0;}body{overflow:hidden;width:100%;height:100%;margin:0;padding:0;touch-action:pan-y;}
@@ -29,7 +29,7 @@
       <text x="26" y="34" text-anchor="middle" fill="white" font-size="26"
         font-weight="900" font-family="Arial Black,sans-serif">M</text>
     </svg>
-    <div style="color:#fff;font-size:20px;font-weight:900;">Mon Métro Paris</div>
+    <div style="color:#fff;font-size:20px;font-weight:900;">Mon Paris Express</div>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
     <div class="progress-text" id="progressText">Chargement... 0%</div>
   </div>
@@ -168,40 +168,66 @@ const TRAM_LINES = [
 ];
 const PICTOS = {
   escalator_up: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "18", x2: "19", y2: "6", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "15", x2: "11", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "15", x2: "11", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "12", x2: "14", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "14", y1: "12", x2: "14", y2: "9", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "17", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "16,10 19,7 16,4", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
-    label: "Escalator mont\xE9e"
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 56 56", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "56", height: "56", rx: "11", fill: "#fff" }),
+      React.createElement("circle", { cx: "38", cy: "13", r: "5", fill: "#1a1a1a" }),
+      React.createElement("circle", { cx: "15", cy: "43", r: "5", fill: "#1a1a1a" }),
+      React.createElement("line", { x1: "11.8", y1: "40.2", x2: "34.8", y2: "10.2", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "18.2", y1: "45.8", x2: "41.2", y2: "15.8", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "34", y1: "47", x2: "43", y2: "38", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polyline", { points: "37,38 43,38 43,44", fill: "none", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" })
+    ),
+    label: "Escalator montée"
   },
   escalator_down: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "6", x2: "19", y2: "18", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "9", x2: "13", y2: "9", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "9", x2: "10", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "10", y1: "12", x2: "13", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "13", y1: "12", x2: "13", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "7", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "8,14 5,17 8,20", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 56 56", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "56", height: "56", rx: "11", fill: "#fff" }),
+      React.createElement("circle", { cx: "38", cy: "13", r: "5", fill: "#1a1a1a" }),
+      React.createElement("circle", { cx: "15", cy: "43", r: "5", fill: "#1a1a1a" }),
+      React.createElement("line", { x1: "11.8", y1: "40.2", x2: "34.8", y2: "10.2", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "18.2", y1: "45.8", x2: "41.2", y2: "15.8", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "43", y1: "38", x2: "34", y2: "47", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polyline", { points: "40,47 34,47 34,41", fill: "none", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" })
+    ),
     label: "Escalator descente"
   },
   elevator: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#0D3B8C" }), /* @__PURE__ */ React.createElement("rect", { x: "4", y: "7", width: "16", height: "12", rx: "2", fill: "none", stroke: "white", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,11 12,8 14,11", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,15 12,18 14,15", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "13", x2: "20", y2: "13", stroke: "white", strokeWidth: "1", strokeLinecap: "round", opacity: "0.5" })),
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 48 48", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "48", height: "48", rx: "10", fill: "#fff" }),
+      React.createElement("rect", { x: "6", y: "20", width: "36", height: "24", rx: "4", fill: "none", stroke: "#1a1a1a", strokeWidth: "2" }),
+      React.createElement("line", { x1: "24", y1: "22", x2: "24", y2: "42", stroke: "#1a1a1a", strokeWidth: "1.5", strokeLinecap: "round", strokeDasharray: "2,2" }),
+      React.createElement("line", { x1: "14", y1: "17", x2: "14", y2: "6", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polygon", { points: "14,3 9,10 19,10", fill: "#1a1a1a" }),
+      React.createElement("line", { x1: "34", y1: "6", x2: "34", y2: "17", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polygon", { points: "34,20 29,13 39,13", fill: "#1a1a1a" })
+    ),
     label: "Ascenseur"
   },
   // Anciens codes conservés pour compatibilité
   escalator: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#111" }), /* @__PURE__ */ React.createElement("line", { x1: "5", y1: "18", x2: "19", y2: "6", stroke: "white", strokeWidth: "2", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "8", y1: "15", x2: "11", y2: "15", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "15", x2: "11", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("line", { x1: "11", y1: "12", x2: "14", y2: "12", stroke: "white", strokeWidth: "1.8", strokeLinecap: "round" }), /* @__PURE__ */ React.createElement("circle", { cx: "17", cy: "7", r: "1.8", fill: "white" }), /* @__PURE__ */ React.createElement("polyline", { points: "16,10 19,7 16,4", fill: "none", stroke: "white", strokeWidth: "1.5", strokeLinecap: "round", strokeLinejoin: "round" })),
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 56 56", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "56", height: "56", rx: "11", fill: "#fff" }),
+      React.createElement("circle", { cx: "38", cy: "13", r: "5", fill: "#1a1a1a" }),
+      React.createElement("circle", { cx: "15", cy: "43", r: "5", fill: "#1a1a1a" }),
+      React.createElement("line", { x1: "11.8", y1: "40.2", x2: "34.8", y2: "10.2", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "18.2", y1: "45.8", x2: "41.2", y2: "15.8", stroke: "#1a1a1a", strokeWidth: "3", strokeLinecap: "round" }),
+      React.createElement("line", { x1: "34", y1: "47", x2: "43", y2: "38", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polyline", { points: "37,38 43,38 43,44", fill: "none", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" })
+    ),
     label: "Escalator"
   },
   ascenseur: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "0", y: "0", width: "24", height: "24", rx: "5", fill: "#0D3B8C" }), /* @__PURE__ */ React.createElement("rect", { x: "4", y: "7", width: "16", height: "12", rx: "2", fill: "none", stroke: "white", strokeWidth: "2" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,11 12,8 14,11", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("polyline", { points: "10,15 12,18 14,15", fill: "none", stroke: "white", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" })),
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 48 48", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "48", height: "48", rx: "10", fill: "#fff" }),
+      React.createElement("rect", { x: "6", y: "20", width: "36", height: "24", rx: "4", fill: "none", stroke: "#1a1a1a", strokeWidth: "2" }),
+      React.createElement("line", { x1: "24", y1: "22", x2: "24", y2: "42", stroke: "#1a1a1a", strokeWidth: "1.5", strokeLinecap: "round", strokeDasharray: "2,2" }),
+      React.createElement("line", { x1: "14", y1: "17", x2: "14", y2: "6", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polygon", { points: "14,3 9,10 19,10", fill: "#1a1a1a" }),
+      React.createElement("line", { x1: "34", y1: "6", x2: "34", y2: "17", stroke: "#1a1a1a", strokeWidth: "2.5", strokeLinecap: "round" }),
+      React.createElement("polygon", { points: "34,20 29,13 39,13", fill: "#1a1a1a" })
+    ),
     label: "Ascenseur"
   },
-  escalier: {
-    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 24 24", width: "100%", height: "100%" }, /* @__PURE__ */ React.createElement("rect", { x: "1", y: "1", width: "22", height: "22", rx: "4", fill: "#37474F" }), /* @__PURE__ */ React.createElement(
-      "polyline",
-      {
-        points: "4,20 4,16 8,16 8,12 12,12 12,8 16,8 16,4 20,4",
-        fill: "none",
-        stroke: "white",
-        strokeWidth: "2.2",
-        strokeLinecap: "round",
-        strokeLinejoin: "round"
-      }
-    ), /* @__PURE__ */ React.createElement("line", { x1: "4", y1: "20", x2: "20", y2: "20", stroke: "white", strokeWidth: "2", strokeLinecap: "round" })),
-    label: "Escalier"
-  }
 };
 function PictoIcon({ type, size = 22 }) {
   const p = PICTOS[type];
@@ -2089,38 +2115,34 @@ function Panel({ group, lineColor, zoomed, onToggle }) {
   const badgeSize = calcBadgeSize(zoomed ? 28 : 22);
   const pictoSize = Math.min(badgeSize, zoomed ? 24 : 18);
   return /* @__PURE__ */ React.createElement("div", { onClick: onToggle, style: {
-    background: isCorr ? "rgba(255,255,255,0.06)" : "#111",
+    background: isCorr ? (zoomed || group.bordered ? "rgba(255,255,255,0.06)" : "transparent") : "#111",
     borderRadius: zoomed ? 10 : 6,
-    padding: zoomed ? "8px 11px" : "5px 7px",
-    // inline-flex pour que le panneau colle EXACTEMENT à son contenu
+    padding: zoomed ? "8px 11px" : (isCorr && !group.bordered ? "3px 5px" : "5px 7px"),
     display: "inline-flex",
     flexDirection: "column",
     alignItems: "flex-start",
     cursor: "pointer",
-    boxShadow: zoomed ? isCorr ? "2px 4px 16px rgba(245,124,0,0.5), -2px 0 10px rgba(245,124,0,0.25)" : "3px 4px 18px rgba(0,0,0,0.55), -2px 0 10px rgba(0,0,0,0.3)" : "none",
-    border: isCorr ? zoomed ? "4px solid #F57C00" : "3px solid #F57C00" : zoomed ? "2px solid rgba(255,255,255,0.75)" : "1.5px solid rgba(255,255,255,0.22)",
+    boxShadow: isCorr && !zoomed && !group.bordered ? "none" : zoomed ? isCorr ? "2px 4px 16px rgba(245,124,0,0.5), -2px 0 10px rgba(245,124,0,0.25)" : "3px 4px 18px rgba(0,0,0,0.55), -2px 0 10px rgba(0,0,0,0.3)" : "none",
+    border: isCorr ? (zoomed || group.bordered ? (zoomed ? "4px solid #F57C00" : "3px solid #F57C00") : "none") : zoomed ? "2px solid rgba(255,255,255,0.75)" : "1.5px solid rgba(255,255,255,0.22)",
     transition: "all 0.18s ease"
-  } }, hasCorr && /* @__PURE__ */ React.createElement("div", { style: {
-    display: "flex",
-    flexWrap: "nowrap",
-    alignItems: "center",
-    gap: zoomed ? 5 : 3,
-    marginBottom: hasSorties ? zoomed ? 6 : 3 : 0
-  } }, hasCorr && group.corr.map((c, i) => /* @__PURE__ */ React.createElement(Badge, { key: `c${i}`, id: c, size: badgeSize }))), hasSorties && !zoomed && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3, flexWrap: "nowrap" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 900, color: "#fff", marginRight: 1 } }, "Sortie"), hasPictos && group.pictos.map((p, i) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `ps${i}`, type: p, size: pictoSize })), group.sorties.map((s, i) => /* @__PURE__ */ React.createElement("span", { key: i, style: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minWidth: 16,
-    height: 16,
-    background: "#FFD54F",
-    color: "#111",
-    borderRadius: 3,
-    fontWeight: 900,
-    fontSize: 9,
-    flexShrink: 0,
-    padding: "0 2px",
-    lineHeight: 1
-  } }, s.num))), hasSorties && zoomed && /* @__PURE__ */ React.createElement(React.Fragment, null, group.sorties.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: fs + 2, fontWeight: 900, color: "#FFD54F" } }, "Sortie"), hasPictos && group.pictos.map((p, j) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `pz${j}`, type: p, size: fs + 4 }))), /* @__PURE__ */ React.createElement("div", { style: {
+  } }, !zoomed && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 3, flexWrap: "nowrap" } },
+    isCorr
+      ? hasCorr && group.corr.map((c, i) => /* @__PURE__ */ React.createElement(Badge, { key: `c${i}`, id: c, size: badgeSize }))
+      : /* @__PURE__ */ React.createElement(React.Fragment, null,
+          hasCorr && group.corr.map((c, i) => /* @__PURE__ */ React.createElement(Badge, { key: `c${i}`, id: c, size: badgeSize })),
+          hasSorties && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, fontWeight: 900, color: "#fff", marginLeft: hasCorr ? 3 : 0, marginRight: 1 } }, "Sortie"),
+          hasSorties && hasPictos && group.pictos.map((p, i) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `ps${i}`, type: p, size: pictoSize })),
+          hasSorties && group.sorties.map((s, i) => /* @__PURE__ */ React.createElement("span", { key: i, style: {
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            minWidth: 16, height: 16, background: "#FFD54F", color: "#111",
+            borderRadius: 3, fontWeight: 900, fontSize: 9, flexShrink: 0,
+            padding: "0 2px", lineHeight: 1
+          } }, s.num))
+        )
+  ),
+  zoomed && hasCorr && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", alignItems: "center", gap: zoomed ? 5 : 3, marginBottom: hasSorties ? 6 : 0 } },
+    group.corr.map((c, i) => /* @__PURE__ */ React.createElement(Badge, { key: `c${i}`, id: c, size: badgeSize }))
+  ), hasSorties && zoomed && /* @__PURE__ */ React.createElement(React.Fragment, null, group.sorties.length > 0 && /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 5, marginBottom: 5 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: fs + 2, fontWeight: 900, color: "#FFD54F" } }, "Sortie"), hasPictos && group.pictos.map((p, j) => /* @__PURE__ */ React.createElement(PictoIcon, { key: `pz${j}`, type: p, size: fs + 4 }))), /* @__PURE__ */ React.createElement("div", { style: {
     height: 2,
     background: "#FFD54F",
     borderRadius: 2,
@@ -2154,20 +2176,25 @@ function Panel({ group, lineColor, zoomed, onToggle }) {
     whiteSpace: "nowrap"
   } }, s.label))))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", marginTop: 2, opacity: 0.25, lineHeight: 1 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 7, color: isCorr ? "#F57C00" : "#fff" } }, zoomed ? "\u25BC" : "\u25B6")));
 }
-function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, onClose }) {
+function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onClose }) {
   const [type, setType] = useState("sortie");
   const [position, setPosition] = useState("tete");
+  const [voitureNum, setVoitureNum] = useState("1");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [bordered, setBordered] = useState(false);
   const [corr, setCorr] = useState("");
   const [pictos, setPictos] = useState([]);
   const [sorties, setSorties] = useState([{ num: "1", label: "" }]);
   const [editIndex, setEditIndex] = useState(null);
   const getVoitures = () => {
+    if (position === "voiture") return [parseInt(voitureNum)];
+    if (position === "voiture") return [parseInt(voitureNum)];
     const n = nVoitures || 5;
     if (position === "tete") return [1, 2];
     if (position === "queue") return [n - 1, n];
     return [Math.ceil(n / 2)];
   };
-  const addSortie = () => setSorties((s) => [...s, { num: String(s.length + 1), label: "" }]);
+  const addSortie = () => setSorties((s) => [...s, { num: "", label: "" }]);
   const removeSortie = (i) => setSorties((s) => s.filter((_, j) => j !== i));
   const updateSortie = (i, field, val) => setSorties((s) => s.map((x, j) => j === i ? __spreadProps(__spreadValues({}, x), { [field]: val }) : x));
   const togglePicto = (p) => setPictos((prev) => prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]);
@@ -2187,7 +2214,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
   const handleSave = () => {
     const corrArr = corr.split(",").map((x) => x.trim()).filter(Boolean);
     const sortiesClean = sorties.filter((s) => s.label.trim() || s.num.trim());
-    const group = { voitures: getVoitures(), type, sorties: sortiesClean, pictos, corr: corrArr };
+    const group = { voitures: getVoitures(), type, sorties: sortiesClean, pictos, corr: corrArr, bordered: bordered };
     onSave(group, editIndex);
     setEditIndex(null);
     setType("sortie");
@@ -2234,7 +2261,16 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     maxHeight: "90vh",
     overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
     padding: "20px 16px 40px"
-  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), existingGroups && existingGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, "Mes panneaux saisis"), existingGroups.map((g, i) => {
+  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), builtinGroups && builtinGroups.length > 0 && !hasCustomData && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16, padding: "12px 14px", background: "#fff8e1", border: "2px solid #FFD700", borderRadius: 12 } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#666", marginBottom: 10, lineHeight: 1.5 } },
+    "\uD83D\uDCC2 Cette station contient ", builtinGroups.length, " panneau", builtinGroups.length > 1 ? "x" : "", " de base. Pour les modifier, importez-les d'abord."
+  ),
+  /* @__PURE__ */ React.createElement("button", { onClick: onImportBuiltin, style: {
+    width: "100%", padding: "10px 0", background: "#1565C0", border: "none",
+    borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer"
+  } }, "\uD83D\uDDB9 Modifier la base de donn\u00E9es")
+),
+existingGroups && existingGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, "Mes panneaux saisis"), existingGroups.map((g, i) => {
     var _a;
     return /* @__PURE__ */ React.createElement("div", { key: i, style: {
       display: "flex",
@@ -2292,7 +2328,38 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
       onClick: () => setType("corr")
     },
     "\u{1F500} Correspondance"
-  ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Position \xB7 voitures : ", getVoitures().join(", ")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } }, /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "tete", lineColor), onClick: () => setPosition("tete") }, "\u2B06 T\xEAte"), /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "milieu", lineColor), onClick: () => setPosition("milieu") }, "\u2195 Milieu"), /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "queue", lineColor), onClick: () => setPosition("queue") }, "\u2B07 Queue"))), type === "sortie" && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Sorties (num\xE9ro + nom)"), sorties.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 6, marginBottom: 7, alignItems: "center" } }, /* @__PURE__ */ React.createElement(
+  ))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Position \xB7 voitures : ", position === "voiture" ? voitureNum : getVoitures().join(", ")),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 8 } },
+    /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "tete", lineColor), onClick: () => setPosition("tete") }, "\u2B06 T\xEAte"),
+    /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "milieu", lineColor), onClick: () => setPosition("milieu") }, "\u2195 Milieu"),
+    /* @__PURE__ */ React.createElement("button", { style: btnPos(position === "queue", lineColor), onClick: () => setPosition("queue") }, "\u2B07 Queue")
+  ),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 5, flexWrap: "wrap" } },
+    Array.from({ length: nVoitures || 5 }, (_, i) => i + 1).map(function(n) {
+      return /* @__PURE__ */ React.createElement("button", {
+        key: n,
+        onClick: function() { setPosition("voiture"); setVoitureNum(String(n)); },
+        style: {
+          width: 32, height: 32,
+          border: "2px solid " + (position === "voiture" && voitureNum === String(n) ? lineColor : "#ccc"),
+          borderRadius: 8,
+          background: position === "voiture" && voitureNum === String(n) ? lineColor : "#fff",
+          color: position === "voiture" && voitureNum === String(n) ? (lineText || "#fff") : "#555",
+          fontWeight: 900, fontSize: 13, cursor: "pointer"
+        }
+      }, n);
+    })
+  )
+), type === "corr" && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12, display: "flex", alignItems: "center", gap: 10 } },
+  /* @__PURE__ */ React.createElement("button", { onClick: function() { setBordered(function(b) { return !b; }); }, style: {
+    padding: "7px 14px", border: "2px solid " + (bordered ? "#F57C00" : "#ccc"),
+    borderRadius: 8, background: bordered ? "#FFF3E0" : "#fff",
+    color: bordered ? "#F57C00" : "#888", fontWeight: 700, fontSize: 12, cursor: "pointer"
+  } }, bordered ? "🟠 Encadré activé" : "⬜ Sans encadré"),
+  /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: "#aaa" } }, "Encadrer ce panneau ?")
+),
+type === "sortie" && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Sorties (num\xE9ro + nom)"), sorties.map((s, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", gap: 6, marginBottom: 7, alignItems: "center" } }, /* @__PURE__ */ React.createElement(
     "input",
     {
       value: s.num,
@@ -2350,7 +2417,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
       placeholder: "ex: 3, 9, A, E",
       style: inputStyle
     }
-  )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "\xC9quipements"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 7 } }, Object.entries(PICTOS).map(([k, v]) => /* @__PURE__ */ React.createElement(
+  )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "\xC9quipements"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 7 } }, Object.entries(PICTOS).filter(([k]) => ["escalator_up","escalator_down","elevator"].includes(k)).map(([k, v]) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: k,
@@ -2367,7 +2434,13 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
       }
     },
     v.label
-  )))), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
+  )))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    setSorties([{ num: "", label: "" }]);
+    setCorr(""); setPictos([]); setPosition("milieu"); setType("sortie");
+    onSave([]);
+  }, style: { width: "100%", padding: "9px 0", background: "#fff0f0", border: "1.5px solid #ffcdd2", borderRadius: 10, color: "#c00", fontWeight: 700, fontSize: 12, cursor: "pointer" } },
+  "\uD83D\uDDD1\uFE0F Supprimer les donn\u00E9es")),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 10 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: onClose,
@@ -3145,6 +3218,17 @@ function App() {
       return {};
     }
   });
+  // Charger les données sauvegardées si présentes
+  React.useEffect(function() {
+    if (window.MPE_SAVED_DATA) {
+      var d = window.MPE_SAVED_DATA;
+      if (d.customTrainData) setCustomTrainData(d.customTrainData);
+      if (d.adminEdits) setAdminEdits(d.adminEdits);
+      if (d.favorites) setFavorites(d.favorites);
+      if (d.version) { setAppVersion(d.version); localStorage.setItem("mpe_version", String(d.version)); }
+    }
+  }, []);
+
   const [customTrainData, setCustomTrainData] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("mpv4_train")) || {};
@@ -3205,7 +3289,15 @@ function App() {
   const [itiResult, setItiResult] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
-  const [adminUnlocked, setAdminUnlocked] = useState(true);
+  const [adminSavedCode, setAdminSavedCode] = useState(() => { try { return localStorage.getItem("mpe_admin_code") || ""; } catch(e) { return ""; } });
+  const [adminCodeInput, setAdminCodeInput] = useState("");
+  const [updateLog, setUpdateLog] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
+  });
+  const [appVersion, setAppVersion] = useState(() => {
+    try { return parseInt(localStorage.getItem("mpe_version") || "14"); } catch(e) { return 14; }
+  });
+  const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
   const [adminLineId, setAdminLineId] = useState(null);
   const [adminStation, setAdminStation] = useState(null);
@@ -3318,7 +3410,31 @@ function App() {
     });
   }, [stKey, builtinTrain, customTrain]);
   const nVoitures = (trainData == null ? void 0 : trainData.voitures) || 5;
+  const addLog = (msg) => {
+    var now = new Date();
+    var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+    var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
+    var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " à " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
+    var entry = label + " — " + msg;
+    setUpdateLog(function(prev) {
+      var next = [entry, ...prev].slice(0, 300);
+      localStorage.setItem("mpe_log", JSON.stringify(next));
+      return next;
+    });
+  };
+
   const saveGroup = (group, editIndex) => {
+    // Si group est un tableau vide -> "Supprimer les données" : on efface tout
+    if (Array.isArray(group) && group.length === 0) {
+      setCustomTrainData((prev) => {
+        const next = Object.assign({}, prev);
+        delete next[stKey];
+        return next;
+      });
+      setShowEditor(false);
+      setShowPhotoAI(false);
+      return;
+    }
     setCustomTrainData((prev) => {
       const existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
       const groups = [...existing.groups || []];
@@ -3329,6 +3445,7 @@ function App() {
       }
       return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
+    if (station) addLog((Array.isArray(group) && group.length === 0) ? "🗑 " + station.n + " — Suppression de toutes les données" : (editIndex !== null && editIndex !== void 0 ? "✏️ " : "➕ ") + station.n + " — " + (group.type === "corr" ? "Correspondance " + (group.corr || []).join("+") : "Sortie " + (group.sorties || []).map(function(s){return s.num;}).join("+")));
     setShowEditor(false);
     setShowPhotoAI(false);
   };
@@ -3342,6 +3459,7 @@ function App() {
         delete next[stKey];
         return next;
       }
+      if (station) addLog("❌ " + station.n + " — Suppression panneau " + (groupIndex + 1));
       return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
   };
@@ -3456,7 +3574,7 @@ function App() {
       fontFamily: "Arial Black,sans-serif"
     },
     "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon Paris Express")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
     gap: 8,
@@ -3527,7 +3645,7 @@ function App() {
       setDirection(null);
       setNoteText(notes[`${l.lineId}::${l.name}`] || "");
       setTab("train");
-      setScreen("stations");
+      setScreen("station");
       setShowDir(true);
     },
     style: {
@@ -4174,7 +4292,7 @@ function App() {
       }
     },
     "Fermer"
-  ))), screen === "station" && line && station && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#f4f4f4", minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", overscrollBehavior: "contain" } }, /* @__PURE__ */ React.createElement("div", { style: { background: line.color, padding: "12px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(
+  ))), screen === "station" && line && station && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#f4f4f4", minHeight: 0, overflow: "hidden" } }, /* @__PURE__ */ React.createElement("div", { style: { background: line.color, padding: "12px 16px 10px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setScreen("stations"),
@@ -4343,25 +4461,7 @@ function App() {
       pointerEvents: "none",
       animation: "bounceDown 1s ease-in-out infinite"
     } }, /* @__PURE__ */ React.createElement("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M12 4v16M5 13l7 7 7-7", stroke: "#000", strokeWidth: "6", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M12 4v16M5 13l7 7 7-7", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
-    tab === "train" && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", margin: "8px 12px", borderRadius: 12 } }, /* @__PURE__ */ React.createElement(TrainDiagram, { trainData, lineColor: line.color, userDirection: displayedTerminus }), customTrainData[stKey] && /* @__PURE__ */ React.createElement("div", { style: { padding: "0 12px 12px" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
-      if (window.confirm("Supprimer toutes vos donn\xE9es saisies pour cette station ?")) {
-        setCustomTrainData((prev) => {
-          const next = __spreadValues({}, prev);
-          delete next[stKey];
-          return next;
-        });
-      }
-    }, style: {
-      width: "100%",
-      padding: "9px 0",
-      background: "#fff0f0",
-      border: "1.5px solid #ffcdd2",
-      borderRadius: 10,
-      color: "#c00",
-      fontWeight: 700,
-      fontSize: 12,
-      cursor: "pointer"
-    } }, "\u{1F5D1}\uFE0F Supprimer mes donn\xE9es pour cette station"))),
+    tab === "train" && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", margin: "8px 12px", borderRadius: 12 } }, /* @__PURE__ */ React.createElement(TrainDiagram, { trainData, lineColor: line.color, userDirection: displayedTerminus }), ),
     tab === "notes" && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", margin: "8px 12px", borderRadius: 12, padding: 14 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#999", marginBottom: 8 } }, "\u{1F4DD} Notes personnelles"), /* @__PURE__ */ React.createElement(
       "textarea",
       {
@@ -4404,7 +4504,17 @@ function App() {
       },
       "Sauvegarder"
     ))
-  ), showEditor && /* @__PURE__ */ React.createElement(
+  ),
+  screen === "stations" && line && /* @__PURE__ */ React.createElement("button", {
+    onClick: () => { setAdminLineId(lineId); setAdminUnlocked(true); setAdminScreen("editLine"); setScreen("admin"); },
+    style: { position: "fixed", bottom: 24, right: 16, zIndex: 100,
+      width: 50, height: 50, borderRadius: "50%",
+      background: "#fff", border: "2px solid #111",
+      boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+      fontSize: 22, cursor: "pointer",
+      display: "flex", alignItems: "center", justifyContent: "center" }
+  }, "\u270F\uFE0F"),
+  showEditor && /* @__PURE__ */ React.createElement(
     PanneauEditor,
     {
       stKey,
@@ -4414,6 +4524,17 @@ function App() {
       onSave: saveGroup,
       onDelete: deleteGroup,
       existingGroups: ((_e = customTrainData[stKey]) == null ? void 0 : _e.groups) || [],
+      builtinGroups: (builtinTrain == null ? void 0 : builtinTrain.groups) || [],
+      hasCustomData: !!customTrainData[stKey],
+      onImportBuiltin: function() {
+        if (!builtinTrain) return;
+        setCustomTrainData(function(prev) {
+          var existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
+          var builtinGroups = (builtinTrain.groups || []).map(function(g) { return Object.assign({}, g, { fromBuiltin: true }); });
+          var customGroups = existing.groups || [];
+          return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { groups: [...builtinGroups, ...customGroups] }) });
+        });
+      },
       onClose: () => setShowEditor(false)
     }
   ), showPhotoAI && /* @__PURE__ */ React.createElement(
@@ -4569,7 +4690,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v13"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v27 \u2014 Sam 10 mai 2025 18h49"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
@@ -4650,15 +4771,35 @@ function App() {
       action: () => setAdminScreen("zoom")
     },
     {
-      icon: "\u{1F5D1}\uFE0F",
-      label: "R\xE9initialiser toutes les modifications",
-      sub: "Revenir aux donn\xE9es d'origine",
-      action: () => {
-        if (window.confirm("Toutes vos modifications seront supprim\xE9es. Confirmer ?")) {
-          setAdminEdits({});
-          alert("\u2705 Donn\xE9es r\xE9initialis\xE9es !");
-        }
-      }
+      icon: "\u{1F4BE}",
+      label: "Sauvegarder",
+      sub: "G\xE9n\xE9rer un nouveau fichier HTML avec toutes vos donn\xE9es",
+      action: () => setAdminScreen("sauvegarde")
+    },
+    {
+      icon: /* @__PURE__ */ React.createElement("span", { style: {
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        width: 34, height: 34, borderRadius: 8, background: "#1565C0", flexShrink: 0
+      }},
+        /* @__PURE__ */ React.createElement("svg", { width: 22, height: 22, viewBox: "0 0 24 24", fill: "none" },
+          /* @__PURE__ */ React.createElement("path", { d: "M12 4V2L9 5l3 3V6a6 6 0 1 1-6 6H3a9 9 0 1 0 9-9z", fill: "white" })
+        )
+      ),
+      label: "Mises \xE0 jour",
+      sub: "Journal de toutes vos modifications",
+      action: () => setAdminScreen("journal")
+    },
+    {
+      icon: "\u{1F4C2}",
+      label: "Restaurer",
+      sub: "Charger un fichier HTML sauvegard\xE9 pour r\xE9cup\xE9rer vos donn\xE9es",
+      action: () => setAdminScreen("restaurer")
+    },
+    {
+      icon: "\u{1F512}",
+      label: adminSavedCode ? "Mot de passe : actif" : "Mot de passe : inactif",
+      sub: adminSavedCode ? "Prot\xE9g\xE9 - modifier ou d\xE9sactiver" : "Cliquez pour d\xE9finir un mot de passe",
+      action: () => setAdminScreen("motdepasse")
     }
   ].map((item, i) => /* @__PURE__ */ React.createElement(
     "button",
@@ -4670,8 +4811,8 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 14,
-        background: "#fff",
-        border: "1px solid #ccc",
+        background: item.highlight ? "#1565C0" : "#fff",
+        border: item.highlight ? "2px solid #0d47a1" : "2px solid #111",
         borderRadius: 12,
         padding: "16px",
         marginBottom: 10,
@@ -4681,9 +4822,129 @@ function App() {
       }
     },
     /* @__PURE__ */ React.createElement("span", { style: { fontSize: 28 } }, item.icon),
-    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 700, fontSize: 15 } }, item.label), /* @__PURE__ */ React.createElement("div", { style: { color: "#888", fontSize: 12, marginTop: 2 } }, item.sub)),
-    /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", color: "#bbb", fontSize: 20 } }, "\u203A")
-  ))), adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+    /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { color: item.highlight ? "#fff" : "#111", fontWeight: 700, fontSize: 15 } }, item.label), /* @__PURE__ */ React.createElement("div", { style: { color: item.highlight ? "rgba(255,255,255,0.7)" : "#888", fontSize: 12, marginTop: 2 } }, item.sub)),
+    /* @__PURE__ */ React.createElement("span", { style: { marginLeft: "auto", color: item.highlight ? "rgba(255,255,255,0.5)" : "#bbb", fontSize: 20 } }, "\u203A")
+  ))), adminUnlocked && adminScreen === "journal" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "\uD83D\uDD04 Mises \u00E0 jour"),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 } },
+    /* @__PURE__ */ React.createElement("div", { style: { color: "#888", fontSize: 12 } }, updateLog.length, " entr\u00E9e", updateLog.length > 1 ? "s" : ""),
+    /* @__PURE__ */ React.createElement("button", { onClick: () => { setUpdateLog([]); localStorage.removeItem("mpe_log"); }, style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "6px 12px", color: "#c00", fontWeight: 700, fontSize: 11, cursor: "pointer" } }, "Tout effacer")
+  ),
+  updateLog.length === 0 && /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 40, fontSize: 13 } }, "Aucune modification enregistr\u00E9e"),
+  updateLog.map(function(entry, i) {
+    var isSave = entry.includes("SAUVEGARDE");
+    return /* @__PURE__ */ React.createElement("div", { key: i, style: {
+      padding: "10px 14px", marginBottom: 6, borderRadius: 10,
+      background: isSave ? "#e8f5e9" : "#fff",
+      border: isSave ? "2px solid #2e7d32" : "1.5px solid #333",
+      fontSize: 12, color: "#333", lineHeight: 1.5
+    } }, entry);
+  })
+),
+adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "\uD83D\uDCBE Sauvegarder"),
+  /* @__PURE__ */ React.createElement("div", { style: { color: "#666", fontSize: 13, marginBottom: 20, lineHeight: 1.6 } },
+    "G\u00E9n\u00E8re un nouveau fichier ", /* @__PURE__ */ React.createElement("b", null, "index.html"), " avec toutes vos donn\u00E9es int\u00E9gr\u00E9es."
+  ),
+  /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    var newVersion = appVersion + 1;
+    setAppVersion(newVersion);
+    localStorage.setItem("mpe_version", String(newVersion));
+    var now = new Date();
+    var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+    var mois = ["jan","\u00E9v","mar","avr","mai","jun","jul","ao\u00FB","sep","oct","nov","d\u00E9c"];
+    var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " \u00E0 " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
+    addLog("\u2705 SAUVEGARDE v" + newVersion + " \u2014 " + label);
+    var dataStr = JSON.stringify({ customTrainData: customTrainData, adminEdits: adminEdits, favorites: favorites, version: newVersion });
+    var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
+    var htmlContent = document.documentElement.outerHTML;
+    if (htmlContent.includes('id="mpe-data"')) {
+      htmlContent = htmlContent.replace(/<script id="mpe-data">[\s\S]*?<\/script>/, dataScript);
+    } else {
+      htmlContent = htmlContent.replace('</head>', dataScript + '</head>');
+    }
+    var blob = new Blob([htmlContent], { type: 'text/html' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'index.html'; a.click();
+    URL.revokeObjectURL(url);
+  }, style: {
+    width: "100%", padding: "16px", background: "#1565C0", border: "none",
+    borderRadius: 14, color: "#fff", fontWeight: 900, fontSize: 16, cursor: "pointer", marginBottom: 12
+  } }, "\uD83D\uDCBE Sauvegarder et t\u00E9l\u00E9charger index.html"),
+  /* @__PURE__ */ React.createElement("div", { style: { color: "#aaa", fontSize: 11, textAlign: "center" } }, "Version actuelle : v", appVersion)
+),
+adminUnlocked && adminScreen === "restaurer" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "\uD83D\uDCC2 Restaurer"),
+  /* @__PURE__ */ React.createElement("div", { style: { color: "#666", fontSize: 13, marginBottom: 20, lineHeight: 1.6 } },
+    "Chargez un fichier ", /* @__PURE__ */ React.createElement("b", null, "index.html"), " pr\u00E9c\u00E9demment sauvegard\u00E9 pour r\u00E9cup\u00E9rer toutes vos donn\u00E9es."
+  ),
+  /* @__PURE__ */ React.createElement("label", { style: {
+    display: "block", width: "100%", padding: "16px", background: "#1565C0",
+    border: "none", borderRadius: 14, color: "#fff", fontWeight: 900,
+    fontSize: 16, cursor: "pointer", textAlign: "center", marginBottom: 12,
+    boxSizing: "border-box"
+  } },
+    "\uD83D\uDCC2 Choisir un fichier HTML",
+    /* @__PURE__ */ React.createElement("input", { type: "file", accept: ".html", style: { display: "none" }, onChange: function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        var html = ev.target.result;
+        var match = html.match(/window\.MPE_SAVED_DATA=(\{[\s\S]*?\});<\/script>/);
+        if (match) {
+          try {
+            var data = JSON.parse(match[1]);
+            if (data.customTrainData) setCustomTrainData(data.customTrainData);
+            if (data.adminEdits) setAdminEdits(data.adminEdits);
+            if (data.favorites) setFavorites(data.favorites);
+            if (data.version) { setAppVersion(data.version); localStorage.setItem("mpe_version", String(data.version)); }
+            addLog("\u2705 RESTAURATION v" + (data.version || "?") + " \u2014 depuis fichier");
+            alert("\u2705 Donn\u00E9es restaur\u00E9es avec succ\u00E8s !");
+            setAdminScreen("menu");
+          } catch(err) {
+            alert("\u274C Erreur lors de la lecture du fichier.");
+          }
+        } else {
+          alert("\u274C Aucune donn\u00E9e trouv\u00E9e dans ce fichier. Assurez-vous d'utiliser un fichier g\u00E9n\u00E9r\u00E9 par Sauvegarder.");
+        }
+      };
+      reader.readAsText(file);
+    } })
+  ),
+  /* @__PURE__ */ React.createElement("div", { style: { color: "#aaa", fontSize: 11, textAlign: "center" } }, "Version actuelle : v", appVersion)
+),
+adminUnlocked && adminScreen === "motdepasse" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "\uD83D\uDD12 Mot de passe"),
+  /* @__PURE__ */ React.createElement("div", { style: { color: "#666", fontSize: 13, marginBottom: 20, lineHeight: 1.6 } },
+    adminSavedCode ? "Mot de passe actif. Modifier ou d\xE9sactiver ci-dessous." : "Aucun mot de passe. L'admin est accessible \xE0 tous."
+  ),
+  /* @__PURE__ */ React.createElement("input", {
+    type: "password", value: adminCodeInput,
+    onChange: function(e) { setAdminCodeInput(e.target.value); },
+    placeholder: adminSavedCode ? "Nouveau mot de passe..." : "D\xE9finir un mot de passe...",
+    style: { width: "100%", padding: "12px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 15, marginBottom: 12, boxSizing: "border-box", outline: "none" }
+  }),
+  /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    if (!adminCodeInput.trim()) { alert("Entrez un mot de passe."); return; }
+    localStorage.setItem("mpe_admin_code", adminCodeInput.trim());
+    setAdminSavedCode(adminCodeInput.trim());
+    setAdminCodeInput("");
+    alert("\u2705 Mot de passe enregistr\xE9 !");
+    setAdminScreen("menu");
+  }, style: { width: "100%", padding: "14px", background: "#1565C0", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer", marginBottom: 10 } },
+  "\u2705 Enregistrer le mot de passe"),
+  adminSavedCode && /* @__PURE__ */ React.createElement("button", { onClick: function() {
+    localStorage.removeItem("mpe_admin_code");
+    setAdminSavedCode("");
+    setAdminCodeInput("");
+    alert("\u2705 Mot de passe supprim\xE9.");
+    setAdminScreen("menu");
+  }, style: { width: "100%", padding: "12px", background: "#fff0f0", border: "1.5px solid #ffcdd2", borderRadius: 12, color: "#c00", fontWeight: 700, fontSize: 13, cursor: "pointer" } },
+  "\uD83D\uDD13 D\xE9sactiver le mot de passe")
+),
+adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
       React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "🔍 Zoom"),
       React.createElement("div", { style: { color: "#888", fontSize: 13, marginBottom: 20 } }, "Agrandissement vertical uniquement."),
       [1.0, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3].map((z) =>
