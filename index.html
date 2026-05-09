@@ -2718,30 +2718,53 @@ function TrainDiagram({ trainData, lineColor, userDirection }) {
 }
 const SK_FAV = "mpv4_fav", SK_NOTES = "mpv4_notes";
 function buildGraph() {
+  // Le graphe utilise des noeuds "station|ligne" pour distinguer
+  // la même station physique sur des lignes différentes.
+  // Une correspondance = arête entre "station|ligneA" et "station|ligneB" (coût 3).
+  // Un trajet = arête entre "stationA|ligne" et "stationB|ligne" (coût 1).
   var graph = {};
-  function addEdge(s1, s2, lineId) {
-    if (!graph[s1]) graph[s1] = [];
-    if (!graph[s2]) graph[s2] = [];
-    graph[s1].push({ station: s2, line: lineId, cost: 1 });
-    graph[s2].push({ station: s1, line: lineId, cost: 1 });
+  function ensureNode(key) { if (!graph[key]) graph[key] = []; }
+  function addTrajet(s1, s2, lineId) {
+    var k1 = s1 + "|" + lineId, k2 = s2 + "|" + lineId;
+    ensureNode(k1); ensureNode(k2);
+    graph[k1].push({ key: k2, station: s2, line: lineId, cost: 1 });
+    graph[k2].push({ key: k1, station: s1, line: lineId, cost: 1 });
   }
   var allLineStations = Object.assign({}, STATIONS, CABLE_STATIONS);
+  // 1. Arêtes de trajet (stations consécutives sur chaque ligne)
   Object.keys(allLineStations).forEach(function(lineId) {
     var stations = allLineStations[lineId].filter(function(s) { return s.n; });
     for (var i = 0; i < stations.length - 1; i++) {
       var s1 = stations[i], s2 = stations[i+1];
       if (s1.branch && s2.branch && s1.branch !== s2.branch) continue;
-      addEdge(s1.n, s2.n, lineId);
+      addTrajet(s1.n, s2.n, lineId);
     }
   });
+  // 2. Arêtes de correspondance (même station, lignes différentes)
+  // On collecte d'abord toutes les lignes disponibles pour chaque station
+  var stationLines = {};
+  Object.keys(allLineStations).forEach(function(lineId) {
+    allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
+      if (!stationLines[s.n]) stationLines[s.n] = new Set();
+      stationLines[s.n].add(lineId);
+    });
+  });
+  // Puis on ajoute les correspondances déclarées (c et walk)
   Object.keys(allLineStations).forEach(function(lineId) {
     allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
       var corrs = (s.c || []).concat(s.walk || []);
       corrs.forEach(function(corrLine) {
         var corrSts = allLineStations[corrLine] || [];
         if (corrSts.find(function(cs) { return cs.n === s.n; })) {
-          if (!graph[s.n]) graph[s.n] = [];
-          graph[s.n].push({ station: s.n, line: corrLine, cost: 3, transfer: true });
+          var k1 = s.n + "|" + lineId, k2 = s.n + "|" + corrLine;
+          ensureNode(k1); ensureNode(k2);
+          // Éviter les doublons
+          if (!graph[k1].find(function(e) { return e.key === k2; })) {
+            graph[k1].push({ key: k2, station: s.n, line: corrLine, cost: 3, transfer: true });
+          }
+          if (!graph[k2].find(function(e) { return e.key === k1; })) {
+            graph[k2].push({ key: k1, station: s.n, line: lineId, cost: 3, transfer: true });
+          }
         }
       });
     });
@@ -2749,36 +2772,57 @@ function buildGraph() {
   return graph;
 }
 
+function normStation(s) {
+  return (s || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, " ").trim();
+}
+
 function dijkstra(graph, start, end) {
   var dist = {}, prev = {}, visited = {};
-  var pq = [[0, start, ""]];
-  dist[start + "|"] = 0;
+  var pq = [];
+  var normStart = normStation(start);
+  var normEnd = normStation(end);
+  Object.keys(graph).forEach(function(key) {
+    var sep = key.indexOf("|");
+    var stName = sep >= 0 ? key.substring(0, sep) : key;
+    if (normStation(stName) === normStart) {
+      dist[key] = 0;
+      pq.push([0, key]);
+    }
+  });
+  if (pq.length === 0) return null;
+
   while (pq.length > 0) {
     pq.sort(function(a,b) { return a[0]-b[0]; });
     var item = pq.shift();
-    var cost = item[0], node = item[1], line = item[2];
-    var key = node + "|" + line;
+    var cost = item[0], key = item[1];
     if (visited[key]) continue;
     visited[key] = true;
-    if (node === end) {
+    var sep = key.indexOf("|");
+    var node = sep >= 0 ? key.substring(0, sep) : key;
+    var line = sep >= 0 ? key.substring(sep + 1) : "";
+    if (normStation(node) === normEnd) {
+      // Reconstruit le chemin en remontant
       var path = [];
-      var cur = node, curLine = line;
+      var cur = key;
       while (cur !== undefined) {
-        path.unshift({ station: cur, line: curLine });
-        var p = prev[cur + "|" + curLine];
-        if (!p) break;
-        cur = p.station; curLine = p.line;
+        var csep = cur.indexOf("|");
+        var cst = csep >= 0 ? cur.substring(0, csep) : cur;
+        var cln = csep >= 0 ? cur.substring(csep + 1) : "";
+        path.unshift({ station: cst, line: cln });
+        cur = prev[cur];
+        if (cur && path.length > 500) break;
       }
       return path;
     }
-    var neighbors = graph[node] || [];
+    var neighbors = graph[key] || [];
     neighbors.forEach(function(nb) {
       var nc = cost + nb.cost;
-      var nk = nb.station + "|" + nb.line;
-      if (dist[nk] === undefined || nc < dist[nk]) {
-        dist[nk] = nc;
-        prev[nk] = { station: node, line: line };
-        pq.push([nc, nb.station, nb.line]);
+      if (dist[nb.key] === undefined || nc < dist[nb.key]) {
+        dist[nb.key] = nc;
+        prev[nb.key] = key;
+        pq.push([nc, nb.key]);
       }
     });
   }
@@ -2803,13 +2847,15 @@ function formatPath(path) {
   var curLine = path[0].line;
   var curStations = [path[0].station];
   for (var i = 1; i < path.length; i++) {
-    if (path[i].line !== curLine) {
+    var st = path[i].station, ln = path[i].line;
+    if (ln !== curLine) {
       segs.push({ line: curLine, stations: curStations });
-      curLine = path[i].line;
-      curStations = [path[i-1].station, path[i].station];
+      curLine = ln;
+      curStations = [st];
     } else {
-      if (curStations[curStations.length-1] !== path[i].station)
-        curStations.push(path[i].station);
+      if (curStations[curStations.length - 1] !== st) {
+        curStations.push(st);
+      }
     }
   }
   segs.push({ line: curLine, stations: curStations });
@@ -2821,13 +2867,15 @@ setProgress(96,'Chargement...');
 function getUniqueStations() {
   var seen = {};
   var result = [];
-  var allLines = (typeof ALL_LINES !== 'undefined' ? ALL_LINES : []);
-  allLines.forEach(function(line) {
-    (line.stations || []).forEach(function(st) {
-      if (st.n && !seen[st.n]) {
-        seen[st.n] = true;
-        result.push({ name: st.n, corr: st.c || [] });
-      }
+  var allStationMaps = [STATIONS, CABLE_STATIONS];
+  allStationMaps.forEach(function(stationsMap) {
+    Object.keys(stationsMap).forEach(function(lineId) {
+      (stationsMap[lineId] || []).forEach(function(st) {
+        if (st.n && !seen[st.n]) {
+          seen[st.n] = true;
+          result.push({ name: st.n, corr: st.c || [] });
+        }
+      });
     });
   });
   return result.sort(function(a,b) { return a.name.localeCompare(b.name, 'fr'); });
@@ -2838,12 +2886,14 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
   var query = queryState[0]; var setQuery = queryState[1];
   var openState = React.useState(false);
   var open = openState[0]; var setOpen = openState[1];
+  // Synchronise le state interne quand value change depuis le parent (ex: bouton inversion)
+  React.useEffect(function() { setQuery(value || ""); }, [value]);
 
   var suggestions = React.useMemo(function() {
     if (query.length < 2) return [];
-    var q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    var q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
     return getUniqueStations().filter(function(s) {
-      return s.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(q);
+      return s.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').includes(q);
     }).slice(0, 8);
   }, [query]);
 
@@ -2867,6 +2917,10 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
       onBlur: function() { setTimeout(function() { setOpen(false); }, 200); },
       placeholder: placeholder,
       autoComplete: "off",
+      autoCorrect: "off",
+      autoCapitalize: "off",
+      spellCheck: false,
+      name: "search_" + Math.random().toString(36).slice(2),
       style: inputStyle
     }),
     open && suggestions.length > 0 && React.createElement("div", {
@@ -2881,19 +2935,11 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
         key: i,
         onMouseDown: function() { handleSelect(s.name); },
         style: {
-          padding: "10px 14px", cursor: "pointer",
+          padding: "11px 16px", cursor: "pointer",
           borderBottom: i < suggestions.length-1 ? "1px solid #eee" : "none",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          fontSize: 14, fontWeight: 600, color: "#111"
+          fontSize: 15, fontWeight: 600, color: "#111"
         }
-      },
-        React.createElement("span", null, s.name),
-        s.corr.length > 0 && React.createElement("div", { style: { display: "flex", gap: 3, flexWrap: "wrap", justifyContent: "flex-end", maxWidth: 120 } },
-          s.corr.slice(0,4).map(function(c) {
-            return React.createElement(Badge, { key: c, id: c, size: 18 });
-          })
-        )
-      );
+      }, s.name);
     }))
   );
 }
@@ -2907,6 +2953,11 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   var setDragIdx = dragState[1]; var dragIdx = dragState[0];
   var dragOverState = React.useState(null);
   var setDragOver = dragOverState[1]; var dragOver = dragOverState[0];
+  // Position du fantôme flottant
+  var dragPosState = React.useState({ x: 0, y: 0 });
+  var setDragPos = dragPosState[1]; var dragPos = dragPosState[0];
+  var dragTextState = React.useState("");
+  var setDragText = dragTextState[1]; var dragText = dragTextState[0];
 
   var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 15, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
 
@@ -2914,13 +2965,32 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   function removeEtape(i) { setItiEtapes(function(p) { return p.filter(function(_,j) { return j!==i; }); }); }
   function updateEtape(i, v) { setItiEtapes(function(p) { return p.map(function(e,j) { return j===i ? v : e; }); }); }
 
-  function handleTouchStart(i) { return function(e) { e.stopPropagation(); setDragIdx(i); }; }
+  function handleTouchStart(i) {
+    return function(e) {
+      e.stopPropagation();
+      setDragIdx(i);
+      setDragText(itiEtapes[i] || "Étape " + (i+1));
+      var t = e.touches[0];
+      setDragPos({ x: t.clientX, y: t.clientY });
+    };
+  }
   function handleTouchMove(e) {
     if (dragIdx === null) return;
     e.preventDefault();
     var t = e.touches[0];
+    setDragPos({ x: t.clientX, y: t.clientY });
     var el = document.elementFromPoint(t.clientX, t.clientY);
-    if (el && el.dataset && el.dataset.eidx !== undefined) setDragOver(parseInt(el.dataset.eidx));
+    if (el) {
+      // Remonter jusqu'à trouver un élément avec data-eidx
+      var cur = el;
+      while (cur && cur !== document.body) {
+        if (cur.dataset && cur.dataset.eidx !== undefined) {
+          setDragOver(parseInt(cur.dataset.eidx));
+          break;
+        }
+        cur = cur.parentElement;
+      }
+    }
   }
   function handleTouchEnd() {
     if (dragIdx !== null && dragOver !== null && dragIdx !== dragOver) {
@@ -2932,6 +3002,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
       });
     }
     setDragIdx(null); setDragOver(null);
+    setDragText("");
   }
 
   function calculer() {
@@ -2952,6 +3023,27 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
         React.createElement("div", { style: { fontWeight: 900, fontSize: 18, color: "#111" } }, "\uD83D\uDCCD It\u00E9n\u00E9raire"),
         itiResult && React.createElement("button", { onClick: function() { setItiResult(null); setError(null); }, style: { marginLeft: "auto", background: "#111", border: "none", borderRadius: 8, padding: "6px 12px", color: "#fff", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Modifier")
       ),
+      // Fantôme flottant sous le doigt pendant le drag
+      dragIdx !== null && React.createElement("div", { style: {
+        position: "fixed",
+        left: dragPos.x - 160,
+        top: dragPos.y - 30,
+        width: 320,
+        background: "#fff",
+        border: "2px solid #1565C0",
+        borderRadius: 12,
+        padding: "12px 16px",
+        boxShadow: "0 8px 32px rgba(21,101,192,0.45)",
+        transform: "rotate(-2deg) scale(1.04)",
+        zIndex: 9999,
+        pointerEvents: "none",
+        display: "flex",
+        alignItems: "center",
+        gap: 10
+      } },
+        React.createElement("div", { style: { fontSize: 20, color: "#1565C0" } }, "\u2630"),
+        React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#111", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, dragText || "\u00c9tape")
+      ),
       !itiResult ? React.createElement("div", { onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd },
         React.createElement("div", { style: { marginBottom: 10 } },
           React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#2e7d32", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
@@ -2960,11 +3052,11 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
         itiEtapes.map(function(etape, i) {
           return React.createElement(React.Fragment, { key: i },
             React.createElement("div", { style: { height: 1, background: "#e0e0e0", margin: "0 0 8px 0" } }),
-            React.createElement("div", { "data-eidx": i, style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: dragOver === i ? "#e3f2fd" : "transparent", borderRadius: 10, padding: "0 4px", opacity: dragIdx === i ? 0.4 : 1 } },
-            React.createElement("div", { onTouchStart: handleTouchStart(i), style: { fontSize: 20, color: "#bbb", cursor: "grab", padding: "0 4px", touchAction: "none" } }, "\u2630"),
+            React.createElement("div", { "data-eidx": i, style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 10, background: dragIdx === i ? "rgba(21,101,192,0.08)" : dragOver === i ? "#bbdefb" : "#fff", borderRadius: 10, padding: "6px 4px", border: dragIdx === i ? "2px dashed #1565C0" : dragOver === i ? "2px dashed #1565C0" : "2px solid transparent", opacity: dragIdx === i ? 0.45 : 1, transition: "opacity 0.15s" } },
+            React.createElement("div", { onTouchStart: handleTouchStart(i), style: { fontSize: 22, color: "#999", cursor: "grab", padding: "0 6px", touchAction: "none", userSelect: "none" } }, "\u2630"),
             React.createElement("div", { style: { flex: 1 } },
               React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#1565C0", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF \u00C9tape " + (i+1)),
-              React.createElement(StationAutocomplete, { value: etape, onChange: function(v) { updateEtape(i, v); }, placeholder: "Station...", inputStyle: inputStyle })
+              React.createElement(StationAutocomplete, { value: etape, onChange: function(v) { updateEtape(i, v); }, placeholder: "Station...", inputStyle: Object.assign({}, inputStyle, dragIdx === i ? { color: "#fff", background: "#1565C0", border: "2px solid #0d47a1" } : {}) })
             ),
             React.createElement("button", { onClick: function() { removeEtape(i); }, style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "8px 11px", color: "#c00", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 16 } }, "\u00D7")
           ));
@@ -3000,11 +3092,23 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
               seg.stations.map(function(st, j) {
                 var isFirst = j === 0, isLast = j === seg.stations.length - 1;
                 var isCorr = isLast && i < itiResult.length - 1;
-                return React.createElement("div", { key: j, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderBottom: j < seg.stations.length - 1 ? "1px solid #f5f5f5" : "none", background: (isFirst || isLast) ? lc + "20" : "#fff" } },
-                  React.createElement("div", { style: { width: 9, height: 9, borderRadius: "50%", background: (isFirst || isLast) ? lc : "#ddd", border: "2px solid " + lc, flexShrink: 0 } }),
+                var normSt = normStation(st);
+                var isDepart = i === 0 && j === 0;
+                var isArrivee = i === itiResult.length - 1 && isLast;
+                var isEtapeChoisie = itiEtapes.some(function(e) { return normStation(e) === normSt; });
+                // Couleurs et styles selon le type de station
+                var rowBg = isDepart ? "#e8f5e9" : isArrivee ? "#ffebee" : isEtapeChoisie ? "#e3f2fd" : (isFirst || isLast) ? lc + "20" : "#fff";
+                var dotBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : (isFirst || isLast) ? lc : "#ddd";
+                var dotSize = (isDepart || isArrivee || isEtapeChoisie) ? 13 : 9;
+                var borderLeft = isDepart ? "4px solid #2e7d32" : isArrivee ? "4px solid #c62828" : isEtapeChoisie ? "4px solid #1565C0" : "none";
+                var labelBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : null;
+                var labelText = isDepart ? "🟢 Départ" : isArrivee ? "🔴 Arrivée" : isEtapeChoisie ? "📍 Étape" : null;
+                return React.createElement("div", { key: j, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderBottom: j < seg.stations.length - 1 ? "1px solid #f5f5f5" : "none", background: rowBg, borderLeft: borderLeft } },
+                  React.createElement("div", { style: { width: dotSize, height: dotSize, borderRadius: "50%", background: dotBg, border: "2px solid " + (isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : lc), flexShrink: 0 } }),
                   React.createElement("div", { style: { flex: 1 } },
-                    React.createElement("div", { style: { fontWeight: (isFirst || isLast) ? 700 : 400, fontSize: 13, color: "#111" } }, st),
-                    isCorr && React.createElement("div", { style: { fontSize: 11, color: "#E65100", fontWeight: 600, marginTop: 2 } }, "\uD83D\uDD04 Correspondance \u2192 ligne " + itiResult[i+1].line)
+                    React.createElement("div", { style: { fontWeight: (isFirst || isLast || isEtapeChoisie) ? 700 : 400, fontSize: 13, color: "#111" } }, st),
+                    labelText && React.createElement("span", { style: { display: "inline-block", marginTop: 3, background: labelBg, color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 5, padding: "2px 7px" } }, labelText),
+                    isCorr && !isEtapeChoisie && !isDepart && !isArrivee && React.createElement("div", { style: { fontSize: 11, color: "#E65100", fontWeight: 600, marginTop: 2 } }, "\uD83D\uDD04 Correspondance \u2192 ligne " + itiResult[i+1].line)
                   )
                 );
               })
@@ -3352,16 +3456,16 @@ function App() {
       fontFamily: "Arial Black,sans-serif"
     },
     "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative", background: "#fff", borderRadius: 16, padding: 2 } }, /* @__PURE__ */ React.createElement("div", { style: {
+  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 19, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon M\xE9tro Paris")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
     display: "flex",
     alignItems: "center",
     gap: 8,
     background: "#ffffff",
-    border: `2px solid ${searchFocused ? "#000" : "#aaa"}`,
+    border: `2px solid ${searchFocused ? "#000" : "#999"}`,
     borderRadius: 14,
     padding: "10px 14px",
     transition: "all 0.2s"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.8 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.5 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
     "input",
     {
       value: searchQuery,
@@ -4465,7 +4569,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v10"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v13"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
