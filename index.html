@@ -2994,7 +2994,7 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
       autoCapitalize: "off",
       spellCheck: false,
       name: "search_" + Math.random().toString(36).slice(2),
-      style: inputStyle
+      style: Object.assign({}, inputStyle, { fontSize: 17, fontWeight: 700 })
     }),
     open && suggestions.length > 0 && React.createElement("div", {
       style: {
@@ -3032,7 +3032,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   var dragTextState = React.useState("");
   var setDragText = dragTextState[1]; var dragText = dragTextState[0];
 
-  var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 15, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
+  var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 20, fontWeight: 900, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
 
   function addEtape() { setItiEtapes(function(p) { return p.concat([""]); }); }
   function removeEtape(i) { setItiEtapes(function(p) { return p.filter(function(_,j) { return j!==i; }); }); }
@@ -3597,14 +3597,15 @@ function App() {
         border: "none",
         outline: "none",
         color: "#111",
-        fontSize: 15,
-        fontWeight: 500
+        fontSize: 20,
+        fontWeight: 900
       }
     }
   ), searchQuery.length > 0 && /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setSearchQuery((q) => q.slice(0, -1)),
+      onMouseDown: (e) => e.preventDefault(),
       style: {
         background: "none",
         border: "none",
