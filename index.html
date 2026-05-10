@@ -3588,9 +3588,9 @@ function App() {
     {
       value: searchQuery,
       onChange: (e) => setSearchQuery(e.target.value),
-      onFocus: () => setSearchFocused(true),
+      onFocus: (e) => { setSearchFocused(true); var v = e.target.value; e.target.value = ""; e.target.value = v; },
       onBlur: () => setTimeout(() => setSearchFocused(false), 200),
-      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", autoCorrect: "off", autoCapitalize: "off", spellCheck: false,
+      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", autoCorrect: "off", autoCapitalize: "off", spellCheck: false, "data-form-type": "other",
       style: {
         flex: 1,
         background: "none",
@@ -3616,13 +3616,7 @@ function App() {
       }
     },
     "\u232B"
-  )), searchQuery.length >= 2 && /* @__PURE__ */ React.createElement(
-    "div",
-    {
-      style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 498 },
-      onClick: () => setSearchQuery("")
-    }
-  ), searchResults.length > 0 && /* @__PURE__ */ React.createElement("div", { style: {
+  )), searchResults.length > 0 && /* @__PURE__ */ React.createElement("div", { style: {
     position: "absolute",
     top: "100%",
     left: 0,
@@ -4692,7 +4686,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v32 \u2014 Sam 10 mai 2025 23h20"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v33 \u2014 Dim 11 mai 2025 18h10"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
