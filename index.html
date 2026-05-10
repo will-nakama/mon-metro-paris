@@ -2989,10 +2989,12 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
       onFocus: function() { setOpen(true); },
       onBlur: function() { setTimeout(function() { setOpen(false); }, 200); },
       placeholder: placeholder,
+      type: "search",
       autoComplete: "off",
       autoCorrect: "off",
       autoCapitalize: "off",
       spellCheck: false,
+      "data-form-type": "other",
       name: "search_" + Math.random().toString(36).slice(2),
       style: Object.assign({}, inputStyle, { fontSize: 17, fontWeight: 700 })
     }),
@@ -3091,9 +3093,9 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
 
   return React.createElement("div", { style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 300, display: "flex", alignItems: "flex-start" }, onClick: onClose },
     React.createElement("div", { style: { background: "#f5f5f5", borderRadius: 0, width: "100%", maxWidth: 480, margin: "0 auto", padding: "16px 16px 40px", height: "100vh", overflowY: "auto", touchAction: "pan-y" }, onClick: function(e) { e.stopPropagation(); } },
-      React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } },
+      React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16, position: "relative" } },
         React.createElement("button", { onClick: onClose, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", fontWeight: 900, padding: "0 10px 0 0" } }, "\u2039"),
-        React.createElement("div", { style: { fontWeight: 900, fontSize: 18, color: "#111" } }, "\uD83D\uDCCD It\u00E9n\u00E9raire"),
+        React.createElement("div", { style: { fontWeight: 900, fontSize: 20, color: "#111", flex: 1, textAlign: "center" } }, "\uD83D\uDCCD It\u00E9n\u00E9raire"),
         itiResult && React.createElement("button", { onClick: function() { setItiResult(null); setError(null); }, style: { marginLeft: "auto", background: "#111", border: "none", borderRadius: 8, padding: "6px 12px", color: "#fff", fontWeight: 700, fontSize: 12, cursor: "pointer" } }, "Modifier")
       ),
       // Fantôme flottant sous le doigt pendant le drag
@@ -3725,7 +3727,7 @@ function App() {
         background: "#1a1a2e", border: "2px solid #333",
         borderRadius: 14, padding: "12px 16px",
         cursor: "pointer", display: "flex",
-        alignItems: "center", gap: 10, color: "#fff"
+        alignItems: "center", justifyContent: "center", gap: 10, color: "#fff"
       }
     },
     /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F4CD}"),
@@ -4687,7 +4689,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v33 \u2014 Dim 11 mai 2025 18h10"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v40 \u2014 Dim 11 mai 2025 18h40"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
