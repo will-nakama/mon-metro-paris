@@ -3228,6 +3228,8 @@ function App() {
       if (d.adminEdits) setAdminEdits(d.adminEdits);
       if (d.favorites) setFavorites(d.favorites);
       if (d.version) { setAppVersion(d.version); localStorage.setItem("mpe_version", String(d.version)); }
+      setScreen("home");
+      setShowAdmin(false);
     }
   }, []);
 
@@ -3592,7 +3594,7 @@ function App() {
       onChange: (e) => setSearchQuery(e.target.value),
       onFocus: (e) => { setSearchFocused(true); var v = e.target.value; e.target.value = ""; e.target.value = v; },
       onBlur: () => setTimeout(() => setSearchFocused(false), 200),
-      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", autoCorrect: "off", autoCapitalize: "off", spellCheck: false, "data-form-type": "other",
+      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", "data-form-type": "other", autoCorrect: "off", autoCapitalize: "off", spellCheck: false, "data-form-type": "other",
       style: {
         flex: 1,
         background: "none",
@@ -4185,6 +4187,8 @@ function App() {
     {
       placeholder: "Nom de la station...",
       value: newStationName,
+      "data-form-type": "other",
+      autoComplete: "off",
       onChange: (e) => setNewStationName(e.target.value),
       style: {
         width: "100%",
@@ -4203,6 +4207,8 @@ function App() {
     {
       placeholder: "Correspondances (ex: 4, B, T3a)",
       value: newStationCorr,
+      "data-form-type": "other",
+      autoComplete: "off",
       onChange: (e) => setNewStationCorr(e.target.value),
       style: {
         width: "100%",
@@ -4920,7 +4926,7 @@ adminUnlocked && adminScreen === "motdepasse" && /* @__PURE__ */ React.createEle
     adminSavedCode ? "Mot de passe actif. Modifier ou d\xE9sactiver ci-dessous." : "Aucun mot de passe. L'admin est accessible \xE0 tous."
   ),
   /* @__PURE__ */ React.createElement("input", {
-    type: "password", value: adminCodeInput,
+    type: "password", value: adminCodeInput, "data-form-type": "other",
     onChange: function(e) { setAdminCodeInput(e.target.value); },
     placeholder: adminSavedCode ? "Nouveau mot de passe..." : "D\xE9finir un mot de passe...",
     style: { width: "100%", padding: "12px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 15, marginBottom: 12, boxSizing: "border-box", outline: "none" }
@@ -5107,6 +5113,8 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
       "input",
       {
         id: "inp_c",
+        "data-form-type": "other",
+        autoComplete: "off",
         placeholder: "Ex: 4, A, T3b...",
         style: {
           flex: 1,
@@ -5175,6 +5183,8 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
       "input",
       {
         id: "inp_w",
+        "data-form-type": "other",
+        autoComplete: "off",
         placeholder: "Ex: 9, C, T2...",
         style: {
           flex: 1,
