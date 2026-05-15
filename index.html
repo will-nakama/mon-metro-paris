@@ -2255,7 +2255,7 @@ function Panel({ group, lineColor, zoomed, onToggle }) {
     whiteSpace: "nowrap"
   } }, s.label))))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", marginTop: 2, opacity: 0.25, lineHeight: 1 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 7, color: isCorr ? "#F57C00" : "#fff" } }, zoomed ? "\u25BC" : "\u25B6")));
 }
-function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onClose }) {
+function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onChangeVoitures, onClose }) {
   const [type, setType] = useState("sortie");
   const [position, setPosition] = useState("tete");
   const [voitureNum, setVoitureNum] = useState("1");
@@ -2340,60 +2340,93 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     maxHeight: "90vh",
     overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
     padding: "20px 16px 40px"
-  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), builtinGroups && builtinGroups.length > 0 && !hasCustomData && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16, padding: "12px 14px", background: "#fff8e1", border: "2px solid #FFD700", borderRadius: 12 } },
-  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, color: "#666", marginBottom: 10, lineHeight: 1.5 } },
-    "\uD83D\uDCC2 Cette station contient ", builtinGroups.length, " panneau", builtinGroups.length > 1 ? "x" : "", " de base. Pour les modifier, importez-les d'abord."
-  ),
-  /* @__PURE__ */ React.createElement("button", { onClick: onImportBuiltin, style: {
-    width: "100%", padding: "10px 0", background: "#1565C0", border: "none",
-    borderRadius: 10, color: "#fff", fontWeight: 700, fontSize: 13, cursor: "pointer"
-  } }, "\uD83D\uDDB9 Modifier la base de donn\u00E9es")
-),
-existingGroups && existingGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 16 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 12, fontWeight: 700, color: "#888", marginBottom: 8, textTransform: "uppercase", letterSpacing: 1 } }, "Mes panneaux saisis"), existingGroups.map((g, i) => {
-    var _a;
-    return /* @__PURE__ */ React.createElement("div", { key: i, style: {
-      display: "flex",
-      alignItems: "center",
-      gap: 8,
-      padding: "8px 10px",
-      marginBottom: 6,
-      background: "#f8f8f8",
-      borderRadius: 10,
-      border: "1.5px solid #e0e0e0"
-    } }, /* @__PURE__ */ React.createElement("div", { style: { flex: 1, fontSize: 13, color: "#111", fontWeight: 600 } }, g.type === "corr" ? "\u{1F500}" : "\u{1F6AA}", " ", g.type === "corr" ? (g.corr || []).join(", ") : (g.sorties || []).map((s) => s.num).join(", "), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11, color: "#888", marginLeft: 6 } }, "voitures ", (_a = g.voitures) == null ? void 0 : _a.join("-"))), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => loadForEdit(g, i),
+  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), // Liste fusionnée : builtin + saisis, tous éditables/supprimables
+// Si pas encore importés, les builtin sont affichés en grisé avec un bouton "📥 Importer pour modifier"
+(() => {
+  const allGroups = [];
+  if (existingGroups && existingGroups.length > 0) {
+    existingGroups.forEach((g, i) => allGroups.push({ g, i, source: 'custom' }));
+  }
+  if (builtinGroups && builtinGroups.length > 0 && !hasCustomData) {
+    builtinGroups.forEach((g, i) => allGroups.push({ g, i, source: 'builtin' }));
+  }
+  if (allGroups.length === 0) return null;
+  return /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#555", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, "Panneaux de cette station"),
+    !hasCustomData && builtinGroups && builtinGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 12px", background: "#fff8e1", border: "2px solid #FFD700", borderRadius: 10, marginBottom: 10, fontSize: 13, color: "#5d4e00", lineHeight: 1.4 } },
+      "📂 ", builtinGroups.length, " panneau", builtinGroups.length > 1 ? "x" : "", " pré-enregistré", builtinGroups.length > 1 ? "s" : "",  ". Cliquez pour les rendre modifiables.",
+      /* @__PURE__ */ React.createElement("button", { onClick: onImportBuiltin, style: { width: "100%", marginTop: 8, padding: "10px", background: "#1565C0", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "📥 Importer pour pouvoir les modifier")
+    ),
+    allGroups.map(({ g, i, source }, k) => {
+      var _a;
+      const isBuiltin = source === 'builtin';
+      const voitures = (_a = g.voitures) == null ? void 0 : _a.join("-");
+      return /* @__PURE__ */ React.createElement("div", { key: k, style: {
+        padding: "12px 14px", marginBottom: 10,
+        background: isBuiltin ? "#fafafa" : "#fff",
+        border: isBuiltin ? "1.5px dashed #bbb" : "2px solid " + (g.type === "corr" ? "#F57C00" : "#333"),
+        borderRadius: 12,
+        opacity: isBuiltin ? 0.65 : 1
+      } },
+        // En-tête : type + voitures + actions
+        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: g.type === "corr" || (g.sorties && g.sorties.length > 0) ? 10 : 0 } },
+          /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+            /* @__PURE__ */ React.createElement("span", { style: {
+              fontSize: 15, fontWeight: 800,
+              background: g.type === "corr" ? "#F57C00" : "#333",
+              color: "#fff", padding: "4px 10px", borderRadius: 8
+            } }, g.type === "corr" ? "🔀 CORRESPONDANCE" : "🚪 SORTIE"),
+            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, fontWeight: 800, color: "#111" } }, "Voiture", g.voitures && g.voitures.length > 1 ? "s" : "", " ", voitures)
+          ),
+          !isBuiltin && /* @__PURE__ */ React.createElement("button", {
+            onClick: () => loadForEdit(g, i),
+            style: { background: "#e3f2fd", border: "none", borderRadius: 8, padding: "8px 12px", color: "#1565C0", fontWeight: 800, fontSize: 16, cursor: "pointer" }
+          }, "✏️"),
+          !isBuiltin && /* @__PURE__ */ React.createElement("button", {
+            onClick: () => onDelete(i),
+            style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "8px 12px", color: "#c00", fontWeight: 800, fontSize: 16, cursor: "pointer" }
+          }, "✕")
+        ),
+        // Détails des correspondances avec badges
+        g.type === "corr" && g.corr && g.corr.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" } },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, color: "#666", fontWeight: 600 } }, "Vers :"),
+          g.corr.map((c, j) => /* @__PURE__ */ React.createElement(Badge, { key: j, id: c, size: 26 }))
+        ),
+        // Détails des sorties avec numéro + label complet
+        g.type === "sortie" && g.sorties && g.sorties.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+          g.sorties.map((s, j) => /* @__PURE__ */ React.createElement("div", { key: j, style: { display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 0" } },
+            /* @__PURE__ */ React.createElement("span", { style: {
+              flexShrink: 0, minWidth: 32, textAlign: "center", padding: "4px 8px",
+              background: "#333", color: "#fff", borderRadius: 6,
+              fontSize: 14, fontWeight: 800
+            } }, s.num),
+            /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontSize: 14, color: "#111", fontWeight: 600, lineHeight: 1.4 } }, s.label || /* @__PURE__ */ React.createElement("span", { style: { color: "#aaa", fontStyle: "italic" } }, "(sans description)"))
+          ))
+        )
+      );
+    }),
+    /* @__PURE__ */ React.createElement("div", { style: { height: 1, background: "#eee", margin: "14px 0" } })
+  );
+})(), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18, padding: "12px 14px", background: "#f0f7ff", border: "2px solid #1565C0", borderRadius: 12 } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1565C0", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, "🚆 Nombre de voitures de la station"),
+  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+    Array.from({ length: 10 }, (_, i) => i + 1).map(function(n) {
+      const isSel = (nVoitures || 5) === n;
+      return /* @__PURE__ */ React.createElement("button", {
+        key: n,
+        onClick: function() { if (onChangeVoitures) onChangeVoitures(n); },
         style: {
-          background: "#e3f2fd",
-          border: "none",
+          width: 38, height: 38,
+          border: "2px solid " + (isSel ? "#1565C0" : "#ccc"),
           borderRadius: 8,
-          padding: "6px 10px",
-          color: "#1565C0",
-          fontWeight: 700,
-          fontSize: 13,
-          cursor: "pointer"
+          background: isSel ? "#1565C0" : "#fff",
+          color: isSel ? "#fff" : "#555",
+          fontWeight: 900, fontSize: 14, cursor: "pointer"
         }
-      },
-      "\u270F\uFE0F"
-    ), /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        onClick: () => onDelete(i),
-        style: {
-          background: "#ffebee",
-          border: "none",
-          borderRadius: 8,
-          padding: "6px 10px",
-          color: "#c00",
-          fontWeight: 700,
-          fontSize: 13,
-          cursor: "pointer"
-        }
-      },
-      "\u2715"
-    ));
-  }), /* @__PURE__ */ React.createElement("div", { style: { height: 1, background: "#eee", margin: "10px 0" } })), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 14 } }, editIndex !== null ? "\u270F\uFE0F Modifier le panneau" : "\u2795 Ajouter un panneau"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Type"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+      }, n);
+    })
+  )
+), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 14 } }, editIndex !== null ? "\u270F\uFE0F Modifier le panneau" : "\u2795 Ajouter un panneau"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Type"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       style: __spreadProps(__spreadValues({}, btnPos(type === "sortie", "#222")), { color: type === "sortie" ? "#fff" : "#555" }),
@@ -3274,6 +3307,114 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   );
 }
 
+
+function ScrollIndicator() {
+  const [direction, setDirection] = React.useState(null); // 'up' | 'down' | null
+  React.useEffect(() => {
+    let currentContainer = null;
+
+    function findMainScrollable() {
+      // UNIQUEMENT sur les listes de stations (classe scroll-list)
+      const lists = document.querySelectorAll('.scroll-list');
+      let best = null, bestScore = 0;
+      for (let i = 0; i < lists.length; i++) {
+        const el = lists[i];
+        const sh = el.scrollHeight;
+        const ch = el.clientHeight;
+        if (sh <= ch + 30) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.width < 100 || rect.height < 200) continue;
+        if (rect.bottom < 50 || rect.top > window.innerHeight - 50) continue;
+        const score = rect.width * rect.height;
+        if (score > bestScore) { best = el; bestScore = score; }
+      }
+      return best;
+    }
+
+    function update() {
+      const cont = findMainScrollable();
+      currentContainer = cont;
+      if (!cont) {
+        setDirection(null);
+        return;
+      }
+      const st = cont.scrollTop;
+      const sh = cont.scrollHeight;
+      const ch = cont.clientHeight;
+      const canDown = st + ch < sh - 30;
+      const canUp = st > 30;
+      if (canDown) setDirection('down');
+      else if (canUp) setDirection('up');
+      else setDirection(null);
+    }
+
+    update();
+    // Surveiller scroll sur capture pour attraper les conteneurs internes
+    window.addEventListener('scroll', update, { passive: true, capture: true });
+    window.addEventListener('resize', update);
+    const interval = setInterval(update, 400);
+    return () => {
+      window.removeEventListener('scroll', update, { capture: true });
+      window.removeEventListener('resize', update);
+      clearInterval(interval);
+    };
+  }, []);
+
+  if (!direction) return null;
+
+  const isDown = direction === 'down';
+  const handleClick = () => {
+    const lists = document.querySelectorAll('.scroll-list');
+    let best = null, bestScore = 0;
+    for (let i = 0; i < lists.length; i++) {
+      const el = lists[i];
+      const sh = el.scrollHeight;
+      const ch = el.clientHeight;
+      if (sh <= ch + 30) continue;
+      const rect = el.getBoundingClientRect();
+      if (rect.width < 100 || rect.height < 200) continue;
+      if (rect.bottom < 50 || rect.top > window.innerHeight - 50) continue;
+      const score = rect.width * rect.height;
+      if (score > bestScore) { best = el; bestScore = score; }
+    }
+    if (best) {
+      best.scrollTo({ top: isDown ? best.scrollHeight : 0, behavior: 'smooth' });
+    }
+  };
+
+  return React.createElement(React.Fragment, null,
+    React.createElement("style", null, `@keyframes mpeBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(${isDown ? '2px' : '-2px'})}}`),
+    React.createElement("div", {
+      onClick: handleClick,
+      style: {
+        position: "fixed",
+        right: 8,
+        top: "50%",
+        marginTop: -13,
+        zIndex: 99999,
+        background: "#fff",
+        border: "1.5px solid #111",
+        borderRadius: "50%",
+        width: 26,
+        height: 26,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.25)",
+        cursor: "pointer",
+        animation: "mpeBounce 1.4s ease-in-out infinite"
+      },
+      "aria-label": isDown ? "Descendre" : "Remonter"
+    },
+      React.createElement("svg", { width: 16, height: 16, viewBox: "0 0 24 24", fill: "none" },
+        React.createElement("path", {
+          d: isDown ? "M12 4v16M5 13l7 7 7-7" : "M12 20V4M5 11l7-7 7 7",
+          stroke: "#111", strokeWidth: "3", strokeLinecap: "round", strokeLinejoin: "round"
+        })
+      )
+    )
+  );
+}
 
 function App() {
   var _a, _b, _c, _d, _e;
@@ -4630,7 +4771,7 @@ function App() {
         setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 10);
       }
     },
-    canScrollUp && tab === "train" && /* @__PURE__ */ React.createElement("div", { style: {
+    false && canScrollUp && tab === "train" && /* @__PURE__ */ React.createElement("div", { style: {
       position: "fixed",
       bottom: 120,
       right: 16,
@@ -4638,7 +4779,7 @@ function App() {
       pointerEvents: "none",
       animation: "bounceUp 1s ease-in-out infinite"
     } }, /* @__PURE__ */ React.createElement("style", null, `@keyframes bounceUp{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}`), /* @__PURE__ */ React.createElement("svg", { width: "18", height: "18", viewBox: "0 0 24 24", fill: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M12 20V4M5 11l7-7 7 7", stroke: "#000", strokeWidth: "6", strokeLinecap: "round", strokeLinejoin: "round" }), /* @__PURE__ */ React.createElement("path", { d: "M12 20V4M5 11l7-7 7 7", stroke: "#fff", strokeWidth: "2.5", strokeLinecap: "round", strokeLinejoin: "round" }))),
-    tab === "train" && canScrollDown && /* @__PURE__ */ React.createElement("div", { style: {
+    false && tab === "train" && canScrollDown && /* @__PURE__ */ React.createElement("div", { style: {
       position: "fixed",
       bottom: 76,
       right: 16,
@@ -4710,6 +4851,13 @@ function App() {
           var customGroups = existing.groups || [];
           return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { groups: [...builtinGroups, ...customGroups] }) });
         });
+      },
+      onChangeVoitures: function(newN) {
+        setCustomTrainData(function(prev) {
+          var existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
+          return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { voitures: newN }) });
+        });
+        if (station) addLog("🚆 " + station.n + " — Voitures : " + newN);
       },
       onClose: () => setShowEditor(false)
     }
@@ -5498,6 +5646,12 @@ try {
   setProgress(95,'Lancement');
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(React.createElement(App));
+  // Indicateur de scroll global — monté séparément
+  const scrollContainer = document.createElement('div');
+  scrollContainer.id = 'mpe-scroll-indicator';
+  document.body.appendChild(scrollContainer);
+  const scrollRoot = ReactDOM.createRoot(scrollContainer);
+  scrollRoot.render(React.createElement(ScrollIndicator));
   setProgress(100,'Prêt !');
   setTimeout(()=>{ document.getElementById('loading').style.display='none'; },400);
 } catch(e) {
