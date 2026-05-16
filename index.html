@@ -764,53 +764,52 @@ const STATIONS = {
     { n: "Versailles \u2013 Chantiers", c: ["C", "N", "U"] }
   ],
   "A": [
-    // Branche Cergy (C) — Cergy-Le Haut terminus en dernier
-    { n: "Conflans - Fin d'Oise", branch: "C" },
-    { n: "Ach\xE8res - Ville", branch: "C" },
-    { n: "Neuville - Universit\xE9", branch: "C" },
+    // Branche Saint-Germain (G) — terminus EN PREMIER, s'arrête juste avant le tronc commun
+    { n: "Saint-Germain-en-Laye", c: ["T13"], branch: "G" },
+    { n: "Le V\xE9sinet - Le Pecq", branch: "G" },
+    { n: "Le V\xE9sinet - Centre", branch: "G" },
+    { n: "Chatou - Croissy", branch: "G" },
+    { n: "Rueil-Malmaison", branch: "G" },
+    { n: "Nanterre - Ville", branch: "G" },
+    { n: "Nanterre - Universit\xE9", branch: "G" },
+    // Branche Cergy (C) — terminus EN PREMIER
+    { n: "Cergy - Le Haut", branch: "C" },
     { n: "Cergy - Saint-Christophe", branch: "C" },
     { n: "Cergy - Pr\xE9fecture", branch: "C" },
-    { n: "Cergy - Le Haut", branch: "C" },
-    // Branche Poissy (P) — Poissy terminus en dernier
-    { n: "Ach\xE8res - Grand Cormier", branch: "P" },
-    { n: "Maisons-Laffitte", branch: "P" },
-    { n: "Sartrouville", branch: "P" },
-    { n: "Houilles - Carri\xE8res-sur-Seine", branch: "P" },
+    { n: "Neuville - Universit\xE9", branch: "C" },
+    { n: "Conflans - Fin d'Oise", branch: "C" },
+    { n: "Ach\xE8res - Ville", branch: "C" },
+    { n: "Maisons-Laffitte", branch: "C" },
+    { n: "Sartrouville", branch: "C" },
+    { n: "Houilles - Carri\xE8res-sur-Seine", branch: "C" },
+    // Branche Poissy (P) — terminus EN PREMIER
     { n: "Poissy", branch: "P" },
-    // Branche Saint-Germain (G) — Saint-Germain est le terminus = en dernier
-    { n: "Nanterre - Universit\xE9", branch: "G" },
-    { n: "Rueil-Malmaison", branch: "G" },
-    { n: "Chatou - Croissy", branch: "G" },
-    { n: "Le V\xE9sinet - Centre", branch: "G" },
-    { n: "Le V\xE9sinet - Le Pecq", branch: "G" },
-    { n: "Saint-Germain-en-Laye", c: ["T13"], branch: "G" },
-    // FOURCHE OUEST — point de séparation
+    { n: "Ach\xE8res - Grand Cormier", branch: "P" },
+    // FOURCHE OUEST — Nanterre Préfecture est la première du tronc commun
     { n: "Nanterre - Pr\xE9fecture", fork: true },
-    // Tronc commun
+    // Tronc commun de Paris
     { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"] },
     { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "6"] },
     { n: "Auber", c: ["E"] },
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "B", "D"] },
     { n: "Gare de Lyon", c: ["1", "14", "D"] },
-    // FOURCHE EST — point de séparation
-    { n: "Nation", c: ["1", "2", "6", "9"], fork: true },
-    // Branche Boissy (B) — Boissy est le terminus = en dernier
-    { n: "Vincennes", branch: "B" },
+    { n: "Nation", c: ["1", "2", "6", "9"] },
+    // FOURCHE EST — Vincennes est la dernière du tronc commun
+    { n: "Vincennes", fork: true },
+    // Branche Boissy (B) — de la fourche vers le terminus
     { n: "Fontenay-sous-Bois", branch: "B" },
-    { n: "Val de Fontenay", c: ["E"], branch: "B" },
     { n: "Nogent-sur-Marne", branch: "B" },
-    { n: "Le Perreux - Nogent", branch: "B" },
-    { n: "Neuilly-Plaisance", branch: "B" },
-    { n: "Bry-sur-Marne", branch: "B" },
-    { n: "Villiers-sur-Marne - Le Plessis-Tr\xE9vise", branch: "B" },
-    { n: "Sucy - Bonneuil", branch: "B" },
-    { n: "La Varenne - Chennevi\xE8res", branch: "B" },
+    { n: "Joinville-le-Pont", branch: "B" },
     { n: "Saint-Maur - Cr\xE9teil", branch: "B" },
     { n: "Le Parc de Saint-Maur", branch: "B" },
     { n: "Champigny", branch: "B" },
-    { n: "La Borne Blanche", branch: "B" },
+    { n: "La Varenne - Chennevi\xE8res", branch: "B" },
+    { n: "Sucy - Bonneuil", branch: "B" },
     { n: "Boissy-Saint-L\xE9ger", branch: "B" },
-    // Branche Marne-la-Vallée (M) — Chessy est le terminus = en dernier
+    // Branche Marne-la-Vallée (M) — de la fourche vers le terminus
+    { n: "Val de Fontenay", c: ["E"], branch: "M" },
+    { n: "Neuilly-Plaisance", branch: "M" },
+    { n: "Bry-sur-Marne", branch: "M" },
     { n: "Noisy-le-Grand - Mont d'Est", branch: "M" },
     { n: "Noisy - Champs", branch: "M" },
     { n: "Noisiel", branch: "M" },
@@ -818,7 +817,7 @@ const STATIONS = {
     { n: "Torcy", branch: "M" },
     { n: "Bussy - Saint-Georges", branch: "M" },
     { n: "Val d'Europe", branch: "M" },
-    { n: "Chessy - Marne-la-Vall\xE9e (Disneyland)", branch: "M" }
+    { n: "Marne-la-Vall\xE9e Chessy (Disneyland)", branch: "M" }
   ],
   "B": [
     // Branche Nord CDG (D) — Aéroport CDG 2 terminus en dernier
@@ -2355,7 +2354,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#555", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, "Panneaux de cette station"),
     !hasCustomData && builtinGroups && builtinGroups.length > 0 && /* @__PURE__ */ React.createElement("div", { style: { padding: "10px 12px", background: "#fff8e1", border: "2px solid #FFD700", borderRadius: 10, marginBottom: 10, fontSize: 13, color: "#5d4e00", lineHeight: 1.4 } },
       "📂 ", builtinGroups.length, " panneau", builtinGroups.length > 1 ? "x" : "", " pré-enregistré", builtinGroups.length > 1 ? "s" : "",  ". Cliquez pour les rendre modifiables.",
-      /* @__PURE__ */ React.createElement("button", { onClick: onImportBuiltin, style: { width: "100%", marginTop: 8, padding: "10px", background: "#1565C0", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "📥 Importer pour pouvoir les modifier")
+      /* @__PURE__ */ React.createElement("button", { onClick: onImportBuiltin, style: { width: "100%", marginTop: 8, padding: "10px", background: "#1565C0", border: "none", borderRadius: 8, color: "#fff", fontWeight: 700, fontSize: 14, cursor: "pointer" } }, "📲 Importer pour pouvoir les modifier")
     ),
     allGroups.map(({ g, i, source }, k) => {
       var _a;
@@ -3800,12 +3799,46 @@ function App() {
       if (!troncon15) return [];
       return stations.filter((s) => s.branch === troncon15);
     }
-    if (!hasFork || !branch) return stations.filter((s) => !s.branch && !s.fork);
-    return stations.filter((s) => !s.branch || s.branch === branch).filter((s) => !s.fork);
+    if (!hasFork) return stations.filter((s) => !s.branch && !s.fork);
+    if (!branch) {
+      // Tronc commun + fourche à la fin
+      const tronc = stations.filter((s) => !s.branch && !s.fork);
+      const forkSt = stations.filter((s) => s.fork);
+      return [...tronc, ...forkSt];
+    }
+    // Construction : branche choisie + fourche + tronc commun complet jusqu'à l'autre fourche
+    // L'ordre dans les données : branches "ouest" sont avant les forks et tronc commun
+    // donc on construit dans l'ordre logique en fonction de la position de la branche
+    const forkStations = stations.filter((s) => s.fork);
+    const forkNames = forkStations.map((s) => s.n);
+    // Exclure les stations de branche qui sont des doublons d'une fourche (ex: La Fourche apparaît dans la branche ET comme fork)
+    const branchStations = stations.filter((s) => s.branch === branch && !forkNames.includes(s.n));
+    const troncStations = stations.filter((s) => !s.branch && !s.fork);
+    if (branchStations.length === 0) return troncStations;
+    // Trouver l'index de la 1re station de la branche et de la 1re station du tronc
+    const firstBranchIdx = stations.findIndex((s) => s.branch === branch);
+    const firstTroncIdx = stations.findIndex((s) => !s.branch && !s.fork);
+    // Si la branche est AVANT le tronc commun dans les données → branche ouest (Saint-Germain, Cergy, Poissy pour RER A)
+    // sinon → branche est (Boissy, Marne-la-Vallée)
+    if (firstBranchIdx < firstTroncIdx) {
+      // branche ouest : terminus → branche → fork ouest → tronc → fork est (si elle existe)
+      if (forkStations.length >= 2) {
+        return [...branchStations, forkStations[0], ...troncStations, forkStations[forkStations.length - 1]].filter(Boolean);
+      }
+      return [...branchStations, forkStations[0], ...troncStations].filter(Boolean);
+    } else {
+      // branche est : terminus → branche inversée → fork est → tronc inversé → fork ouest (si elle existe)
+      if (forkStations.length >= 2) {
+        return [...branchStations.slice().reverse(), forkStations[forkStations.length - 1], ...troncStations.slice().reverse(), forkStations[0]].filter(Boolean);
+      }
+      return [...branchStations.slice().reverse(), forkStations[0], ...troncStations.slice().reverse()].filter(Boolean);
+    }
   }, [stations, hasFork, branch, is15, troncon15]);
+  const filteredFirstName = filteredStations.length > 0 ? filteredStations[0].n : null;
+  const filteredLastName = filteredStations.length > 0 ? filteredStations[filteredStations.length - 1].n : null;
   const displayed = is15
     ? (direction === termA ? [...filteredStations].reverse() : filteredStations)
-    : (direction === termB ? [...filteredStations].reverse() : filteredStations);
+    : (direction === filteredLastName ? [...filteredStations].reverse() : filteredStations);
   const displayedTerminus = direction;
   const isFav = stKey ? favorites.includes(stKey) : false;
   const linesForType = transport === "metro" ? METRO_LINES : transport === "rer" ? RER_LINES : transport === "tram" ? TRAM_LINES : CABLE_LINES;
@@ -4143,13 +4176,14 @@ function App() {
         const troncLast = (_a2 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0]) == null ? void 0 : _a2.n;
         return /* @__PURE__ */ React.createElement(React.Fragment, null, forkConfig.branches.map((br) => {
           var _a3;
-          const branchLast = (_a3 = stations.filter((s) => s.branch === br.id).slice(-1)[0]) == null ? void 0 : _a3.n;
+          // Le terminus est la première station de la branche (les branches sont stockées du terminus vers la fourche)
+          const branchTerm = (_a3 = stations.filter((s) => s.branch === br.id)[0]) == null ? void 0 : _a3.n;
           return /* @__PURE__ */ React.createElement(
             "button",
             {
               key: br.id,
               onClick: () => {
-                setDirection(troncLast || "");
+                setDirection(branchTerm || "");
                 setShowDir(false);
                 setScreen("stations");
                 setBranch(br.id);
@@ -4174,7 +4208,7 @@ function App() {
               }
             },
             /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22, fontWeight: 900, color: br.color, flexShrink: 0 } }, "\u2192"),
-            /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontSize: 17, fontWeight: 900, lineHeight: 1.25 } }, branchLast)
+            /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontSize: 17, fontWeight: 900, lineHeight: 1.25 } }, branchTerm)
           );
         }));
       }
@@ -4182,18 +4216,19 @@ function App() {
         const branchALast = (_b2 = stations.filter((s) => s.branch === branchA).slice(-1)[0]) == null ? void 0 : _b2.n;
         const branchBLast = (_c2 = stations.filter((s) => s.branch === branchB).slice(-1)[0]) == null ? void 0 : _c2.n;
         const troncFirst = (_d2 = stations.filter((s) => !s.branch && !s.fork)[0]) == null ? void 0 : _d2.n;
+        const troncLast2 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0];
+        const troncLastName = troncLast2 == null ? void 0 : troncLast2.n;
         const cards = [
-          { label: branchALast, branch: branchA, color: forkConfig.A.color, letter: forkConfig.letter.A },
-          { label: branchBLast, branch: branchB, color: forkConfig.B.color, letter: forkConfig.letter.B },
-          { label: troncFirst, branch: null, color: line.color, letter: "\u21A9" }
+          { label: branchALast, branch: branchA, color: forkConfig.A.color, letter: forkConfig.letter.A, targetDir: branchALast },
+          { label: branchBLast, branch: branchB, color: forkConfig.B.color, letter: forkConfig.letter.B, targetDir: branchBLast },
+          { label: troncFirst, branch: null, color: line.color, letter: "\u21A9", targetDir: troncFirst }
         ];
         return cards.map((c, i) => /* @__PURE__ */ React.createElement(
           "button",
           {
             key: i,
             onClick: () => {
-              var _a3, _b3;
-              setDirection(c.branch ? (_a3 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0]) == null ? void 0 : _a3.n : (_b3 = stations.filter((s) => !s.branch && !s.fork)[0]) == null ? void 0 : _b3.n);
+              setDirection(c.targetDir);
               setShowDir(false);
               setScreen("stations");
               setBranch(c.branch);
@@ -4297,13 +4332,18 @@ function App() {
         "button",
         {
           key: br.id,
-          onClick: () => setBranch(br.id),
+          onClick: () => {
+            // Mettre à jour la direction avec le terminus de la branche (1ère station de la branche)
+            const branchTerm = stations.filter((s) => s.branch === br.id)[0];
+            if (branchTerm) setDirection(branchTerm.n);
+            setBranch(br.id);
+          },
           style: {
             padding: "7px 10px",
             borderRadius: 9,
             border: `3px solid ${br.color}`,
             background: isActive ? br.color : "#fff",
-            color: isActive ? "#fff" : "#111",
+            color: "#111",
             fontWeight: 900,
             fontSize: 12,
             cursor: "pointer",
@@ -4312,41 +4352,150 @@ function App() {
             gap: 5
           }
         },
-        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#fff" : br.color, fontWeight: 900, fontSize: 13 } }, br.letter),
+        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : br.color, fontWeight: 900, fontSize: 13 } }, br.letter),
         /* @__PURE__ */ React.createElement("span", null, br.label)
       );
     })))
   ) : (
     // Mode 2 branches (lignes 7 et 13)
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, [["A", branchA], ["B", branchB]].map(([key, branchVal]) => {
-      const cfg = forkConfig[key];
-      const isActive = branch === branchVal;
-      return /* @__PURE__ */ React.createElement(
-        "button",
-        {
-          key,
-          onClick: () => setBranch(branchVal),
+    // Mode 2 branches (lignes 7 et 13) + 3ème bouton tronc commun
+    (() => {
+      const troncTermStation = stations.filter((s) => !s.branch && !s.fork)[0];
+      const troncTerm = troncTermStation ? troncTermStation.n : null;
+      const lineColor = line.color || "#111";
+      const items = [["A", branchA], ["B", branchB]];
+      return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6 } },
+        items.map(([key, branchVal]) => {
+          const cfg = forkConfig[key];
+          const isActive = branch === branchVal;
+          return /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              key,
+              onClick: () => {
+                const branchTerm = stations.filter((s) => s.branch === branchVal).slice(-1)[0];
+                if (branchTerm) setDirection(branchTerm.n);
+                setBranch(branchVal);
+              },
+              style: {
+                flex: 1,
+                padding: "8px 6px",
+                minWidth: 0,
+                borderRadius: 10,
+                border: `2.5px solid ${cfg.color}`,
+                background: isActive ? cfg.color : "#fff",
+                color: "#111",
+                fontWeight: 900,
+                fontSize: 12,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5,
+                overflow: "hidden"
+              }
+            },
+            /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : cfg.textInactive, fontSize: 14, fontWeight: 900, flexShrink: 0 } }, forkConfig.letter[key]),
+            /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, cfg.label)
+          );
+        }).concat(troncTerm ? [
+          /* @__PURE__ */ React.createElement(
+            "button",
+            {
+              key: "tronc",
+              onClick: () => {
+                setDirection(troncTerm);
+                setBranch(null);
+              },
+              style: {
+                flex: 1,
+                padding: "8px 6px",
+                minWidth: 0,
+                borderRadius: 10,
+                border: `2.5px solid ${branch === null ? lineColor : "#ccc"}`,
+                background: branch === null ? lineColor : "#f5f5f5",
+                color: "#111",
+                fontWeight: 900,
+                fontSize: 12,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 5,
+                overflow: "hidden"
+              }
+            },
+            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u21A9"),
+            /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, troncTerm)
+          )
+        ] : [])
+      );
+    })()
+  )), !hasFork && !is15 && filteredStations.length > 1 && (() => {
+    // Sélecteur de direction pour lignes normales : 2 terminus côte à côte
+    const term1 = filteredStations[0].n;
+    const term2 = filteredStations[filteredStations.length - 1].n;
+    const lineColor = line.color || "#111";
+    const lineText = line.text || "#fff";
+    return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 10 } },
+      [term1, term2].map((termName, i) => {
+        const isActive = direction === termName;
+        return /* @__PURE__ */ React.createElement("button", {
+          key: i,
+          onClick: () => setDirection(termName),
           style: {
-            flex: 1,
-            padding: "9px 8px",
-            borderRadius: 10,
-            border: `3px solid ${cfg.color}`,
-            background: isActive ? cfg.color : "#fff",
-            color: "#111",
-            fontWeight: 900,
-            fontSize: 13,
+            flex: 1, padding: "8px 6px", minWidth: 0,
+            borderRadius: 9,
+            border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
+            background: isActive ? lineColor : "#f5f5f5",
+            color: isActive ? "#111" : "#888",
+            fontWeight: 800, fontSize: 12,
             cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
+            display: "flex", alignItems: "center", gap: 5,
             justifyContent: "center",
-            gap: 6
+            lineHeight: 1.2,
+            overflow: "hidden",
+            textOverflow: "ellipsis"
           }
         },
-        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : cfg.textInactive, fontSize: 15, fontWeight: 900 } }, forkConfig.letter[key]),
-        /* @__PURE__ */ React.createElement("span", null, cfg.label)
-      );
-    }))
-  ))), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", paddingBottom: 80 } }, displayed.map((st, idx) => {
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u2192"),
+          /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, termName)
+        );
+      })
+    );
+  })(),
+  is15 && troncon15 && filteredStations.length > 1 && (() => {
+    // Sélecteur de direction pour ligne 15 : 2 terminus du tronçon
+    const term1 = filteredStations[0].n;
+    const term2 = filteredStations[filteredStations.length - 1].n;
+    const lineColor = "#B90845";
+    return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 10 } },
+      [term1, term2].map((termName, i) => {
+        const isActive = direction === termName;
+        return /* @__PURE__ */ React.createElement("button", {
+          key: i,
+          onClick: () => setDirection(termName),
+          style: {
+            flex: 1, padding: "8px 6px", minWidth: 0,
+            borderRadius: 9,
+            border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
+            background: isActive ? lineColor : "#f5f5f5",
+            color: isActive ? "#111" : "#888",
+            fontWeight: 800, fontSize: 12,
+            cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 5,
+            justifyContent: "center",
+            lineHeight: 1.2,
+            overflow: "hidden"
+          }
+        },
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u2192"),
+          /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, termName)
+        );
+      })
+    );
+  })()
+  ), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", paddingBottom: 80 } }, displayed.map((st, idx) => {
     if (st.fork) {
       return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
         background: "#FFF3E0",
@@ -4356,7 +4505,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 10
-      } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#E65100" } }, (forkConfig == null ? void 0 : forkConfig.forkName) || st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#F57C00", fontWeight: 700 } }, "Choisissez votre branche ci-dessus")));
+      } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#111" } }, st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#111", fontWeight: 700 } }, "Choisissez votre branche ci-dessus")));
     }
     const isTerminus = idx === 0 || idx === displayed.length - 1;
     return /* @__PURE__ */ React.createElement(
@@ -5014,7 +5163,12 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, "\u2699\uFE0F Administration  v40 \u2014 Dim 11 mai 2025 18h40"), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, (() => {
+    var d = new Date();
+    var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+    var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
+    return "\u2699\uFE0F Administration v" + appVersion + " \u2014 " + jours[d.getDay()] + " " + d.getDate() + " " + mois[d.getMonth()] + " " + d.getFullYear() + " " + String(d.getHours()).padStart(2,"0") + "h" + String(d.getMinutes()).padStart(2,"0");
+  })()), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
@@ -5170,54 +5324,111 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
   /* @__PURE__ */ React.createElement("div", { style: { color: "#666", fontSize: 13, marginBottom: 20, lineHeight: 1.6 } },
     "G\u00E9n\u00E8re un nouveau fichier ", /* @__PURE__ */ React.createElement("b", null, "index.html"), " avec toutes vos donn\u00E9es int\u00E9gr\u00E9es."
   ),
-  /* @__PURE__ */ React.createElement("button", { onClick: function() {
-    var newVersion = appVersion + 1;
-    setAppVersion(newVersion);
-    localStorage.setItem("mpe_version", String(newVersion));
-    var now = new Date();
-    var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
-    var mois = ["jan","\u00E9v","mar","avr","mai","jun","jul","ao\u00FB","sep","oct","nov","d\u00E9c"];
-    var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " \u00E0 " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
-    addLog("\u2705 SAUVEGARDE v" + newVersion + " \u2014 " + label);
-    var dataStr = JSON.stringify({ customTrainData: customTrainData, adminEdits: adminEdits, favorites: favorites, version: newVersion });
-    var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
+  (() => {
+    var isGitHub = window.location.hostname.indexOf("github.io") !== -1 || window.location.protocol === "https:" || window.location.protocol === "http:";
+    var isLocal = window.location.protocol === "file:" || window.location.protocol === "content:" || window.location.protocol === "blob:";
+    if (!isLocal) {
+      return /* @__PURE__ */ React.createElement("div", { style: { background: "#fff3cd", border: "2px solid #ffa726", borderRadius: 12, padding: 16, marginBottom: 14 } },
+        /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 15, color: "#b26500", marginBottom: 8 } }, "\u26A0\uFE0F Mode en ligne d\u00E9tect\u00E9"),
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#5d4500", lineHeight: 1.5, marginBottom: 12 } },
+          "Vous \u00EAtes sur GitHub Pages. Pour sauvegarder de fa\u00E7on fiable, ", /* @__PURE__ */ React.createElement("b", null, "t\u00E9l\u00E9chargez d'abord ce fichier sur votre t\u00E9l\u00E9phone"), " puis travaillez en local. La sauvegarde sera ensuite fiable \u00E0 100%."
+        ),
+        /* @__PURE__ */ React.createElement("button", { onClick: function() {
+          var a = document.createElement('a');
+          a.href = window.location.href;
+          a.download = 'index.html';
+          a.click();
+        }, style: { width: "100%", padding: 14, background: "#1565C0", border: "none", borderRadius: 10, color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer" } }, "\uD83D\uDCF2 T\u00E9l\u00E9charger pour travailler en local")
+      );
+    }
+    return /* @__PURE__ */ React.createElement("button", { onClick: function() {
+      var newVersion = appVersion + 1;
+      var now = new Date();
+      var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+      var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
+      var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " \u00E0 " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
+      var dataStr = JSON.stringify({ customTrainData: customTrainData, adminEdits: adminEdits, favorites: favorites, futurActifs: futurActifs, version: newVersion });
+      var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
 
-    function doDownload(htmlContent) {
-      if (htmlContent.includes('id="mpe-data"')) {
-        htmlContent = htmlContent.replace(/<script id="mpe-data">[\s\S]*?<\/script>/, dataScript);
-      } else {
-        htmlContent = htmlContent.replace('</head>', dataScript + '</head>');
+      function cleanAndDownload(htmlContent) {
+        // Insérer ou remplacer le bloc de données
+        if (htmlContent.indexOf('id="mpe-data"') !== -1) {
+          htmlContent = htmlContent.replace(/<script id="mpe-data">[\s\S]*?<\/script>/, dataScript);
+        } else {
+          htmlContent = htmlContent.replace('</head>', dataScript + '</head>');
+        }
+
+        // VÉRIFICATION D'INTÉGRITÉ
+        var hasDoctype = htmlContent.toLowerCase().indexOf('<!doctype') !== -1 || htmlContent.indexOf('<html') !== -1;
+        var hasClosingHtml = htmlContent.indexOf('</html>') !== -1;
+        var hasData = htmlContent.indexOf('id="mpe-data"') !== -1;
+        var hasReact = htmlContent.indexOf('ReactDOM') !== -1;
+        var minSize = htmlContent.length > 100000;
+
+        if (!hasDoctype || !hasClosingHtml || !hasData || !hasReact || !minSize) {
+          alert("\u274C Erreur lors de la sauvegarde : le fichier g\u00E9n\u00E9r\u00E9 n'est pas complet. R\u00E9essayez ou rechargez la page.");
+          return false;
+        }
+
+        // Télécharger
+        var blob = new Blob([htmlContent], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        a.click();
+        URL.revokeObjectURL(url);
+
+        // Mettre à jour la version et logger SEULEMENT si tout a réussi
+        setAppVersion(newVersion);
+        localStorage.setItem("mpe_version", String(newVersion));
+        addLog("\u2705 SAUVEGARDE v" + newVersion + " \u2014 " + label);
+
+        // Toast de confirmation
+        var toast = document.createElement('div');
+        toast.textContent = '✅ Fichier v' + newVersion + ' téléchargé avec succès !';
+        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1b5e20;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
+        document.body.appendChild(toast);
+        setTimeout(function() { toast.remove(); }, 4000);
+        return true;
       }
-      var blob = new Blob([htmlContent], { type: 'text/html' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url; a.download = 'index.html'; a.click();
-      URL.revokeObjectURL(url);
-      var toast = document.createElement('div');
-      toast.textContent = '✅ Fichier téléchargé avec succès !';
-      toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1b5e20;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
-      document.body.appendChild(toast);
-      setTimeout(function() { toast.remove(); }, 4000);
-    }
 
-    try {
-      var htmlContent = document.documentElement.outerHTML;
-      doDownload(htmlContent);
-    } catch(e) {
-      fetch(window.location.href)
-        .then(function(r) { return r.text(); })
-        .then(function(htmlContent) { doDownload(htmlContent); })
-        .catch(function() {
-          alert('❌ Impossible de sauvegarder. Essayez depuis un navigateur.');
-        });
-    }
-    return;
-
-  }, style: {
-    width: "100%", padding: "16px", background: "#1565C0", border: "none",
-    borderRadius: 14, color: "#fff", fontWeight: 900, fontSize: 16, cursor: "pointer", marginBottom: 12
-  } }, "\uD83D\uDCBE Sauvegarder et t\u00E9l\u00E9charger index.html"),
-  /* @__PURE__ */ React.createElement("div", { style: { color: "#aaa", fontSize: 11, textAlign: "center" } }, "Version actuelle : v", appVersion)
+      // Capture propre : cloner le document et nettoyer les éléments transitoires
+      try {
+        var clone = document.documentElement.cloneNode(true);
+        // Supprimer les éléments transitoires injectés dynamiquement
+        var toRemove = clone.querySelectorAll('#mpe-scroll-indicator, [data-transient]');
+        for (var i = 0; i < toRemove.length; i++) toRemove[i].remove();
+        // Nettoyer les inputs en cours de saisie (remettre la valeur originale)
+        var inputs = clone.querySelectorAll('input, textarea');
+        for (var j = 0; j < inputs.length; j++) {
+          inputs[j].removeAttribute('value');
+          if (inputs[j].tagName === 'TEXTAREA') inputs[j].textContent = '';
+        }
+        var htmlContent = '<!DOCTYPE html>\n' + clone.outerHTML;
+        cleanAndDownload(htmlContent);
+      } catch(e) {
+        alert("\u274C Erreur lors de la sauvegarde : " + e.message);
+      }
+    }, style: {
+      width: "100%", padding: 16,
+      background: "#1b5e20", border: "none", borderRadius: 12,
+      color: "#fff", fontWeight: 900, fontSize: 16, cursor: "pointer",
+      boxShadow: "0 3px 10px rgba(27,94,32,0.3)"
+    } }, "\uD83D\uDCBE Sauvegarder v" + (appVersion + 1));
+  })(),
+  /* @__PURE__ */ React.createElement("div", { style: { marginTop: 20, padding: 14, background: "#f5f5f5", borderRadius: 10, fontSize: 12, color: "#666", lineHeight: 1.6 } },
+    /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, marginBottom: 6, color: "#333" } }, "\uD83D\uDCCB Que contient la sauvegarde ?"),
+    "\u2022 Tous les panneaux de train modifi\u00E9s",
+    /* @__PURE__ */ React.createElement("br"),
+    "\u2022 Toutes les corrections de stations (nom, correspondances)",
+    /* @__PURE__ */ React.createElement("br"),
+    "\u2022 Vos favoris",
+    /* @__PURE__ */ React.createElement("br"),
+    "\u2022 L'\u00E9tat des lignes futures (15-18)",
+    /* @__PURE__ */ React.createElement("br"),
+    "\u2022 Le num\u00E9ro de version (v", appVersion + 1, ")"
+  )
 ),
 adminUnlocked && adminScreen === "restaurer" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } },
   /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111", marginBottom: 6 } }, "\uD83D\uDCC2 Restaurer"),
@@ -5244,6 +5455,7 @@ adminUnlocked && adminScreen === "restaurer" && /* @__PURE__ */ React.createElem
             if (data.customTrainData) setCustomTrainData(data.customTrainData);
             if (data.adminEdits) setAdminEdits(data.adminEdits);
             if (data.favorites) setFavorites(data.favorites);
+            if (data.futurActifs) setFuturActifs(data.futurActifs);
             if (data.version) { setAppVersion(data.version); localStorage.setItem("mpe_version", String(data.version)); }
             addLog("\u2705 RESTAURATION v" + (data.version || "?") + " \u2014 depuis fichier");
             alert("\u2705 Donn\u00E9es restaur\u00E9es avec succ\u00E8s !");
@@ -5444,8 +5656,8 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
       boxShadow: "0 1px 3px rgba(0,0,0,0.06)"
     } }, /* @__PURE__ */ React.createElement(Badge, { id: adminLineId, size: 30 }), /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 800, fontSize: 15 } }, adminStation.n)), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
       color: "#555",
-      fontSize: 11,
-      fontWeight: 700,
+      fontSize: 13,
+      fontWeight: 800,
       textTransform: "uppercase",
       letterSpacing: 1,
       marginBottom: 8
@@ -5471,34 +5683,34 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
       }
     )), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
       color: "#555",
-      fontSize: 11,
-      fontWeight: 700,
+      fontSize: 13,
+      fontWeight: 800,
       textTransform: "uppercase",
       letterSpacing: 1,
       marginBottom: 8
     } }, "\u{1F500} Correspondances directes"), /* @__PURE__ */ React.createElement("div", { style: {
       display: "flex",
-      flexWrap: "wrap",
-      gap: 6,
+      flexDirection: "column",
+      gap: 0,
       marginBottom: 10,
-      minHeight: 40,
+      minHeight: 50,
       background: "#fff",
-      border: "1px solid #ddd",
-      borderRadius: 8,
+      border: "2px solid #ddd",
+      borderRadius: 10,
       padding: "8px"
     } }, currentC.map((c, i) => /* @__PURE__ */ React.createElement("div", {
       key: i,
-      style: { display: "flex", alignItems: "center", gap: 10, padding: "8px 4px",
+      style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 6px",
         borderBottom: i < currentC.length - 1 ? "1px solid #eee" : "none" }
     },
-      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 28 }),
-      /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontWeight: 700, fontSize: 14, color: "#111" } }, "Ligne " + c),
+      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 32 }),
+      /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontWeight: 800, fontSize: 16, color: "#111" } }, "Ligne " + c),
       /* @__PURE__ */ React.createElement("button", {
         onClick: () => saveField("c", currentC.filter((x) => x !== c)),
         style: { background: "#ffebee", border: "none", borderRadius: 8,
-          padding: "6px 12px", color: "#c00", fontWeight: 700, fontSize: 13, cursor: "pointer" }
+          padding: "8px 14px", color: "#c00", fontWeight: 800, fontSize: 16, cursor: "pointer" }
       }, "\u2715")
-    )), currentC.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 12, fontStyle: "italic" } }, "Aucune")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+    )), currentC.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 14, fontStyle: "italic", padding: "8px" } }, "Aucune correspondance")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
       "input",
       {
         id: "inp_c",
@@ -5534,41 +5746,34 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
       cursor: "pointer"
     } }, "+ Ajouter"))), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 20 } }, /* @__PURE__ */ React.createElement("div", { style: {
       color: "#555",
-      fontSize: 11,
-      fontWeight: 700,
+      fontSize: 13,
+      fontWeight: 800,
       textTransform: "uppercase",
       letterSpacing: 1,
       marginBottom: 8
     } }, "\u{1F6B6} Correspondances \xE0 pied"), /* @__PURE__ */ React.createElement("div", { style: {
       display: "flex",
-      flexWrap: "wrap",
-      gap: 6,
+      flexDirection: "column",
+      gap: 0,
       marginBottom: 10,
-      minHeight: 40,
+      minHeight: 50,
       background: "#fff",
-      border: "1px solid #ddd",
-      borderRadius: 8,
+      border: "2px solid #ddd",
+      borderRadius: 10,
       padding: "8px"
-    } }, currentWalk.map((c, i) => /* @__PURE__ */ React.createElement(
-      "button",
-      {
-        key: i,
+    } }, currentWalk.map((c, i) => /* @__PURE__ */ React.createElement("div", {
+      key: i,
+      style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 6px",
+        borderBottom: i < currentWalk.length - 1 ? "1px solid #eee" : "none" }
+    },
+      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 32 }),
+      /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontWeight: 800, fontSize: 16, color: "#111" } }, "Ligne " + c),
+      /* @__PURE__ */ React.createElement("button", {
         onClick: () => saveField("walk", currentWalk.filter((x) => x !== c)),
-        style: {
-          display: "flex",
-          alignItems: "center",
-          gap: 3,
-          background: "#f5f5f5",
-          border: "1px solid #ccc",
-          borderRadius: 6,
-          padding: "3px 6px",
-          cursor: "pointer",
-          opacity: 0.8
-        }
-      },
-      /* @__PURE__ */ React.createElement(Badge, { id: c, size: 20 }),
-      /* @__PURE__ */ React.createElement("span", { style: { color: "#e53935", fontSize: 13, fontWeight: 700 } }, "\u2715")
-    )), currentWalk.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 12, fontStyle: "italic" } }, "Aucune")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+        style: { background: "#ffebee", border: "none", borderRadius: 8,
+          padding: "8px 14px", color: "#c00", fontWeight: 800, fontSize: 16, cursor: "pointer" }
+      }, "\u2715")
+    )), currentWalk.length === 0 && /* @__PURE__ */ React.createElement("span", { style: { color: "#bbb", fontSize: 14, fontStyle: "italic", padding: "8px" } }, "Aucune correspondance \xE0 pied")), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
       "input",
       {
         id: "inp_w",
