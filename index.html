@@ -622,7 +622,7 @@ const STATIONS = {
   ],
   "13": [
     // Tronc commun Sud
-    { n: "Ch\xE2tillon - Montrouge", c: ["T6"] },
+    { n: "Ch\xE2tillon - Montrouge", c: ["T6", "15"] },
     { n: "Malakoff - Rue \xC9tienne Dolet" },
     { n: "Malakoff - Plateau de Vanves" },
     { n: "Porte de Vanves", c: ["T3a"] },
@@ -686,7 +686,7 @@ const STATIONS = {
   ],
   "15": [
     // Tronçon EST — branch "E"
-    { n: "Saint-Denis \u2013 Pleyel", c: ["14", "16", "17", "D"], branch: "E" },
+    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17", "D"], branch: "E" },
     { n: "Stade de France", c: ["B"], branch: "E" },
     { n: "Mairie d'Aubervilliers", c: ["12"], branch: "E" },
     { n: "Fort d'Aubervilliers", c: ["7"], branch: "E" },
@@ -702,7 +702,7 @@ const STATIONS = {
     { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "S" },
     { n: "Issy", c: ["C"], branch: "S" },
     { n: "Clamart", c: ["N"], branch: "S" },
-    { n: "Ch\xE2tillon \u2013 Montrouge", c: ["13", "T6"], branch: "S" },
+    { n: "Ch\xE2tillon - Montrouge", c: ["13", "T6"], branch: "S" },
     { n: "Bagneux \u2013 Lucie Aubrac", c: ["4"], branch: "S" },
     { n: "Arcueil \u2013 Cachan", c: ["B"], branch: "S" },
     { n: "Villejuif \u2013 Gustave Roussy", c: ["14"], branch: "S" },
@@ -716,7 +716,7 @@ const STATIONS = {
     { n: "Villiers \u2013 Champigny \u2013 Bry", c: ["E", "P"], branch: "S" },
     { n: "Noisy \u2013 Champs", c: ["16", "A"], branch: "S" },
     // Tronçon OUEST — branch "O"
-    { n: "Saint-Denis \u2013 Pleyel", c: ["14", "16", "17", "D"], branch: "O" },
+    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17", "D"], branch: "O" },
     { n: "Les Gr\xE9sillons", c: ["C"], branch: "O" },
     { n: "Les Agnettes", c: ["13"], branch: "O" },
     { n: "Bois-Colombes", c: ["J"], branch: "O" },
@@ -729,7 +729,7 @@ const STATIONS = {
     { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "O" }
   ],
   "16": [
-    { n: "Saint-Denis \u2013 Pleyel", c: ["14", "15", "17", "D"] },
+    { n: "Saint-Denis - Pleyel", c: ["14", "15", "17", "D"] },
     { n: "La Courneuve \u2013 Six Routes", c: ["17", "T1"] },
     { n: "Le Bourget", c: ["17", "B", "T11"] },
     { n: "Parc du Blanc-Mesnil" },
@@ -741,7 +741,7 @@ const STATIONS = {
     { n: "Noisy \u2013 Champs", c: ["15", "A"] }
   ],
   "17": [
-    { n: "Saint-Denis \u2013 Pleyel", c: ["14", "15", "16", "D"] },
+    { n: "Saint-Denis - Pleyel", c: ["14", "15", "16", "D"] },
     { n: "La Courneuve \u2013 Six Routes", c: ["16", "T1"] },
     { n: "Le Bourget", c: ["16", "B", "T11"] },
     { n: "Le Bourget A\xE9roport" },
@@ -764,7 +764,7 @@ const STATIONS = {
     { n: "Versailles \u2013 Chantiers", c: ["C", "N", "U"] }
   ],
   "A": [
-    // Branche Saint-Germain (G) — terminus EN PREMIER, s'arrête juste avant le tronc commun
+    // Branche Saint-Germain (G) — terminus EN PREMIER, va jusqu'à la fourche ouest
     { n: "Saint-Germain-en-Laye", c: ["T13"], branch: "G" },
     { n: "Le V\xE9sinet - Le Pecq", branch: "G" },
     { n: "Le V\xE9sinet - Centre", branch: "G" },
@@ -772,7 +772,9 @@ const STATIONS = {
     { n: "Rueil-Malmaison", branch: "G" },
     { n: "Nanterre - Ville", branch: "G" },
     { n: "Nanterre - Universit\xE9", branch: "G" },
-    // Branche Cergy (C) — terminus EN PREMIER
+    { n: "Nanterre - Pr\xE9fecture", branch: "G" },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"], branch: "G" },
+    // Branche Cergy (C)
     { n: "Cergy - Le Haut", branch: "C" },
     { n: "Cergy - Saint-Christophe", branch: "C" },
     { n: "Cergy - Pr\xE9fecture", branch: "C" },
@@ -782,21 +784,26 @@ const STATIONS = {
     { n: "Maisons-Laffitte", branch: "C" },
     { n: "Sartrouville", branch: "C" },
     { n: "Houilles - Carri\xE8res-sur-Seine", branch: "C" },
-    // Branche Poissy (P) — terminus EN PREMIER
+    { n: "Nanterre - Pr\xE9fecture", branch: "C" },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"], branch: "C" },
+    // Branche Poissy (P)
     { n: "Poissy", branch: "P" },
     { n: "Ach\xE8res - Grand Cormier", branch: "P" },
-    // FOURCHE OUEST — Nanterre Préfecture est la première du tronc commun
-    { n: "Nanterre - Pr\xE9fecture", fork: true },
-    // Tronc commun de Paris
-    { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"] },
-    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "6"] },
+    { n: "Maisons-Laffitte", branch: "P" },
+    { n: "Sartrouville", branch: "P" },
+    { n: "Houilles - Carri\xE8res-sur-Seine", branch: "P" },
+    { n: "Nanterre - Pr\xE9fecture", branch: "P" },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"], branch: "P" },
+    // FOURCHE OUEST
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "6"], fork: true },
+    // Tronc commun Paris
     { n: "Auber", c: ["E"] },
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "B", "D"] },
     { n: "Gare de Lyon", c: ["1", "14", "D"] },
-    { n: "Nation", c: ["1", "2", "6", "9"] },
-    // FOURCHE EST — Vincennes est la dernière du tronc commun
-    { n: "Vincennes", fork: true },
+    // FOURCHE EST
+    { n: "Nation", c: ["1", "2", "6", "9"], fork: true },
     // Branche Boissy (B) — de la fourche vers le terminus
+    { n: "Vincennes", branch: "B" },
     { n: "Fontenay-sous-Bois", branch: "B" },
     { n: "Nogent-sur-Marne", branch: "B" },
     { n: "Joinville-le-Pont", branch: "B" },
@@ -806,7 +813,8 @@ const STATIONS = {
     { n: "La Varenne - Chennevi\xE8res", branch: "B" },
     { n: "Sucy - Bonneuil", branch: "B" },
     { n: "Boissy-Saint-L\xE9ger", branch: "B" },
-    // Branche Marne-la-Vallée (M) — de la fourche vers le terminus
+    // Branche Marne-la-Vallée (M)
+    { n: "Vincennes", branch: "M" },
     { n: "Val de Fontenay", c: ["E"], branch: "M" },
     { n: "Neuilly-Plaisance", branch: "M" },
     { n: "Bry-sur-Marne", branch: "M" },
@@ -820,45 +828,55 @@ const STATIONS = {
     { n: "Marne-la-Vall\xE9e Chessy (Disneyland)", branch: "M" }
   ],
   "B": [
-    // Branche Nord CDG (D) — Aéroport CDG 2 terminus en dernier
-    { n: "Sevran - Beaudottes", branch: "D" },
-    { n: "Villepinte", branch: "D" },
-    { n: "Le Parc des Expositions", branch: "D" },
-    { n: "A\xE9roport CDG 1", branch: "D" },
+    // Branche CDG (D) — terminus en premier, va jusqu'à la fourche nord
     { n: "A\xE9roport CDG 2 - TGV", branch: "D" },
-    // Branche Nord Mitry (Y) — Mitry-Claye terminus en dernier
-    { n: "Sevran - Livry", branch: "Y" },
-    { n: "Vert Galant", branch: "Y" },
-    { n: "Villeparisis - Mitry-le-Neuf", branch: "Y" },
+    { n: "A\xE9roport CDG 1", branch: "D" },
+    { n: "Le Parc des Expositions", branch: "D" },
+    { n: "Villepinte", branch: "D" },
+    { n: "Sevran - Beaudottes", branch: "D" },
+    { n: "Aulnay-sous-Bois", c: ["T4"], branch: "D" },
+    { n: "Le Blanc-Mesnil", branch: "D" },
+    { n: "Drancy", branch: "D" },
+    { n: "Le Bourget", c: ["T11"], branch: "D" },
+    { n: "La Courneuve - Aubervilliers", branch: "D" },
+    { n: "La Plaine - Stade de France", branch: "D" },
+    // Branche Mitry (Y)
     { n: "Mitry - Claye", branch: "Y" },
+    { n: "Villeparisis - Mitry-le-Neuf", branch: "Y" },
+    { n: "Vert Galant", branch: "Y" },
+    { n: "Sevran - Livry", branch: "Y" },
+    { n: "Aulnay-sous-Bois", c: ["T4"], branch: "Y" },
+    { n: "Le Blanc-Mesnil", branch: "Y" },
+    { n: "Drancy", branch: "Y" },
+    { n: "Le Bourget", c: ["T11"], branch: "Y" },
+    { n: "La Courneuve - Aubervilliers", branch: "Y" },
+    { n: "La Plaine - Stade de France", branch: "Y" },
     // FOURCHE NORD
-    { n: "Aulnay-sous-Bois", c: ["T4"], fork: true },
-    // Tronc commun
-    { n: "Le Blanc-Mesnil" },
-    { n: "Drancy" },
-    { n: "Le Bourget", c: ["T11"] },
-    { n: "La Courneuve - Aubervilliers" },
-    { n: "La Plaine - Stade de France" },
-    { n: "Stade de France - Saint-Denis" },
-    { n: "Gare du Nord", c: ["4", "5", "D", "E"] },
+    { n: "Gare du Nord", c: ["4", "5", "D", "E"], fork: true },
+    // Tronc commun Paris
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "A", "D"] },
     { n: "Saint-Michel - Notre-Dame", c: ["4", "C"] },
     { n: "Luxembourg", c: ["C"] },
     { n: "Port-Royal" },
     { n: "Denfert-Rochereau", c: ["4", "6", "T3a"] },
-    { n: "Cit\xE9 Universitaire", c: ["T3a"] },
-    { n: "Gentilly" },
-    { n: "Laplace" },
-    { n: "Arcueil - Cachan" },
-    { n: "Bagneux - Lucie Aubrac", c: ["4"], fork: true },
-    // Branche Robinson (R) — Robinson terminus en dernier
+    // FOURCHE SUD
+    { n: "Cit\xE9 Universitaire", c: ["T3a"], fork: true },
+    // Branche Robinson (R)
+    { n: "Gentilly", branch: "R" },
+    { n: "Laplace", branch: "R" },
+    { n: "Arcueil - Cachan", branch: "R" },
+    { n: "Bagneux - Lucie Aubrac", c: ["4"], branch: "R" },
     { n: "Bourg-la-Reine", branch: "R" },
-    { n: "Parc de Sceaux", branch: "R" },
     { n: "Sceaux", branch: "R" },
     { n: "Fontenay-aux-Roses", branch: "R" },
     { n: "Robinson", branch: "R" },
-    // Branche Saint-Rémy (S) — Saint-Rémy terminus en dernier
+    // Branche Saint-Rémy (S)
+    { n: "Gentilly", branch: "S" },
+    { n: "Laplace", branch: "S" },
+    { n: "Arcueil - Cachan", branch: "S" },
+    { n: "Bagneux - Lucie Aubrac", c: ["4"], branch: "S" },
     { n: "Bourg-la-Reine", branch: "S" },
+    { n: "Parc de Sceaux", branch: "S" },
     { n: "La Croix de Berny", c: ["T10"], branch: "S" },
     { n: "Antony", c: ["T10"], branch: "S" },
     { n: "Fontaine-Michalon", branch: "S" },
@@ -877,9 +895,10 @@ const STATIONS = {
     { n: "Saint-R\xE9my-l\xE8s-Chevreuse", branch: "S" }
   ],
   "C": [
-    // Branche Pontoise (PT) — terminus en dernier
-    { n: "Saint-Ouen-l'Aum\xF4ne - Liesse", branch: "PT" },
+    // Branche Pontoise (PT) — terminus en premier
+    { n: "Pontoise", branch: "PT" },
     { n: "Saint-Ouen-l'Aum\xF4ne", branch: "PT" },
+    { n: "Saint-Ouen-l'Aum\xF4ne - Liesse", branch: "PT" },
     { n: "Pierrelaye", branch: "PT" },
     { n: "Montigny - Beauchamp", branch: "PT" },
     { n: "Franconville - Le Plessis-Bouchard", branch: "PT" },
@@ -892,46 +911,51 @@ const STATIONS = {
     { n: "Saint-Ouen", c: ["14"], branch: "PT" },
     { n: "Porte de Clichy", c: ["13", "14", "T3b"], branch: "PT" },
     { n: "Pereire - Levallois", c: ["3"], branch: "PT" },
-    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "PT" },
+    { n: "Neuilly - Porte Maillot", c: ["1", "T3b"], branch: "PT" },
     { n: "Avenue Foch", branch: "PT" },
     { n: "Avenue Henri Martin", branch: "PT" },
     { n: "Boulainvilliers", branch: "PT" },
     { n: "Avenue du Pdt Kennedy", c: ["6", "9"], branch: "PT" },
     { n: "Champ de Mars - Tour Eiffel", branch: "PT" },
     { n: "Pont de l'Alma", branch: "PT" },
-    { n: "Pontoise", branch: "PT" },
-    // Branche Versailles Château (VC) — terminus en dernier
+    // Branche Versailles Château (VC)
     { n: "Versailles - Ch\xE2teau - Rive Gauche", branch: "VC" },
     { n: "Porchefontaine", branch: "VC" },
-    // Branche Saint-Quentin (SQ) — terminus en dernier
+    { n: "Viroflay - Rive Gauche", c: ["T6"], branch: "VC" },
+    { n: "Chaville - V\xE9lizy", branch: "VC" },
+    { n: "Meudon - Val Fleury", branch: "VC" },
+    { n: "Issy", branch: "VC" },
+    { n: "Issy - Val de Seine", c: ["T2"], branch: "VC" },
+    { n: "Pont du Garigliano - HEGP", branch: "VC" },
+    { n: "Javel", c: ["10"], branch: "VC" },
+    { n: "Champ de Mars - Tour Eiffel", branch: "VC" },
+    { n: "Pont de l'Alma", branch: "VC" },
+    // Branche Saint-Quentin-en-Yvelines (SQ)
     { n: "Saint-Quentin-en-Yvelines", branch: "SQ" },
     { n: "Saint-Cyr", c: ["T13"], branch: "SQ" },
     { n: "Versailles - Chantiers", branch: "SQ" },
-    // FOURCHE OUEST — Viroflay
-    { n: "Viroflay - Rive Gauche", c: ["T6"], fork: true },
-    // Tronc commun Ouest → Paris
-    { n: "Chaville - V\xE9lizy" },
-    { n: "Meudon - Val Fleury" },
-    { n: "Issy" },
-    { n: "Issy - Val de Seine", c: ["T2"] },
-    { n: "Pont du Garigliano - H\xF4pital Europ\xE9en Georges Pompidou" },
-    { n: "Javel", c: ["10"] },
+    { n: "Viroflay - Rive Gauche", c: ["T6"], branch: "SQ" },
+    { n: "Chaville - V\xE9lizy", branch: "SQ" },
+    { n: "Meudon - Val Fleury", branch: "SQ" },
+    { n: "Issy", branch: "SQ" },
+    { n: "Issy - Val de Seine", c: ["T2"], branch: "SQ" },
+    { n: "Pont du Garigliano - HEGP", branch: "SQ" },
+    { n: "Javel", c: ["10"], branch: "SQ" },
+    { n: "Champ de Mars - Tour Eiffel", branch: "SQ" },
+    { n: "Pont de l'Alma", branch: "SQ" },
+    // FOURCHE OUEST
+    { n: "Invalides", c: ["8", "13"], fork: true },
     // Tronc commun Paris
-    { n: "Invalides", c: ["8", "13"] },
     { n: "Mus\xE9e d'Orsay", walk: ["12"] },
     { n: "Saint-Michel - Notre-Dame", c: ["4", "B"] },
-    { n: "Paris - Austerlitz", c: ["5", "10"] },
-    { n: "Biblioth\xE8que Fran\xE7ois Mitterrand", c: ["14", "T3a"] },
-    // Tronc commun Sud
-    { n: "Ivry-sur-Seine" },
-    { n: "Vitry-sur-Seine" },
-    { n: "Les Ardoines" },
-    { n: "Choisy-le-Roi" },
-    { n: "Villeneuve-le-Roi" },
-    { n: "Ablon" },
-    { n: "Athis-Mons" },
-    { n: "Juvisy", c: ["D"] },
-    // Branche Massy-Orly (MY) — Massy-Palaiseau terminus en dernier
+    { n: "Gare d'Austerlitz", c: ["5", "10"] },
+    // FOURCHE SUD
+    { n: "Biblioth\xE8que Fran\xE7ois Mitterrand", c: ["14", "T3a"], fork: true },
+    // Branche Massy-Palaiseau / Pont de Rungis - Orly (MY)
+    { n: "Ivry-sur-Seine", branch: "MY" },
+    { n: "Vitry-sur-Seine", branch: "MY" },
+    { n: "Les Ardoines", branch: "MY" },
+    { n: "Choisy-le-Roi", branch: "MY" },
     { n: "Les Saules", branch: "MY" },
     { n: "Orly - Ville", c: ["T7"], branch: "MY" },
     { n: "Pont de Rungis - A\xE9roport d'Orly", c: ["T9"], branch: "MY" },
@@ -939,93 +963,101 @@ const STATIONS = {
     { n: "Chemin d'Antony", branch: "MY" },
     { n: "Massy - Verri\xE8res", branch: "MY" },
     { n: "Massy - Palaiseau", c: ["B", "T12"], branch: "MY" },
-    // Suite tronc commun Sud
-    { n: "Savigny-sur-Orge" },
-    { n: "\xC9pinay-sur-Orge", c: ["T12"] },
-    { n: "Sainte-Genevi\xE8ve-des-Bois" },
-    { n: "Saint-Michel-sur-Orge" },
-    // FOURCHE SUD — Brétigny
-    { n: "Br\xE9tigny", fork: true },
-    // Branche Étampes (ET) — terminus en dernier
+    // Branche Dourdan (DO)
+    { n: "Ivry-sur-Seine", branch: "DO" },
+    { n: "Vitry-sur-Seine", branch: "DO" },
+    { n: "Les Ardoines", branch: "DO" },
+    { n: "Choisy-le-Roi", branch: "DO" },
+    { n: "Villeneuve-le-Roi", branch: "DO" },
+    { n: "Ablon", branch: "DO" },
+    { n: "Athis-Mons", branch: "DO" },
+    { n: "Juvisy", c: ["D"], branch: "DO" },
+    { n: "Savigny-sur-Orge", branch: "DO" },
+    { n: "\xC9pinay-sur-Orge", c: ["T12"], branch: "DO" },
+    { n: "Sainte-Genevi\xE8ve-des-Bois", branch: "DO" },
+    { n: "Saint-Michel-sur-Orge", branch: "DO" },
+    { n: "Br\xE9tigny", branch: "DO" },
+    { n: "La Norville - St-Germain-l\xE8s-Arpajon", branch: "DO" },
+    { n: "Arpajon", branch: "DO" },
+    { n: "\xC9gly", branch: "DO" },
+    { n: "Breuillet", branch: "DO" },
+    { n: "Breuillet - Village", branch: "DO" },
+    { n: "Saint-Ch\xE9ron", branch: "DO" },
+    { n: "Sermaise", branch: "DO" },
+    { n: "Dourdan", branch: "DO" },
+    { n: "Dourdan - La For\xEAt", branch: "DO" },
+    // Branche Saint-Martin d'Étampes (ET)
+    { n: "Ivry-sur-Seine", branch: "ET" },
+    { n: "Vitry-sur-Seine", branch: "ET" },
+    { n: "Les Ardoines", branch: "ET" },
+    { n: "Choisy-le-Roi", branch: "ET" },
+    { n: "Villeneuve-le-Roi", branch: "ET" },
+    { n: "Ablon", branch: "ET" },
+    { n: "Athis-Mons", branch: "ET" },
+    { n: "Juvisy", c: ["D"], branch: "ET" },
+    { n: "Savigny-sur-Orge", branch: "ET" },
+    { n: "\xC9pinay-sur-Orge", c: ["T12"], branch: "ET" },
+    { n: "Sainte-Genevi\xE8ve-des-Bois", branch: "ET" },
+    { n: "Saint-Michel-sur-Orge", branch: "ET" },
+    { n: "Br\xE9tigny", branch: "ET" },
     { n: "Marolles-en-Hurepoix", branch: "ET" },
     { n: "Bouray", branch: "ET" },
     { n: "Lardy", branch: "ET" },
     { n: "Chamarande", branch: "ET" },
     { n: "\xC9tr\xE9chy", branch: "ET" },
     { n: "\xC9tampes", branch: "ET" },
-    { n: "Saint-Martin-d'\xC9tampes", branch: "ET" },
-    // Branche Dourdan (DO) — terminus en dernier
-    { n: "La Norville - Saint-Germain-l\xE8s-Arpajon", branch: "DO" },
-    { n: "Arpajon", branch: "DO" },
-    { n: "\xC9gly", branch: "DO" },
-    { n: "Breuillet - Bruy\xE8res-le-Ch\xE2tel", branch: "DO" },
-    { n: "Breuillet - Village", branch: "DO" },
-    { n: "Saint-Ch\xE9ron", branch: "DO" },
-    { n: "Sermaise", branch: "DO" },
-    { n: "Dourdan", branch: "DO" },
-    { n: "Dourdan - La For\xEAt", branch: "DO" }
+    { n: "Saint-Martin-d'\xC9tampes", branch: "ET" }
   ],
   "D": [
-    // Branche Nord Creil — terminus en dernier
-    { n: "Orry-la-Ville - Coye-la-For\xEAt", branch: "CR" },
-    { n: "Chantilly - Gouvieux", branch: "CR" },
+    // Branche Creil (CR)
     { n: "Creil", branch: "CR" },
-    // Branche Nord Goussainville — terminus en dernier
-    { n: "La Borne Blanche", branch: "GO" },
-    { n: "Survilliers - Fosses", branch: "GO" },
-    { n: "Louvres", branch: "GO" },
-    { n: "Les Noues", branch: "GO" },
-    { n: "Goussainville", branch: "GO" },
-    { n: "Villiers-le-Bel - Gonesse - Arnouville", branch: "GO" },
-    { n: "Garges - Sarcelles", c: ["T5"], branch: "GO" },
-    { n: "Pierrefitte - Stains", c: ["T11"], branch: "GO" },
+    { n: "Chantilly - Gouvieux", branch: "CR" },
+    { n: "Orry-la-Ville - Coye-la-For\xEAt", branch: "CR" },
+    { n: "La Borne Blanche", branch: "CR" },
+    { n: "Survilliers - Fosses", branch: "CR" },
+    { n: "Louvres", branch: "CR" },
+    { n: "Les Noues", branch: "CR" },
+    { n: "Goussainville", branch: "CR" },
+    { n: "Villiers-le-Bel - Gonesse - Arnouville", branch: "CR" },
+    { n: "Garges - Sarcelles", c: ["T5"], branch: "CR" },
+    { n: "Pierrefitte - Stains", c: ["T11"], branch: "CR" },
+    { n: "Saint-Denis", c: ["13", "T1", "T5", "T8"], branch: "CR" },
+    { n: "Stade de France - Saint-Denis", branch: "CR" },
     // FOURCHE NORD
-    { n: "Saint-Denis", c: ["13", "T1", "T5", "T8"], fork: true },
-    // Tronc commun
-    { n: "Stade de France - Saint-Denis" },
-    { n: "Gare du Nord", c: ["2", "4", "5", "B", "E"] },
+    { n: "Gare du Nord", c: ["2", "4", "5", "B", "E"], fork: true },
+    // Tronc commun Paris
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "A", "B"] },
-    { n: "Paris - Gare de Lyon", c: ["1", "14", "A"] },
     // FOURCHE SUD
-    { n: "Maisons-Alfort - Alfortville", fork: true },
-    // Tronc commun Sud
-    { n: "Le Vert de Maisons" },
-    { n: "Cr\xE9teil - Pompadour" },
-    { n: "Villeneuve - Triage" },
-    { n: "Villeneuve - Saint-Georges" },
-    { n: "Montgeron - Crosne" },
-    { n: "Yerres" },
-    { n: "Brunoy" },
-    { n: "Boussy - Saint-Antoine" },
-    { n: "Combs-la-Ville - Quincy" },
-    { n: "Lieusaint - Moissy" },
-    { n: "Savigny-le-Temple - Nandy" },
-    { n: "Cesson" },
-    { n: "Le M\xE9e-sur-Seine" },
-    // Branche Melun (ME) — terminus en dernier
+    { n: "Gare de Lyon", c: ["1", "14", "A"], fork: true },
+    // Branche Melun directe (ME)
+    { n: "Maisons-Alfort - Alfortville", branch: "ME" },
+    { n: "Le Vert de Maisons", branch: "ME" },
+    { n: "Cr\xE9teil - Pompadour", branch: "ME" },
+    { n: "Villeneuve - Triage", branch: "ME" },
+    { n: "Villeneuve - Saint-Georges", branch: "ME" },
+    { n: "Montgeron - Crosne", branch: "ME" },
+    { n: "Yerres", branch: "ME" },
+    { n: "Brunoy", branch: "ME" },
+    { n: "Boussy - Saint-Antoine", branch: "ME" },
+    { n: "Combs-la-Ville - Quincy", branch: "ME" },
+    { n: "Lieusaint - Moissy", branch: "ME" },
+    { n: "Savigny-le-Temple - Nandy", branch: "ME" },
+    { n: "Cesson", branch: "ME" },
+    { n: "Le M\xE9e", branch: "ME" },
     { n: "Melun", branch: "ME" },
-    // Branche Corbeil (CO) — depuis Vigneux, terminus en dernier
-    { n: "Vigneux-sur-Seine", branch: "CO" },
-    { n: "Viry-Ch\xE2tillon", branch: "CO" },
-    { n: "Juvisy", c: ["C"], branch: "CO" },
-    { n: "Ris-Orangis", branch: "CO" },
-    { n: "Grand Bourg", branch: "CO" },
-    { n: "\xC9vry - Val de Seine", branch: "CO" },
-    { n: "Corbeil-Essonnes", branch: "CO" },
-    { n: "Essonnes - Robinson", branch: "CO" },
-    { n: "Villab\xE9", branch: "CO" },
-    { n: "Le Plessis-Chenet", branch: "CO" },
-    { n: "Le Coudray - Montceaux", branch: "CO" },
-    { n: "Saint-Fargeau", branch: "CO" },
-    { n: "Ponthierry - Pringy", branch: "CO" },
-    { n: "Boissise-le-Roi", branch: "CO" },
-    { n: "Vosves", branch: "CO" },
-    // Sous-branche Évry Centre (EC) — terminus en dernier
-    { n: "Grigny Centre", branch: "EC" },
-    { n: "Orangis - Bois de l'\xC9pine", branch: "EC" },
-    { n: "\xC9vry - Courcouronnes", c: ["T12"], branch: "EC" },
-    { n: "Le Bras de Fer - \xC9vry G\xE9nopole", branch: "EC" },
-    // Branche Malesherbes (MA) — terminus en dernier
+    // Branche Malesherbes (MA) - via Corbeil
+    { n: "Maisons-Alfort - Alfortville", branch: "MA" },
+    { n: "Le Vert de Maisons", branch: "MA" },
+    { n: "Cr\xE9teil - Pompadour", branch: "MA" },
+    { n: "Villeneuve - Triage", branch: "MA" },
+    { n: "Villeneuve - Saint-Georges", branch: "MA" },
+    { n: "Vigneux-sur-Seine", branch: "MA" },
+    { n: "Juvisy", c: ["C"], branch: "MA" },
+    { n: "Viry-Ch\xE2tillon", branch: "MA" },
+    { n: "Ris-Orangis", branch: "MA" },
+    { n: "Grand Bourg", branch: "MA" },
+    { n: "\xC9vry - Val de Seine", branch: "MA" },
+    { n: "Corbeil-Essonnes", branch: "MA" },
     { n: "Moulin Galant", branch: "MA" },
     { n: "Mennecy", branch: "MA" },
     { n: "Ballancourt", branch: "MA" },
@@ -1034,29 +1066,73 @@ const STATIONS = {
     { n: "Maisse", branch: "MA" },
     { n: "Buno - Gironville", branch: "MA" },
     { n: "Boigneville", branch: "MA" },
-    { n: "Malesherbes", branch: "MA" }
+    { n: "Malesherbes", branch: "MA" },
+    // Branche Melun via Corbeil (MC)
+    { n: "Maisons-Alfort - Alfortville", branch: "MC" },
+    { n: "Le Vert de Maisons", branch: "MC" },
+    { n: "Cr\xE9teil - Pompadour", branch: "MC" },
+    { n: "Villeneuve - Triage", branch: "MC" },
+    { n: "Villeneuve - Saint-Georges", branch: "MC" },
+    { n: "Vigneux-sur-Seine", branch: "MC" },
+    { n: "Juvisy", c: ["C"], branch: "MC" },
+    { n: "Viry-Ch\xE2tillon", branch: "MC" },
+    { n: "Ris-Orangis", branch: "MC" },
+    { n: "Grand Bourg", branch: "MC" },
+    { n: "\xC9vry - Val de Seine", branch: "MC" },
+    { n: "Corbeil-Essonnes", branch: "MC" },
+    { n: "Essonnes - Robinson", branch: "MC" },
+    { n: "Villab\xE9", branch: "MC" },
+    { n: "Le Plessis-Chenet", branch: "MC" },
+    { n: "Le Coudray - Montceaux", branch: "MC" },
+    { n: "Saint-Fargeau", branch: "MC" },
+    { n: "Ponthierry - Pringy", branch: "MC" },
+    { n: "Boissise-le-Roi", branch: "MC" },
+    { n: "Vosves", branch: "MC" },
+    { n: "Melun", branch: "MC" },
+    // Branche Corbeil via Évry-Courcouronnes (CO)
+    { n: "Maisons-Alfort - Alfortville", branch: "CO" },
+    { n: "Le Vert de Maisons", branch: "CO" },
+    { n: "Cr\xE9teil - Pompadour", branch: "CO" },
+    { n: "Villeneuve - Triage", branch: "CO" },
+    { n: "Villeneuve - Saint-Georges", branch: "CO" },
+    { n: "Vigneux-sur-Seine", branch: "CO" },
+    { n: "Juvisy", c: ["C"], branch: "CO" },
+    { n: "Viry-Ch\xE2tillon", branch: "CO" },
+    { n: "Grigny Centre", branch: "CO" },
+    { n: "Orangis - Bois de l'\xC9pine", branch: "CO" },
+    { n: "\xC9vry-Courcouronnes Centre", c: ["T12"], branch: "CO" },
+    { n: "Le Bras de Fer - \xC9vry G\xE9nopole", branch: "CO" },
+    { n: "Corbeil-Essonnes", branch: "CO" }
   ],
   "E": [
-    // Terminus Ouest
-    { n: "Nanterre - La Folie", c: ["A"] },
-    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"] },
-    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"] },
-    // Tronc commun
-    { n: "Haussmann - Saint-Lazare", c: ["3", "9", "12", "13", "14"], walk: ["A"] },
-    { n: "Magenta - Gare du Nord", c: ["2", "4", "5", "B", "D"] },
-    { n: "Rosa Parks", c: ["T3b"] },
-    { n: "Pantin", c: ["T1", "T3b"] },
+    // Branche Ouest Nanterre - La Folie (NF) — terminus actuel ouest
+    { n: "Nanterre - La Folie", c: ["A"], branch: "NF" },
+    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"], branch: "NF" },
+    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "NF" },
+    // Branche FUTURE Mantes-la-Jolie (MJ) — mise en service 2027-2029
+    { n: "Mantes-la-Jolie", branch: "MJ", futurBranch: "MJ" },
+    { n: "Mantes Station", branch: "MJ", futurBranch: "MJ" },
+    { n: "\xC9p\xF4ne-M\xE9zi\xE8res", branch: "MJ", futurBranch: "MJ" },
+    { n: "Aubergenville-\xC9lisabethville", branch: "MJ", futurBranch: "MJ" },
+    { n: "Les Mureaux", branch: "MJ", futurBranch: "MJ" },
+    { n: "Les Clairi\xE8res de Verneuil", branch: "MJ", futurBranch: "MJ" },
+    { n: "Vernouillet - Verneuil", branch: "MJ", futurBranch: "MJ" },
+    { n: "Villennes-sur-Seine", branch: "MJ", futurBranch: "MJ" },
+    { n: "Poissy", c: ["A", "T13"], branch: "MJ", futurBranch: "MJ" },
+    { n: "Houilles - Carri\xE8res-sur-Seine", c: ["A", "J", "L"], branch: "MJ", futurBranch: "MJ" },
+    { n: "Nanterre - La Folie", c: ["A"], branch: "MJ", futurBranch: "MJ" },
+    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"], branch: "MJ", futurBranch: "MJ" },
+    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "MJ", futurBranch: "MJ" },
+    // FOURCHE OUEST
+    { n: "Haussmann - Saint-Lazare", c: ["3", "9", "12", "13", "14"], walk: ["A"], fork: true },
     // FOURCHE EST
-    { n: "Noisy-le-Sec", c: ["T1"], fork: true },
-    // Branche Chelles (CH) — terminus en dernier
-    { n: "Bondy", c: ["T4"], branch: "CH" },
-    { n: "Le Raincy - Villemomble - Montfermeil", branch: "CH" },
-    { n: "Gagny", branch: "CH" },
-    { n: "Le Ch\xE9nay - Gagny", branch: "CH" },
-    { n: "Chelles - Gournay", branch: "CH" },
-    // Branche Tournan (TO) — terminus en dernier
+    { n: "Magenta - Gare du Nord", c: ["2", "4", "5", "B", "D"], fork: true },
+    // Branche Tournan-en-Brie (TO)
+    { n: "Rosa Parks", c: ["T3b"], branch: "TO" },
+    { n: "Pantin", c: ["T1"], walk: ["T3b"], branch: "TO" },
+    { n: "Noisy-le-Sec", c: ["T1"], branch: "TO" },
     { n: "Rosny - Bois-Perrier", c: ["11"], branch: "TO" },
-    { n: "Rosny - sous-Bois", branch: "TO" },
+    { n: "Rosny-sous-Bois", branch: "TO" },
     { n: "Val de Fontenay", c: ["A"], branch: "TO" },
     { n: "Nogent - Le Perreux", branch: "TO" },
     { n: "Les Boullereaux - Champigny", branch: "TO" },
@@ -1066,7 +1142,16 @@ const STATIONS = {
     { n: "Roissy-en-Brie", branch: "TO" },
     { n: "Ozoir-la-Ferri\xE8re", branch: "TO" },
     { n: "Gretz - Armainvilliers", branch: "TO" },
-    { n: "Tournan-en-Brie", branch: "TO" }
+    { n: "Tournan-en-Brie", branch: "TO" },
+    // Branche Chelles-Gournay (CH)
+    { n: "Rosa Parks", c: ["T3b"], branch: "CH" },
+    { n: "Pantin", c: ["T1"], walk: ["T3b"], branch: "CH" },
+    { n: "Noisy-le-Sec", c: ["T1"], branch: "CH" },
+    { n: "Bondy", c: ["T4"], branch: "CH" },
+    { n: "Le Raincy - Villemomble - Montfermeil", branch: "CH" },
+    { n: "Gagny", branch: "CH" },
+    { n: "Le Ch\xE9nay - Gagny", branch: "CH" },
+    { n: "Chelles - Gournay", branch: "CH" }
   ],
   "T1": [
     { n: "Asni\xE8res - Quatre Routes", c: ["13"] },
@@ -1262,7 +1347,7 @@ const STATIONS = {
     { n: "Parc Andr\xE9 Malraux" },
     { n: "Centre de Ch\xE2tillon" },
     { n: "Vauban" },
-    { n: "Ch\xE2tillon - Montrouge", c: ["13"] }
+    { n: "Ch\xE2tillon - Montrouge", c: ["13", "15"] }
   ],
   "T7": [
     { n: "Villejuif - Louis Aragon", c: ["7"] },
@@ -3421,6 +3506,8 @@ function App() {
   const [transport, setTransport] = useState(null);
   const [lineId, setLineId] = useState(null);
   const [direction, setDirection] = useState(null);
+  const [buttonOrder, setButtonOrder] = useState(null); // Ordre figé des boutons de bascule (mémorisé à l'arrivée sur la liste)
+  React.useEffect(() => { setButtonOrder(null); }, [lineId]);
   const [showDir, setShowDir] = useState(false);
   const [station, setStation] = useState(null);
   const [tab, setTab] = useState("train");
@@ -3534,7 +3621,7 @@ function App() {
   });
   const [futurActifs, setFuturActifs] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("mpe_futur_actifs")) || { "15": [], "16": false, "17": false, "18": false };
+      return JSON.parse(localStorage.getItem("mpe_futur_actifs")) || { "15": [], "16": false, "17": false, "18": false, "E-MJ": false };
     } catch(e) {
       return { "15": [], "16": false, "17": false, "18": false };
     }
@@ -3700,9 +3787,9 @@ function App() {
   const hasFork = stations.some((s) => s.fork);
   const is15 = lineId === "15";
   const L15_TRONCONS = [
-    { id: "E", label: "Est", terminus: ["Saint-Denis \u2013 Pleyel", "Champigny Centre"] },
+    { id: "E", label: "Est", terminus: ["Saint-Denis - Pleyel", "Champigny Centre"] },
     { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres", "Noisy \u2013 Champs"] },
-    { id: "O", label: "Ouest", terminus: ["Saint-Denis \u2013 Pleyel", "Pont de S\xE8vres"] }
+    { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres"] }
   ];
   const termA = is15 && troncon15
     ? (L15_TRONCONS.find((t) => t.id === troncon15) || {terminus:[]}).terminus[0]
@@ -3722,6 +3809,14 @@ function App() {
       B: { label: "Saint-Denis", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
       letter: { A: "A", B: "S" },
       forkName: "La Fourche"
+    };
+    if (lineId === "T4") return {
+      A: { label: "Aulnay-sous-Bois", color: "#D4A900", textActive: "#111", textInactive: "#8B7500" },
+      B: { label: "H\xF4pital de Montfermeil", color: "#a08200", textActive: "#111", textInactive: "#a08200" },
+      letter: { A: "A", B: "M" },
+      branchA: "A",
+      branchB: "M",
+      forkName: "Gargan"
     };
     if (lineId === "7") return {
       A: { label: "Villejuif - Louis Aragon", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
@@ -3771,10 +3866,8 @@ function App() {
     if (lineId === "D") return {
       branches: [
         { id: "CR", label: "Creil", letter: "CR", color: "#007a52" },
-        { id: "GO", label: "Goussainville", letter: "GO", color: "#007a52" },
-        { id: "ME", label: "Melun", letter: "ME", color: "#005a3c" },
         { id: "CO", label: "Corbeil-Essonnes", letter: "CO", color: "#005a3c" },
-        { id: "EC", label: "\xC9vry Centre", letter: "EC", color: "#005a3c" },
+        { id: "MC", label: "Melun", letter: "ME", color: "#005a3c" },
         { id: "MA", label: "Malesherbes", letter: "MA", color: "#005a3c" }
       ],
       forkName: "RER D",
@@ -3783,6 +3876,8 @@ function App() {
     };
     if (lineId === "E") return {
       branches: [
+        { id: "NF", label: "Nanterre - La Folie", letter: "NF", color: "#b0006e" },
+        { id: "MJ", label: "Mantes-la-Jolie (futur)", letter: "MJ", color: "#b0006e", futur: true },
         { id: "CH", label: "Chelles - Gournay", letter: "CH", color: "#b0006e" },
         { id: "TO", label: "Tournan-en-Brie", letter: "TO", color: "#b0006e" }
       ],
@@ -3815,12 +3910,13 @@ function App() {
     const branchStations = stations.filter((s) => s.branch === branch && !forkNames.includes(s.n));
     const troncStations = stations.filter((s) => !s.branch && !s.fork);
     if (branchStations.length === 0) return troncStations;
-    // Trouver l'index de la 1re station de la branche et de la 1re station du tronc
+    // Trouver l'index de la 1re station de la branche et de la 1re fourche
     const firstBranchIdx = stations.findIndex((s) => s.branch === branch);
-    const firstTroncIdx = stations.findIndex((s) => !s.branch && !s.fork);
-    // Si la branche est AVANT le tronc commun dans les données → branche ouest (Saint-Germain, Cergy, Poissy pour RER A)
-    // sinon → branche est (Boissy, Marne-la-Vallée)
-    if (firstBranchIdx < firstTroncIdx) {
+    const firstForkIdx = stations.findIndex((s) => s.fork);
+    // Si la branche est AVANT la première fourche → branche ouest
+    // sinon → branche est
+    const isWestBranch = firstBranchIdx < firstForkIdx;
+    if (isWestBranch) {
       // branche ouest : terminus → branche → fork ouest → tronc → fork est (si elle existe)
       if (forkStations.length >= 2) {
         return [...branchStations, forkStations[0], ...troncStations, forkStations[forkStations.length - 1]].filter(Boolean);
@@ -3837,7 +3933,7 @@ function App() {
   const filteredFirstName = filteredStations.length > 0 ? filteredStations[0].n : null;
   const filteredLastName = filteredStations.length > 0 ? filteredStations[filteredStations.length - 1].n : null;
   const displayed = is15
-    ? (direction === termA ? [...filteredStations].reverse() : filteredStations)
+    ? (direction === termB ? [...filteredStations].reverse() : filteredStations)
     : (direction === filteredLastName ? [...filteredStations].reverse() : filteredStations);
   const displayedTerminus = direction;
   const isFav = stKey ? favorites.includes(stKey) : false;
@@ -4062,7 +4158,31 @@ function App() {
         setLineId(l.id);
         setTroncon15(null);
         setBranch(null);
-        setShowDir(true);
+        setButtonOrder(null);
+        // Lignes nécessitant l'écran direction : ligne 15, RER (multimode)
+        const needsDirectionScreen = l.id === "15" || transport === "rer";
+        if (needsDirectionScreen) {
+          setShowDir(true);
+        } else {
+          // Sinon, aller directement à la liste avec direction par défaut (premier terminus)
+          const lineStations = STATIONS[l.id] || [];
+          // Pour les lignes avec fourche (7, 13, T4), définir branch sur la 1ère branche disponible
+          const firstBranch = lineStations.find((s) => s.branch);
+          if (firstBranch) {
+            setBranch(firstBranch.branch);
+            // Trouver le terminus de cette branche
+            const branchStations = lineStations.filter((s) => s.branch === firstBranch.branch);
+            const firstBranchIdx = lineStations.findIndex((s) => s.branch === firstBranch.branch);
+            const firstForkIdx = lineStations.findIndex((s) => s.fork);
+            const term = (firstBranchIdx < firstForkIdx) ? branchStations[0] : branchStations[branchStations.length - 1];
+            if (term) setDirection(term.n);
+          } else {
+            // Ligne normale : prendre le premier terminus
+            const filtered = lineStations.filter((s) => !s.branch && !s.fork);
+            if (filtered[0]) setDirection(filtered[0].n);
+          }
+          setScreen("stations");
+        }
       },
       style: {
         background: "none",
@@ -4110,9 +4230,9 @@ function App() {
       // LIGNE 15 — sélection tronçon + terminus sur un seul écran
       if (lineId === "15" && forkConfig && forkConfig.tronconMode) {
         const troncons = [
-          { id: "O", label: "Ouest", terminus: ["Saint-Denis \u2013 Pleyel", "Pont de S\xE8vres"] },
+          { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres"] },
           { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres", "Noisy \u2013 Champs"] },
-          { id: "E", label: "Est", terminus: ["Saint-Denis \u2013 Pleyel", "Champigny Centre"] }
+          { id: "E", label: "Est", terminus: ["Saint-Denis - Pleyel", "Champigny Centre"] }
         ];
         const lineColor = "#B90845";
         const selectedId = troncon15 || "O";
@@ -4134,9 +4254,9 @@ function App() {
                     border: isSel ? "2.5px solid #000" : "2.5px solid #bbb",
                     borderRadius: 12,
                     color: isSel ? "#fff" : actif ? "#333" : "#aaa",
+                    textShadow: isSel ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
                     fontWeight: 900, fontSize: 16, cursor: "pointer",
-                    opacity: actif ? 1 : 0.55,
-                    WebkitTextStroke: isSel ? "0.4px #000" : "none"
+                    opacity: actif ? 1 : 0.55
                   }
                 },
                 tr.label
@@ -4174,10 +4294,16 @@ function App() {
       }
       if (hasFork && (forkConfig == null ? void 0 : forkConfig.multiMode)) {
         const troncLast = (_a2 = stations.filter((s) => !s.branch && !s.fork).slice(-1)[0]) == null ? void 0 : _a2.n;
+        const firstForkIdx = stations.findIndex((s) => s.fork);
         return /* @__PURE__ */ React.createElement(React.Fragment, null, forkConfig.branches.map((br) => {
           var _a3;
-          // Le terminus est la première station de la branche (les branches sont stockées du terminus vers la fourche)
-          const branchTerm = (_a3 = stations.filter((s) => s.branch === br.id)[0]) == null ? void 0 : _a3.n;
+          // Trouver le terminus : si la branche est AVANT la première fourche → terminus = première station (ouest)
+          // Si la branche est APRÈS → terminus = dernière station (est)
+          const branchStations = stations.filter((s) => s.branch === br.id);
+          const firstBranchIdx = stations.findIndex((s) => s.branch === br.id);
+          const branchTerm = (firstBranchIdx < firstForkIdx)
+            ? (_a3 = branchStations[0]) == null ? void 0 : _a3.n
+            : (_a3 = branchStations[branchStations.length - 1]) == null ? void 0 : _a3.n;
           return /* @__PURE__ */ React.createElement(
             "button",
             {
@@ -4320,10 +4446,23 @@ function App() {
   }, "\u270F\uFE0F"),
   screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 44, fontWeight: 900, cursor: "pointer", color: "#111", padding: "4px 12px 4px 4px", minWidth: 52, minHeight: 52, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
     "div",
-    { style: { fontWeight: 800, fontSize: 14 } },
-    "\u2192 ",
-    // Pour les RER avec branches, afficher le vrai terminus de la branche
-    hasFork && branch && (forkConfig == null ? void 0 : forkConfig.multiMode) ? (_c = stations.filter((s) => s.branch === branch).slice(-1)[0]) == null ? void 0 : _c.n : displayedTerminus
+    { style: { fontWeight: 600, fontSize: 12, color: "#888" } },
+    (() => {
+      // Afficher les 2 terminus de la ligne (ou de la branche pour RER)
+      if (hasFork && branch && (forkConfig == null ? void 0 : forkConfig.multiMode)) {
+        const bs = stations.filter((s) => s.branch === branch);
+        const firstBrIdx = stations.findIndex((s) => s.branch === branch);
+        const firstFkIdx = stations.findIndex((s) => s.fork);
+        const t = (firstBrIdx < firstFkIdx) ? bs[0] : bs[bs.length - 1];
+        return t == null ? void 0 : t.n;
+      }
+      // Pour les lignes normales : afficher Terminus1 ↔ Terminus2
+      const allStations = stations.filter((s) => !s.fork);
+      if (allStations.length < 2) return displayedTerminus;
+      const t1 = allStations[0].n;
+      const t2 = allStations[allStations.length - 1].n;
+      return t1 + " \u2194 " + t2;
+    })()
   )), hasFork && forkConfig && !forkConfig.simpleMode && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 10 } }, forkConfig.multiMode ? (
     // Mode multi-branches RER : boutons groupés
     /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 6, textTransform: "uppercase", letterSpacing: 1 } }, "Choisir la branche"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } }, forkConfig.branches.map((br) => {
@@ -4343,7 +4482,8 @@ function App() {
             borderRadius: 9,
             border: `3px solid ${br.color}`,
             background: isActive ? br.color : "#fff",
-            color: "#111",
+            color: isActive ? "#fff" : "#111",
+            textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
             fontWeight: 900,
             fontSize: 12,
             cursor: "pointer",
@@ -4352,7 +4492,7 @@ function App() {
             gap: 5
           }
         },
-        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : br.color, fontWeight: 900, fontSize: 13 } }, br.letter),
+        /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#fff" : br.color, textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none", fontWeight: 900, fontSize: 13 } }, br.letter),
         /* @__PURE__ */ React.createElement("span", null, br.label)
       );
     })))
@@ -4379,14 +4519,15 @@ function App() {
               },
               style: {
                 flex: 1,
-                padding: "8px 6px",
+                padding: "12px 8px",
                 minWidth: 0,
                 borderRadius: 10,
                 border: `2.5px solid ${cfg.color}`,
                 background: isActive ? cfg.color : "#fff",
-                color: "#111",
+                color: isActive ? "#fff" : "#111",
+                textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
                 fontWeight: 900,
-                fontSize: 12,
+                fontSize: 14,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -4395,7 +4536,7 @@ function App() {
                 overflow: "hidden"
               }
             },
-            /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#111" : cfg.textInactive, fontSize: 14, fontWeight: 900, flexShrink: 0 } }, forkConfig.letter[key]),
+            /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#fff" : cfg.textInactive, textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none", fontSize: 14, fontWeight: 900, flexShrink: 0 } }, forkConfig.letter[key]),
             /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, cfg.label)
           );
         }).concat(troncTerm ? [
@@ -4409,14 +4550,15 @@ function App() {
               },
               style: {
                 flex: 1,
-                padding: "8px 6px",
+                padding: "12px 8px",
                 minWidth: 0,
                 borderRadius: 10,
                 border: `2.5px solid ${branch === null ? lineColor : "#ccc"}`,
                 background: branch === null ? lineColor : "#f5f5f5",
-                color: "#111",
+                color: branch === null ? "#fff" : "#111",
+                textShadow: branch === null ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
                 fontWeight: 900,
-                fontSize: 12,
+                fontSize: 14,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -4433,32 +4575,42 @@ function App() {
     })()
   )), !hasFork && !is15 && filteredStations.length > 1 && (() => {
     // Sélecteur de direction pour lignes normales : 2 terminus côte à côte
+    // À l'arrivée : bouton sélectionné à gauche. Ensuite, l'ordre est figé.
     const term1 = filteredStations[0].n;
     const term2 = filteredStations[filteredStations.length - 1].n;
     const lineColor = line.color || "#111";
     const lineText = line.text || "#fff";
+    // Si l'ordre n'a pas encore été figé OU si les terminus actuels ne correspondent pas (changement de ligne) → recalculer
+    let ordered;
+    if (buttonOrder && buttonOrder.includes(term1) && buttonOrder.includes(term2)) {
+      ordered = buttonOrder;
+    } else {
+      ordered = direction === term2 ? [term2, term1] : [term1, term2];
+      // Figer l'ordre
+      setTimeout(() => setButtonOrder(ordered), 0);
+    }
     return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 10 } },
-      [term1, term2].map((termName, i) => {
+      ordered.map((termName, i) => {
         const isActive = direction === termName;
         return /* @__PURE__ */ React.createElement("button", {
           key: i,
           onClick: () => setDirection(termName),
           style: {
-            flex: 1, padding: "8px 6px", minWidth: 0,
+            flex: 1, padding: "14px 8px", minWidth: 0,
             borderRadius: 9,
             border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
             background: isActive ? lineColor : "#f5f5f5",
-            color: isActive ? "#111" : "#888",
-            fontWeight: 800, fontSize: 12,
+            color: isActive ? "#fff" : "#222",
+            textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
+            fontWeight: isActive ? 800 : 600, fontSize: 15,
             cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 5,
+            display: "flex", alignItems: "center", gap: 6,
             justifyContent: "center",
             lineHeight: 1.2,
             overflow: "hidden",
             textOverflow: "ellipsis"
           }
         },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u2192"),
           /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, termName)
         );
       })
@@ -4466,30 +4618,38 @@ function App() {
   })(),
   is15 && troncon15 && filteredStations.length > 1 && (() => {
     // Sélecteur de direction pour ligne 15 : 2 terminus du tronçon
+    // À l'arrivée : bouton sélectionné à gauche. Ensuite, l'ordre est figé.
     const term1 = filteredStations[0].n;
     const term2 = filteredStations[filteredStations.length - 1].n;
     const lineColor = "#B90845";
+    let ordered;
+    if (buttonOrder && buttonOrder.includes(term1) && buttonOrder.includes(term2)) {
+      ordered = buttonOrder;
+    } else {
+      ordered = direction === term2 ? [term2, term1] : [term1, term2];
+      setTimeout(() => setButtonOrder(ordered), 0);
+    }
     return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 10 } },
-      [term1, term2].map((termName, i) => {
+      ordered.map((termName, i) => {
         const isActive = direction === termName;
         return /* @__PURE__ */ React.createElement("button", {
           key: i,
           onClick: () => setDirection(termName),
           style: {
-            flex: 1, padding: "8px 6px", minWidth: 0,
+            flex: 1, padding: "14px 8px", minWidth: 0,
             borderRadius: 9,
             border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
             background: isActive ? lineColor : "#f5f5f5",
-            color: isActive ? "#111" : "#888",
-            fontWeight: 800, fontSize: 12,
+            color: isActive ? "#fff" : "#222",
+            textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
+            fontWeight: isActive ? 800 : 600, fontSize: 15,
             cursor: "pointer",
-            display: "flex", alignItems: "center", gap: 5,
+            display: "flex", alignItems: "center", gap: 6,
             justifyContent: "center",
             lineHeight: 1.2,
             overflow: "hidden"
           }
         },
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u2192"),
           /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, termName)
         );
       })
@@ -4567,7 +4727,7 @@ function App() {
           const isTram = !!TRAM_LINES.find((l) => l.id === c);
           return acc + (isTram ? 30 : 24) + 4;
         }, 0);
-        const fitsOneLine = nameW + badgesW + 10 < 300;
+        const fitsOneLine = nameW + badgesW + 10 < 360;
         const nameStyle = {
           fontWeight: 900,
           fontSize: isTerminus ? 16 : 15,
@@ -4592,7 +4752,7 @@ function App() {
             } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: 21 }));
           }));
         } else {
-          return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25 }) }, st.n), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } }, st.c.filter((c) => c !== lineId).map((c, i) => {
+          return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25, display: "inline-block" }) }, st.n), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } }, st.c.filter((c) => c !== lineId).map((c, i) => {
             const isTram = !!TRAM_LINES.find((l) => l.id === c);
             const isRer = !!RER_LINES.find((l) => l.id === c);
             const isCab = !!CABLE_LINES.find((l) => l.id === c);
