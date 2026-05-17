@@ -290,7 +290,7 @@ const STATIONS = {
     { n: "Nation", c: ["1", "6", "9", "A"] }
   ],
   "3": [
-    { n: "Pont de Levallois - B\xE9con" },
+    { n: "Pont de Levallois" },
     { n: "Anatole France" },
     { n: "Louise Michel" },
     { n: "Porte de Champerret", c: ["T3b"] },
@@ -354,7 +354,7 @@ const STATIONS = {
     { n: "Bagneux - Lucie Aubrac", c: ["B"] }
   ],
   "5": [
-    { n: "Bobigny - Pablo Picasso", c: ["T1"] },
+    { n: "Bobigny", c: ["T1"] },
     { n: "\xC9glise de Pantin" },
     { n: "Hoche" },
     { n: "Porte de Pantin", walk: ["T3b"] },
@@ -407,7 +407,7 @@ const STATIONS = {
     { n: "Nation", c: ["1", "2", "9", "A"] }
   ],
   "7": [
-    { n: "La Courneuve - 8 Mai 1945", c: ["T1"] },
+    { n: "La Courneuve", c: ["T1"] },
     { n: "Fort d'Aubervilliers" },
     { n: "Aubervilliers - Pantin - Quatre Chemins" },
     { n: "Porte de la Villette", c: ["T3b"] },
@@ -541,7 +541,7 @@ const STATIONS = {
     { n: "Mairie de Montreuil" }
   ],
   "10": [
-    { n: "Boulogne - Pont de Saint-Cloud", walk: ["T2"] },
+    { n: "Boulogne", walk: ["T2"] },
     { n: "Boulogne - Jean Jaur\xE8s" },
     { n: "Michel-Ange - Molitor", c: ["9"] },
     { n: "Michel-Ange - Auteuil", c: ["9"] },
@@ -622,7 +622,7 @@ const STATIONS = {
   ],
   "13": [
     // Tronc commun Sud
-    { n: "Ch\xE2tillon - Montrouge", c: ["T6", "15"] },
+    { n: "Ch\xE2tillon - Montrouge", c: ["15", "T6"] },
     { n: "Malakoff - Rue \xC9tienne Dolet" },
     { n: "Malakoff - Plateau de Vanves" },
     { n: "Porte de Vanves", c: ["T3a"] },
@@ -644,7 +644,7 @@ const STATIONS = {
     // Branche A : Asnières-Gennevilliers
     { n: "La Fourche", branch: "A" },
     { n: "Brochant", branch: "A" },
-    { n: "Porte de Clichy", c: ["C", "14", "T3b"], branch: "A" },
+    { n: "Porte de Clichy", c: ["14", "C", "T3b"], branch: "A" },
     { n: "Mairie de Clichy", branch: "A" },
     { n: "Gabriel P\xE9ri", branch: "A" },
     { n: "Les Agnettes", branch: "A" },
@@ -691,7 +691,7 @@ const STATIONS = {
     { n: "Mairie d'Aubervilliers", c: ["12"], branch: "E" },
     { n: "Fort d'Aubervilliers", c: ["7"], branch: "E" },
     { n: "Drancy \u2013 Bobigny", c: ["T1", "T11"], branch: "E" },
-    { n: "Bobigny \u2013 Pablo Picasso", c: ["5", "T1", "T11"], branch: "E" },
+    { n: "Bobigny", c: ["5", "T1", "T11"], branch: "E" },
     { n: "Pont de Bondy", c: ["T1", "T11"], branch: "E" },
     { n: "Bondy", c: ["E", "T4"], branch: "E" },
     { n: "Rosny Bois-Perrier", c: ["11", "E"], branch: "E" },
@@ -701,7 +701,7 @@ const STATIONS = {
     // Tronçon SUD — branch "S"
     { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "S" },
     { n: "Issy", c: ["C"], branch: "S" },
-    { n: "Clamart", c: ["N"], branch: "S" },
+    { n: "Clamart", branch: "S" },
     { n: "Ch\xE2tillon - Montrouge", c: ["13", "T6"], branch: "S" },
     { n: "Bagneux \u2013 Lucie Aubrac", c: ["4"], branch: "S" },
     { n: "Arcueil \u2013 Cachan", c: ["B"], branch: "S" },
@@ -713,19 +713,19 @@ const STATIONS = {
     { n: "Cr\xE9teil \u2013 L'\xC9chat", c: ["8"], branch: "S" },
     { n: "Saint-Maur \u2013 Cr\xE9teil", c: ["A"], branch: "S" },
     { n: "Champigny Centre", branch: "S" },
-    { n: "Villiers \u2013 Champigny \u2013 Bry", c: ["E", "P"], branch: "S" },
+    { n: "Villiers \u2013 Champigny \u2013 Bry", c: ["E"], branch: "S" },
     { n: "Noisy \u2013 Champs", c: ["16", "A"], branch: "S" },
     // Tronçon OUEST — branch "O"
     { n: "Saint-Denis - Pleyel", c: ["14", "16", "17", "D"], branch: "O" },
     { n: "Les Gr\xE9sillons", c: ["C"], branch: "O" },
     { n: "Les Agnettes", c: ["13"], branch: "O" },
-    { n: "Bois-Colombes", c: ["J"], branch: "O" },
-    { n: "B\xE9con-les-Bruy\xE8res", c: ["L"], branch: "O" },
+    { n: "Bois-Colombes", branch: "O" },
+    { n: "B\xE9con-les-Bruy\xE8res", branch: "O" },
     { n: "La D\xE9fense", c: ["1", "A", "E", "T2"], branch: "O" },
     { n: "Nanterre La Folie", c: ["E"], branch: "O" },
     { n: "Nanterre La Boule", c: ["T1"], branch: "O" },
     { n: "Rueil \u2013 Suresnes Mont-Val\xE9rien", branch: "O" },
-    { n: "Saint-Cloud", c: ["L", "U"], branch: "O" },
+    { n: "Saint-Cloud", branch: "O" },
     { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "O" }
   ],
   "16": [
@@ -737,7 +737,7 @@ const STATIONS = {
     { n: "Sevran \u2013 Beaudottes", c: ["B"] },
     { n: "Sevran \u2013 Livry", c: ["B"] },
     { n: "Clichy \u2013 Montfermeil", c: ["T4"] },
-    { n: "Chelles \u2013 Gournay", c: ["E", "P"] },
+    { n: "Chelles \u2013 Gournay", c: ["E"] },
     { n: "Noisy \u2013 Champs", c: ["15", "A"] }
   ],
   "17": [
@@ -761,7 +761,7 @@ const STATIONS = {
     { n: "Christ de Saclay" },
     { n: "Guyancourt" },
     { n: "Satory" },
-    { n: "Versailles \u2013 Chantiers", c: ["C", "N", "U"] }
+    { n: "Versailles \u2013 Chantiers", c: ["C"] }
   ],
   "A": [
     // Branche Saint-Germain (G) — terminus EN PREMIER, va jusqu'à la fourche ouest
@@ -1107,7 +1107,7 @@ const STATIONS = {
   "E": [
     // Branche Ouest Nanterre - La Folie (NF) — terminus actuel ouest
     { n: "Nanterre - La Folie", c: ["A"], branch: "NF" },
-    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"], branch: "NF" },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "T2"], branch: "NF" },
     { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "NF" },
     // Branche FUTURE Mantes-la-Jolie (MJ) — mise en service 2027-2029
     { n: "Mantes-la-Jolie", branch: "MJ", futurBranch: "MJ" },
@@ -1119,9 +1119,9 @@ const STATIONS = {
     { n: "Vernouillet - Verneuil", branch: "MJ", futurBranch: "MJ" },
     { n: "Villennes-sur-Seine", branch: "MJ", futurBranch: "MJ" },
     { n: "Poissy", c: ["A", "T13"], branch: "MJ", futurBranch: "MJ" },
-    { n: "Houilles - Carri\xE8res-sur-Seine", c: ["A", "J", "L"], branch: "MJ", futurBranch: "MJ" },
+    { n: "Houilles - Carri\xE8res-sur-Seine", c: ["A"], branch: "MJ", futurBranch: "MJ" },
     { n: "Nanterre - La Folie", c: ["A"], branch: "MJ", futurBranch: "MJ" },
-    { n: "La D\xE9fense - Grande Arche", c: ["A", "1", "T2"], branch: "MJ", futurBranch: "MJ" },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "T2"], branch: "MJ", futurBranch: "MJ" },
     { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "MJ", futurBranch: "MJ" },
     // FOURCHE OUEST
     { n: "Haussmann - Saint-Lazare", c: ["3", "9", "12", "13", "14"], walk: ["A"], fork: true },
@@ -1176,7 +1176,7 @@ const STATIONS = {
     { n: "H\xF4tel de Ville de La Courneuve" },
     { n: "Stade G\xE9o Andr\xE9" },
     { n: "Danton" },
-    { n: "La Courneuve - 8 Mai 1945", c: ["7"] },
+    { n: "La Courneuve", c: ["7"] },
     { n: "Maurice Lach\xE2tre" },
     { n: "Drancy - Avenir" },
     { n: "H\xF4pital Avicenne" },
@@ -1186,7 +1186,7 @@ const STATIONS = {
     { n: "La Ferme" },
     { n: "Lib\xE9ration" },
     { n: "H\xF4tel de Ville de Bobigny", c: ["5"] },
-    { n: "Bobigny - Pablo Picasso", c: ["5", "T1"] },
+    { n: "Bobigny", c: ["5", "T1"] },
     { n: "Auguste Delaune" },
     { n: "Pont de Bondy" },
     { n: "Petit Noisy" },
@@ -1200,7 +1200,7 @@ const STATIONS = {
     { n: "Charlebourg", c: ["1"] },
     { n: "Les Fauvelles" },
     { n: "Faubourg de l'Arche" },
-    { n: "La D\xE9fense - Grande Arche", c: ["A", "E", "1"] },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "E"] },
     { n: "Puteaux" },
     { n: "Belv\xE9d\xE8re" },
     { n: "Suresnes - Longchamp" },
@@ -1219,7 +1219,7 @@ const STATIONS = {
     { n: "Porte de Versailles", c: ["12"] }
   ],
   "T3a": [
-    { n: "Pont du Garigliano", c: ["C", "8", "T2"] },
+    { n: "Pont du Garigliano", c: ["T2"], walk: ["C"] },
     { n: "Balard", c: ["8", "T2"] },
     { n: "Desnouettes" },
     { n: "Porte de Versailles", c: ["12", "T2"] },
@@ -1232,14 +1232,14 @@ const STATIONS = {
     { n: "Montsouris" },
     { n: "Cit\xE9 Universitaire", c: ["B"] },
     { n: "Stade Charl\xE9ty" },
-    { n: "Poterne des Peupliers", c: ["7", "14", "T9"] },
-    { n: "Porte d'Italie", c: ["7", "T9"] },
-    { n: "Porte de Choisy", c: ["7"] },
+    { n: "Poterne des Peupliers" },
+    { n: "Porte d'Italie", c: ["7"], walk: ["14"] },
+    { n: "Porte de Choisy", c: ["7", "T9"] },
     { n: "Porte d'Ivry", c: ["7"] },
-    { n: "Maryse Basti\xE9", c: ["C", "4"] },
-    { n: "Avenue de France", c: ["8"] },
-    { n: "Baron Le Roy", c: ["8"] },
-    { n: "Porte de Charenton", c: ["8"] },
+    { n: "Maryse Basti\xE9" },
+    { n: "Avenue de France", walk: ["14", "C"] },
+    { n: "Baron Le Roy" },
+    { n: "Porte de Charenton" },
     { n: "Porte Dor\xE9e", c: ["8"] },
     { n: "Montempoivre" },
     { n: "Alexandra David-N\xE9el" },
@@ -1267,10 +1267,10 @@ const STATIONS = {
     { n: "Diane Arbus" },
     { n: "Porte de Clignancourt", c: ["4"] },
     { n: "Ang\xE9lique Compoint" },
-    { n: "Porte de Saint-Ouen", c: ["C", "13"] },
+    { n: "Porte de Saint-Ouen", c: ["13"] },
     { n: "\xC9pinettes - Pouchet" },
     { n: "Honor\xE9 de Balzac" },
-    { n: "Porte de Clichy", c: ["C", "13", "14"] },
+    { n: "Porte de Clichy", c: ["13", "14", "C"] },
     { n: "Marguerite Long" },
     { n: "Square Sainte-Odile", c: ["3"] },
     { n: "Porte de Champerret", c: ["3"] },
@@ -1389,7 +1389,7 @@ const STATIONS = {
     { n: "Saint-Denis - Porte de Paris", c: ["13"] }
   ],
   "T9": [
-    { n: "Porte de Choisy", c: ["T3a", "7"] },
+    { n: "Porte de Choisy", c: ["7", "T3a"] },
     { n: "Ch\xE2teaudun - Barb\xE8s" },
     { n: "Cimeti\xE8re Parisien d'Ivry" },
     { n: "La Briqueterie" },
@@ -1548,9 +1548,9 @@ const TRAIN_DATA = {
       {
         voitures: [1, 2],
         type: "sortie",
-        sorties: [{ num: "1", label: "RER C / Transilien N \xB7 U" }],
+        sorties: [{ num: "1", label: "RER C" }],
         pictos: ["escalator"],
-        corr: ["C", "N", "U"]
+        corr: ["C"]
       }
     ]
   },
@@ -1561,9 +1561,9 @@ const TRAIN_DATA = {
       {
         voitures: [1, 2],
         type: "sortie",
-        sorties: [{ num: "1", label: "Transilien L" }],
+        sorties: [{ num: "1", label: "Sortie" }],
         pictos: [],
-        corr: ["L"]
+        corr: []
       }
     ]
   },
@@ -1576,9 +1576,9 @@ const TRAIN_DATA = {
       {
         voitures: [1, 2],
         type: "sortie",
-        sorties: [{ num: "1", label: "RER P / Gare d'Esbly" }],
+        sorties: [{ num: "1", label: "Gare d'Esbly" }],
         pictos: ["escalator"],
-        corr: ["P"]
+        corr: []
       }
     ]
   },
@@ -3819,7 +3819,7 @@ function App() {
       forkName: "Gargan"
     };
     if (lineId === "7") return {
-      A: { label: "Villejuif - Louis Aragon", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
+      A: { label: "Villejuif", color: "#4A90D9", textActive: "#111", textInactive: "#4A90D9" },
       B: { label: "Mairie d'Ivry", color: "#DAA520", textActive: "#111", textInactive: "#B8860B" },
       letter: { A: "V", B: "I" },
       branchA: "V",
@@ -4223,7 +4223,7 @@ function App() {
       },
       onClick: (e) => e.stopPropagation()
     },
-    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ccc", borderRadius: 4, margin: "0 auto" } })),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 16 } }, React.createElement("button", { onClick: () => setShowDir(false), style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ccc", borderRadius: 4, margin: "0 auto" } })),
     /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 } }, /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 38 }), /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 900, fontSize: 17, letterSpacing: 0.2 } }, "Choisir la direction")),
     (() => {
       var _a2, _b2, _c2, _d2, _e2, _f;
@@ -4444,17 +4444,62 @@ function App() {
       fontSize: 16, cursor: "pointer",
       display: "flex", alignItems: "center", justifyContent: "center" }
   }, "\u270F\uFE0F"),
-  screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("lines"), style: { background: "none", border: "none", fontSize: 44, fontWeight: 900, cursor: "pointer", color: "#111", padding: "4px 12px 4px 4px", minWidth: 52, minHeight: 52, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
+  screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    // Pour ligne 15 et RER : retour à l'écran de choix de direction
+    if (lineId === "15" || transport === "rer") {
+      setScreen("lines");
+      setShowDir(true);
+    } else {
+      setScreen("lines");
+    }
+  }, style: { background: "none", border: "none", fontSize: 44, fontWeight: 900, cursor: "pointer", color: "#111", padding: "4px 12px 4px 4px", minWidth: 52, minHeight: 52, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
     "div",
     { style: { fontWeight: 600, fontSize: 12, color: "#888" } },
     (() => {
-      // Afficher les 2 terminus de la ligne (ou de la branche pour RER)
+      // Afficher les terminus de la branche pour RER multimode
       if (hasFork && branch && (forkConfig == null ? void 0 : forkConfig.multiMode)) {
         const bs = stations.filter((s) => s.branch === branch);
         const firstBrIdx = stations.findIndex((s) => s.branch === branch);
         const firstFkIdx = stations.findIndex((s) => s.fork);
         const t = (firstBrIdx < firstFkIdx) ? bs[0] : bs[bs.length - 1];
         return t == null ? void 0 : t.n;
+      }
+      // Pour les lignes avec fourche simple (7, 13, T4) : afficher les 3 terminus avec noms courts
+      if (hasFork && forkConfig && forkConfig.A && forkConfig.B) {
+        // Noms courts personnalisés selon la ligne
+        const shortNames = {
+          "7": { tronc: "La Courneuve", a: "Mairie d'Ivry", b: "Villejuif" },
+          "13": { tronc: "Ch\xE2tillon - Montrouge", a: "Asni\xE8res", b: "Saint-Denis" },
+          "T4": { tronc: "Bondy", a: "Aulnay-sous-Bois", b: "H\xF4pital de Montfermeil" }
+        };
+        const sn = shortNames[lineId];
+        if (sn) {
+          // Déterminer si le tronc est avant ou après les branches dans les données
+          const firstTroncIdx = stations.findIndex((s) => !s.branch && !s.fork);
+          const firstBranchIdx = stations.findIndex((s) => s.branch);
+          const troncFirst = firstTroncIdx < firstBranchIdx;
+          if (troncFirst) {
+            return sn.tronc + " \u2194 " + sn.a + " / " + sn.b;
+          } else {
+            return sn.a + " / " + sn.b + " \u2194 " + sn.tronc;
+          }
+        }
+        // Fallback générique
+        const troncTerm = stations.filter((s) => !s.branch && !s.fork)[0];
+        const branchAVal = forkConfig.branchA || "A";
+        const branchBVal = forkConfig.branchB || "B";
+        const termA = stations.filter((s) => s.branch === branchAVal).slice(-1)[0];
+        const termB = stations.filter((s) => s.branch === branchBVal).slice(-1)[0];
+        if (troncTerm && termA && termB) {
+          return troncTerm.n + " \u2194 " + termA.n + " / " + termB.n;
+        }
+      }
+      // Pour la ligne 15 : afficher les terminus du tronçon sélectionné
+      if (is15 && troncon15) {
+        const tronconObj = L15_TRONCONS.find((t) => t.id === troncon15);
+        if (tronconObj && tronconObj.terminus.length >= 2) {
+          return tronconObj.terminus[0] + " \u2194 " + tronconObj.terminus[1];
+        }
       }
       // Pour les lignes normales : afficher Terminus1 ↔ Terminus2
       const allStations = stations.filter((s) => !s.fork);
@@ -4481,6 +4526,7 @@ function App() {
             padding: "7px 10px",
             borderRadius: 9,
             border: `3px solid ${br.color}`,
+            outline: "1px solid #000",
             background: isActive ? br.color : "#fff",
             color: isActive ? "#fff" : "#111",
             textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
@@ -4523,11 +4569,12 @@ function App() {
                 minWidth: 0,
                 borderRadius: 10,
                 border: `2.5px solid ${cfg.color}`,
+                outline: "1px solid #000",
                 background: isActive ? cfg.color : "#fff",
                 color: isActive ? "#fff" : "#111",
                 textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
                 fontWeight: 900,
-                fontSize: 14,
+                fontSize: 15,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -4536,7 +4583,6 @@ function App() {
                 overflow: "hidden"
               }
             },
-            /* @__PURE__ */ React.createElement("span", { style: { color: isActive ? "#fff" : cfg.textInactive, textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none", fontSize: 14, fontWeight: 900, flexShrink: 0 } }, forkConfig.letter[key]),
             /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, cfg.label)
           );
         }).concat(troncTerm ? [
@@ -4554,11 +4600,12 @@ function App() {
                 minWidth: 0,
                 borderRadius: 10,
                 border: `2.5px solid ${branch === null ? lineColor : "#ccc"}`,
+                outline: "1px solid #000",
                 background: branch === null ? lineColor : "#f5f5f5",
                 color: branch === null ? "#fff" : "#111",
                 textShadow: branch === null ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
                 fontWeight: 900,
-                fontSize: 14,
+                fontSize: 15,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -4567,8 +4614,13 @@ function App() {
                 overflow: "hidden"
               }
             },
-            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, fontWeight: 900, flexShrink: 0 } }, "\u21A9"),
-            /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, troncTerm)
+            /* @__PURE__ */ React.createElement("span", { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, (() => {
+              // Label court pour le bouton tronc selon la ligne
+              if (lineId === "7") return "Courneuve";
+              if (lineId === "13") return "Ch\xE2tillon";
+              if (lineId === "T4") return "Bondy";
+              return troncTerm;
+            })())
           )
         ] : [])
       );
@@ -4599,6 +4651,7 @@ function App() {
             flex: 1, padding: "14px 8px", minWidth: 0,
             borderRadius: 9,
             border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
+            outline: "1px solid #000",
             background: isActive ? lineColor : "#f5f5f5",
             color: isActive ? "#fff" : "#222",
             textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
@@ -4639,6 +4692,7 @@ function App() {
             flex: 1, padding: "14px 8px", minWidth: 0,
             borderRadius: 9,
             border: `2.5px solid ${isActive ? lineColor : "#ccc"}`,
+            outline: "1px solid #000",
             background: isActive ? lineColor : "#f5f5f5",
             color: isActive ? "#fff" : "#222",
             textShadow: isActive ? "-1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000" : "none",
@@ -4707,7 +4761,9 @@ function App() {
         zIndex: 1
       } }),
       /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 28, flex: 1, paddingTop: 5, paddingBottom: 5, minWidth: 0 } }, (() => {
-        const hasBadges = st.c && st.c.length > 0;
+        const cList = (st.c || []).filter((c) => c !== lineId);
+        const wList = (st.walk || []).filter((c) => c !== lineId);
+        const hasBadges = cList.length > 0 || wList.length > 0;
         if (!hasBadges) {
           return /* @__PURE__ */ React.createElement("span", { style: {
             fontWeight: 900,
@@ -4723,10 +4779,10 @@ function App() {
           } }, st.n);
         }
         const nameW = st.n.length * 9;
-        const badgesW = st.c.reduce((acc, c) => {
+        const badgesW = [...cList, ...wList].reduce((acc, c) => {
           const isTram = !!TRAM_LINES.find((l) => l.id === c);
           return acc + (isTram ? 30 : 24) + 4;
-        }, 0);
+        }, 0) + (wList.length > 0 ? 20 : 0);
         const fitsOneLine = nameW + badgesW + 10 < 360;
         const nameStyle = {
           fontWeight: 900,
@@ -4738,32 +4794,35 @@ function App() {
           textShadow: isTerminus ? line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.95), 2px -2px 0 rgba(255,255,255,0.95), -2px 2px 0 rgba(255,255,255,0.95), 2px 2px 0 rgba(255,255,255,0.95)" : "-2px -2px 0 rgba(0,0,0,0.95), 2px -2px 0 rgba(0,0,0,0.95), -2px 2px 0 rgba(0,0,0,0.95), 2px 2px 0 rgba(0,0,0,0.95)" : "none",
           whiteSpace: "nowrap"
         };
+        const renderBadge = (c, i, size) => {
+          const isTram = !!TRAM_LINES.find((l) => l.id === c);
+          const isRer = !!RER_LINES.find((l) => l.id === c);
+          const isCab = !!CABLE_LINES.find((l) => l.id === c);
+          return /* @__PURE__ */ React.createElement("span", { key: i, style: {
+            display: "inline-flex",
+            flexShrink: 0,
+            borderRadius: isTram || isRer || isCab ? "4px" : "50%",
+            outline: "2px solid rgba(0,0,0,0.75)",
+            outlineOffset: "1px"
+          } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size }));
+        };
+        const walkIcon = wList.length > 0 ? /* @__PURE__ */ React.createElement("span", { key: "walk-icon", style: { fontSize: 16, marginLeft: 2, marginRight: 2, flexShrink: 0 } }, "\u{1F6B6}") : null;
         if (fitsOneLine) {
-          return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", flexWrap: "nowrap", gap: 4 } }, /* @__PURE__ */ React.createElement("span", { style: nameStyle }, st.n), st.c.filter((c) => c !== lineId).map((c, i) => {
-            const isTram = !!TRAM_LINES.find((l) => l.id === c);
-            const isRer = !!RER_LINES.find((l) => l.id === c);
-            const isCab = !!CABLE_LINES.find((l) => l.id === c);
-            return /* @__PURE__ */ React.createElement("span", { key: i, style: {
-              display: "inline-flex",
-              flexShrink: 0,
-              borderRadius: isTram || isRer || isCab ? "4px" : "50%",
-              outline: "2px solid rgba(0,0,0,0.75)",
-              outlineOffset: "1px"
-            } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: 21 }));
-          }));
+          return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", flexWrap: "nowrap", gap: 4 } },
+            /* @__PURE__ */ React.createElement("span", { style: nameStyle }, st.n),
+            ...cList.map((c, i) => renderBadge(c, "c" + i, 21)),
+            walkIcon,
+            ...wList.map((c, i) => renderBadge(c, "w" + i, 21))
+          );
         } else {
-          return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25, display: "inline-block" }) }, st.n), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } }, st.c.filter((c) => c !== lineId).map((c, i) => {
-            const isTram = !!TRAM_LINES.find((l) => l.id === c);
-            const isRer = !!RER_LINES.find((l) => l.id === c);
-            const isCab = !!CABLE_LINES.find((l) => l.id === c);
-            return /* @__PURE__ */ React.createElement("span", { key: i, style: {
-              display: "inline-flex",
-              flexShrink: 0,
-              borderRadius: isTram || isRer || isCab ? "4px" : "50%",
-              outline: "2px solid rgba(0,0,0,0.75)",
-              outlineOffset: "1px"
-            } }, /* @__PURE__ */ React.createElement(Badge, { id: c, size: 22 }));
-          })));
+          return /* @__PURE__ */ React.createElement("div", null,
+            /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25, display: "inline-block" }) }, st.n),
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } },
+              ...cList.map((c, i) => renderBadge(c, "c" + i, 22)),
+              walkIcon,
+              ...wList.map((c, i) => renderBadge(c, "w" + i, 22))
+            )
+          );
         }
       })()),
       favorites.includes(`${lineId}::${st.n}`) && /* @__PURE__ */ React.createElement("span", { style: { marginRight: 4 } }, "\u2B50")
