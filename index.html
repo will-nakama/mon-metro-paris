@@ -351,10 +351,10 @@ const STATIONS = {
     { n: "Porte d'Orl\xE9ans", c: ["T3a"] },
     { n: "Mairie de Montrouge" },
     { n: "Barbara" },
-    { n: "Bagneux - Lucie Aubrac", c: ["B"] }
+    { n: "Bagneux - Lucie Aubrac", c: ["B", "15"] }
   ],
   "5": [
-    { n: "Bobigny - Pablo Picasso", c: ["T1"] },
+    { n: "Bobigny - Pablo Picasso", c: ["T1", "15"] },
     { n: "\xC9glise de Pantin" },
     { n: "Hoche" },
     { n: "Porte de Pantin", walk: ["T3b"] },
@@ -408,7 +408,7 @@ const STATIONS = {
   ],
   "7": [
     { n: "La Courneuve - 8 Mai 1945", c: ["T1"] },
-    { n: "Fort d'Aubervilliers" },
+    { n: "Fort d'Aubervilliers", c: ["15"] },
     { n: "Aubervilliers - Pantin - Quatre Chemins" },
     { n: "Porte de la Villette (Cit\xE9 des Sciences)", c: ["T3b"] },
     { n: "Corentin Cariou" },
@@ -435,14 +435,14 @@ const STATIONS = {
     { n: "Les Gobelins" },
     { n: "Place d'Italie", c: ["5", "6"] },
     { n: "Tolbiac" },
-    // FOURCHE — station pivot
+    // FOURCHE - station pivot
     { n: "Maison Blanche", fork: true },
     // Branche V : Villejuif
     { n: "Maison Blanche", c: ["14"], walk: ["T3a"], branch: "V" },
     { n: "Le Kremlin-Bic\xEAtre", branch: "V" },
     { n: "Villejuif - L\xE9o Lagrange", branch: "V" },
     { n: "Villejuif - Paul Vaillant-Couturier", branch: "V" },
-    { n: "Villejuif - Louis Aragon", c: ["T7"], branch: "V" },
+    { n: "Villejuif - Louis Aragon", c: ["T7", "15"], branch: "V" },
     // Branche I : Ivry
     { n: "Maison Blanche", c: ["14"], walk: ["T3a"], branch: "I" },
     { n: "Porte d'Italie", c: ["T3a"], branch: "I" },
@@ -496,13 +496,13 @@ const STATIONS = {
     { n: "\xC9cole V\xE9t\xE9rinaire de Maisons-Alfort" },
     { n: "Maisons-Alfort - Stade" },
     { n: "Maisons-Alfort - Les Juilliottes" },
-    { n: "Cr\xE9teil - L'\xC9chat" },
+    { n: "Cr\xE9teil - L'\xC9chat (H\xF4pital Henri Mondor)", c: ["15"] },
     { n: "Cr\xE9teil - Universit\xE9" },
     { n: "Cr\xE9teil - Pr\xE9fecture" },
     { n: "Cr\xE9teil - Pointe du Lac", c: ["C1"] }
   ],
   "9": [
-    { n: "Pont de S\xE8vres", walk: ["T2"] },
+    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["15"], walk: ["T2"] },
     { n: "Billancourt" },
     { n: "Marcel Sembat" },
     { n: "Porte de Saint-Cloud" },
@@ -542,13 +542,14 @@ const STATIONS = {
   ],
   "10": [
     { n: "Boulogne - Pont de Saint-Cloud", walk: ["T2"] },
-    { n: "Boulogne - Jean Jaur\xE8s" },
-    { n: "Michel-Ange - Molitor", c: ["9"] },
-    { n: "Michel-Ange - Auteuil", c: ["9"] },
-    { n: "\xC9glise d'Auteuil" },
-    { n: "Chardon-Lagache" },
-    { n: "Mirabeau" },
-    { n: "Javel - Andr\xE9 Citro\xEBn", walk: ["C"] },
+    { n: "Boulogne - Jean Jaur\xE8s", loopInfo: true },
+    { n: "Michel-Ange - Molitor", c: ["9"], direction: "Austerlitz" },
+    { n: "Porte d'Auteuil", direction: "Boulogne" },
+    { n: "Michel-Ange - Auteuil", c: ["9"], direction: "Boulogne" },
+    { n: "\xC9glise d'Auteuil", direction: "Boulogne" },
+    { n: "Chardon-Lagache", direction: "Austerlitz" },
+    { n: "Mirabeau", direction: "Austerlitz" },
+    { n: "Javel - Andr\xE9 Citro\xEBn", walk: ["C"], loopInfo: true },
     { n: "Charles Michels" },
     { n: "Avenue \xC9mile Zola" },
     { n: "La Motte-Picquet - Grenelle", c: ["6", "8"] },
@@ -585,10 +586,10 @@ const STATIONS = {
     { n: "Montreuil - H\xF4pital" },
     { n: "La Dhuys" },
     { n: "Coteaux Beauclair" },
-    { n: "Rosny - Bois-Perrier", c: ["E"] }
+    { n: "Rosny - Bois-Perrier", c: ["E", "15"] }
   ],
   "12": [
-    { n: "Mairie d'Aubervilliers", c: ["T8"] },
+    { n: "Mairie d'Aubervilliers", c: ["15"] },
     { n: "Aim\xE9 C\xE9saire" },
     { n: "Front Populaire" },
     { n: "Porte de la Chapelle", c: ["T3b"] },
@@ -639,7 +640,7 @@ const STATIONS = {
     { n: "Saint-Lazare", c: ["3", "12", "14", "E"], walk: ["9"] },
     { n: "Li\xE8ge" },
     { n: "Place de Clichy", c: ["2"] },
-    // FOURCHE — station pivot
+    // FOURCHE - station pivot
     { n: "La Fourche", fork: true },
     // Branche A : Asnières-Gennevilliers
     { n: "La Fourche", branch: "A" },
@@ -647,7 +648,7 @@ const STATIONS = {
     { n: "Porte de Clichy", c: ["14", "C"], walk: ["T3b"], branch: "A" },
     { n: "Mairie de Clichy", branch: "A" },
     { n: "Gabriel P\xE9ri", branch: "A" },
-    { n: "Les Agnettes", branch: "A" },
+    { n: "Les Agnettes", c: ["15"], branch: "A" },
     { n: "Asni\xE8res - Gennevilliers - Les Courtilles", walk: ["T1"], branch: "A" },
     // Branche B : Saint-Denis
     { n: "La Fourche", branch: "B" },
@@ -661,7 +662,7 @@ const STATIONS = {
     { n: "Saint-Denis - Universit\xE9", walk: ["T5"], branch: "B" }
   ],
   "14": [
-    { n: "Saint-Denis - Pleyel", c: ["T8"], walk: ["13", "D"] },
+    { n: "Saint-Denis - Pleyel", c: ["T8", "15", "16", "17"], walk: ["13", "D"] },
     { n: "Mairie de Saint-Ouen", c: ["13"] },
     { n: "Saint-Ouen", c: ["C"] },
     { n: "Clichy - Saint-Ouen" },
@@ -678,93 +679,93 @@ const STATIONS = {
     { n: "Olympiades" },
     { n: "Maison Blanche", c: ["7"], walk: ["T3a"] },
     { n: "H\xF4pital Bic\xEAtre" },
-    { n: "Villejuif - Gustave Roussy" },
+    { n: "Villejuif - Gustave Roussy", c: ["15"] },
     { n: "L'Ha\xFF-les-Roses" },
     { n: "Chevilly-Larue", c: ["T7"] },
     { n: "Thiais - Orly", c: ["C"] },
-    { n: "A\xE9roport d'Orly", c: ["T7"] }
+    { n: "A\xE9roport d'Orly", c: ["T7", "18"] }
   ],
   "15": [
-    // Tronçon EST — branch "E"
-    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17", "D"], branch: "E" },
-    { n: "Stade de France", c: ["B", "T8"], branch: "E" },
-    { n: "Mairie d'Aubervilliers", c: ["12"], branch: "E" },
-    { n: "Fort d'Aubervilliers", c: ["7"], branch: "E" },
-    { n: "Drancy \u2013 Bobigny", c: ["T1", "T11"], branch: "E" },
-    { n: "Bobigny", c: ["5", "T1", "T11"], branch: "E" },
-    { n: "Pont de Bondy", c: ["T1", "T11"], branch: "E" },
-    { n: "Bondy", c: ["E", "T4"], branch: "E" },
-    { n: "Rosny Bois-Perrier", c: ["11", "E"], branch: "E" },
-    { n: "Val de Fontenay", c: ["1", "A", "E", "T1"], branch: "E" },
-    { n: "Nogent \u2013 Le Perreux", c: ["E"], branch: "E" },
-    { n: "Champigny Centre", branch: "E" },
-    // Tronçon SUD — branch "S"
-    { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "S" },
-    { n: "Issy", c: ["C"], branch: "S" },
-    { n: "Clamart", branch: "S" },
-    { n: "Ch\xE2tillon - Montrouge", c: ["13", "T6"], branch: "S" },
-    { n: "Bagneux \u2013 Lucie Aubrac", c: ["4"], branch: "S" },
-    { n: "Arcueil \u2013 Cachan", c: ["B"], branch: "S" },
-    { n: "Villejuif \u2013 Gustave Roussy", c: ["14"], branch: "S" },
-    { n: "Villejuif \u2013 Louis Aragon", c: ["7", "T7"], branch: "S" },
-    { n: "Mairie de Vitry-sur-Seine", c: ["T9"], branch: "S" },
-    { n: "Les Ardoines", c: ["C"], branch: "S" },
-    { n: "Le Vert de Maisons", c: ["D"], branch: "S" },
-    { n: "Cr\xE9teil \u2013 L'\xC9chat", c: ["8"], branch: "S" },
-    { n: "Saint-Maur \u2013 Cr\xE9teil", c: ["A"], branch: "S" },
-    { n: "Champigny Centre", branch: "S" },
-    { n: "Villiers \u2013 Champigny \u2013 Bry", c: ["E"], branch: "S" },
-    { n: "Noisy \u2013 Champs", c: ["16", "A"], branch: "S" },
-    // Tronçon OUEST — branch "O"
-    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17", "D"], branch: "O" },
-    { n: "Les Gr\xE9sillons", c: ["C"], branch: "O" },
-    { n: "Les Agnettes", c: ["13"], branch: "O" },
-    { n: "Bois-Colombes", branch: "O" },
-    { n: "B\xE9con-les-Bruy\xE8res", branch: "O" },
-    { n: "La D\xE9fense", c: ["1", "A", "E", "T2"], branch: "O" },
-    { n: "Nanterre La Folie", c: ["E"], branch: "O" },
-    { n: "Nanterre La Boule", c: ["T1"], branch: "O" },
-    { n: "Rueil \u2013 Suresnes Mont-Val\xE9rien", branch: "O" },
-    { n: "Saint-Cloud", branch: "O" },
-    { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "O" }
+    // Tronçon EST - branch "E"
+    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17"], walk: ["D"], branch: "E", futur: true },
+    { n: "Stade de France", c: ["B"], branch: "E", futur: true },
+    { n: "Mairie d'Aubervilliers", c: ["12"], branch: "E", futur: true },
+    { n: "Fort d'Aubervilliers", c: ["7"], branch: "E", futur: true },
+    { n: "Drancy - Bobigny", c: ["T1", "T11"], branch: "E", futur: true },
+    { n: "Bobigny - Pablo Picasso", c: ["5", "T1"], branch: "E", futur: true },
+    { n: "Pont de Bondy", c: ["T1"], branch: "E", futur: true },
+    { n: "Bondy", c: ["E", "T4"], branch: "E", futur: true },
+    { n: "Rosny - Bois-Perrier", c: ["11", "E"], branch: "E", futur: true },
+    { n: "Val de Fontenay", c: ["A", "E", "T1"], branch: "E", futur: true },
+    { n: "Nogent - Le Perreux", c: ["E"], branch: "E", futur: true },
+    { n: "Champigny Centre", branch: "E", futur: true },
+    // Tronçon SUD - branch "S"
+    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["9", "T2"], branch: "S", futur: true },
+    { n: "Issy", c: ["C"], branch: "S", futur: true },
+    { n: "Clamart", branch: "S", futur: true },
+    { n: "Ch\xE2tillon - Montrouge", c: ["13", "T6"], branch: "S", futur: true },
+    { n: "Bagneux - Lucie Aubrac", c: ["4"], branch: "S", futur: true },
+    { n: "Arcueil - Cachan", c: ["B"], branch: "S", futur: true },
+    { n: "Villejuif - Gustave Roussy", c: ["14"], branch: "S", futur: true },
+    { n: "Villejuif - Louis Aragon", c: ["7", "T7"], branch: "S", futur: true },
+    { n: "Mairie de Vitry-sur-Seine", c: ["T9"], branch: "S", futur: true },
+    { n: "Les Ardoines", c: ["C"], branch: "S", futur: true },
+    { n: "Le Vert de Maisons", c: ["D"], branch: "S", futur: true },
+    { n: "Cr\xE9teil - L'\xC9chat (H\xF4pital Henri Mondor)", c: ["8"], branch: "S", futur: true },
+    { n: "Saint-Maur - Cr\xE9teil", c: ["A"], branch: "S", futur: true },
+    { n: "Champigny Centre", branch: "S", futur: true },
+    { n: "Villiers - Champigny - Bry", c: ["E"], branch: "S", futur: true },
+    { n: "Noisy - Champs", c: ["16", "A"], branch: "S", futur: true },
+    // Tronçon OUEST - branch "O"
+    { n: "Saint-Denis - Pleyel", c: ["14", "16", "17"], walk: ["D"], branch: "O", futur: true },
+    { n: "Les Gr\xE9sillons", c: ["C"], branch: "O", futur: true },
+    { n: "Les Agnettes", c: ["13"], branch: "O", futur: true },
+    { n: "Bois-Colombes", branch: "O", futur: true },
+    { n: "B\xE9con-les-Bruy\xE8res", branch: "O", futur: true },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "E", "T2"], branch: "O", futur: true },
+    { n: "Nanterre - La Folie", c: ["E"], branch: "O", futur: true },
+    { n: "Nanterre - La Boule", c: ["T1"], branch: "O", futur: true },
+    { n: "Rueil - Suresnes Mont-Val\xE9rien", branch: "O", futur: true },
+    { n: "Saint-Cloud", branch: "O", futur: true },
+    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["9", "T2"], branch: "O", futur: true }
   ],
   "16": [
-    { n: "Saint-Denis - Pleyel", c: ["14", "15", "17", "D"] },
-    { n: "La Courneuve \u2013 Six Routes", c: ["17", "T1"] },
-    { n: "Le Bourget", c: ["17", "B", "T11"] },
-    { n: "Parc du Blanc-Mesnil" },
-    { n: "Aulnay \u2013 Val Francilia" },
-    { n: "Sevran \u2013 Beaudottes", c: ["B"] },
-    { n: "Sevran \u2013 Livry", c: ["B"] },
-    { n: "Clichy \u2013 Montfermeil", c: ["T4"] },
-    { n: "Chelles \u2013 Gournay", c: ["E"] },
-    { n: "Noisy \u2013 Champs", c: ["15", "A"] }
+    { n: "Saint-Denis - Pleyel", c: ["14", "15", "17"], walk: ["D"], futur: true },
+    { n: "La Courneuve - Six Routes", c: ["17", "T1"], futur: true },
+    { n: "Le Bourget", c: ["17", "B", "T11"], futur: true },
+    { n: "Parc du Blanc-Mesnil", futur: true },
+    { n: "Aulnay - Val Francilia", futur: true },
+    { n: "Sevran - Beaudottes", c: ["B"], futur: true },
+    { n: "Sevran - Livry", c: ["B"], futur: true },
+    { n: "Clichy - Montfermeil", c: ["T4"], futur: true },
+    { n: "Chelles - Gournay", c: ["E"], futur: true },
+    { n: "Noisy - Champs", c: ["15", "A"], futur: true }
   ],
   "17": [
-    { n: "Saint-Denis - Pleyel", c: ["14", "15", "16", "D"] },
-    { n: "La Courneuve \u2013 Six Routes", c: ["16", "T1"] },
-    { n: "Le Bourget", c: ["16", "B", "T11"] },
-    { n: "Le Bourget A\xE9roport" },
-    { n: "Gonesse" },
-    { n: "Parc des Expositions", c: ["B"] },
-    { n: "A\xE9roport Charles de Gaulle 2 TGV", c: ["B"] },
-    { n: "A\xE9roport Charles de Gaulle 2e gare" },
-    { n: "Le Mesnil-Amelot" }
+    { n: "Saint-Denis - Pleyel", c: ["14", "15", "16"], walk: ["D"], futur: true },
+    { n: "La Courneuve - Six Routes", c: ["16", "T1"], futur: true },
+    { n: "Le Bourget", c: ["16", "B", "T11"], futur: true },
+    { n: "Le Bourget A\xE9roport (Mus\xE9e de l'Air et de l'Espace)", futur: true },
+    { n: "Gonesse", futur: true },
+    { n: "Parc des Expositions", c: ["B"], futur: true },
+    { n: "A\xE9roport Charles de Gaulle 2 - TGV", c: ["B"], futur: true },
+    { n: "A\xE9roport Charles de Gaulle 2e gare", futur: true },
+    { n: "Le Mesnil-Amelot", futur: true }
   ],
   "18": [
-    { n: "A\xE9roport d'Orly", c: ["14", "T7"] },
-    { n: "Antonymole \u2013 Wissous Centre" },
-    { n: "Massy Op\xE9ra" },
-    { n: "Massy \u2013 Palaiseau", c: ["B", "C", "T12"] },
-    { n: "Polytechnique" },
-    { n: "Universit\xE9 Paris-Saclay" },
-    { n: "Christ de Saclay" },
-    { n: "Guyancourt" },
-    { n: "Satory" },
-    { n: "Versailles \u2013 Chantiers", c: ["C"] }
+    { n: "A\xE9roport d'Orly", c: ["14", "T7"], futur: true },
+    { n: "Antonypole - Wissous Centre", futur: true },
+    { n: "Massy Op\xE9ra", futur: true },
+    { n: "Massy - Palaiseau", c: ["B", "C", "T12"], futur: true },
+    { n: "Polytechnique", futur: true },
+    { n: "Universit\xE9 Paris-Saclay", futur: true },
+    { n: "Christ de Saclay", futur: true },
+    { n: "Guyancourt", futur: true },
+    { n: "Satory", futur: true },
+    { n: "Versailles - Chantiers", c: ["C"], futur: true }
   ],
   "A": [
-    // Branche Saint-Germain (G) — terminus EN PREMIER, va jusqu'à la fourche ouest
+    // Branche Saint-Germain (G) - terminus EN PREMIER, va jusqu'à la fourche ouest
     { n: "Saint-Germain-en-Laye", c: ["T13"], branch: "G" },
     { n: "Le V\xE9sinet - Le Pecq", branch: "G" },
     { n: "Le V\xE9sinet - Centre", branch: "G" },
@@ -802,12 +803,12 @@ const STATIONS = {
     { n: "Gare de Lyon", c: ["1", "14", "D"] },
     // FOURCHE EST
     { n: "Nation", c: ["1", "2", "6", "9"], fork: true },
-    // Branche Boissy (B) — de la fourche vers le terminus
+    // Branche Boissy (B) - de la fourche vers le terminus
     { n: "Vincennes", branch: "B" },
     { n: "Fontenay-sous-Bois", branch: "B" },
     { n: "Nogent-sur-Marne", branch: "B" },
     { n: "Joinville-le-Pont", branch: "B" },
-    { n: "Saint-Maur - Cr\xE9teil", branch: "B" },
+    { n: "Saint-Maur - Cr\xE9teil", c: ["15"], branch: "B" },
     { n: "Le Parc de Saint-Maur", branch: "B" },
     { n: "Champigny", branch: "B" },
     { n: "La Varenne - Chennevi\xE8res", branch: "B" },
@@ -815,11 +816,11 @@ const STATIONS = {
     { n: "Boissy-Saint-L\xE9ger", branch: "B" },
     // Branche Marne-la-Vallée (M)
     { n: "Vincennes", branch: "M" },
-    { n: "Val de Fontenay", c: ["E"], branch: "M" },
+    { n: "Val de Fontenay", c: ["E", "15"], branch: "M" },
     { n: "Neuilly-Plaisance", branch: "M" },
     { n: "Bry-sur-Marne", branch: "M" },
     { n: "Noisy-le-Grand - Mont d'Est", branch: "M" },
-    { n: "Noisy - Champs", branch: "M" },
+    { n: "Noisy - Champs", c: ["15", "16"], branch: "M" },
     { n: "Noisiel", branch: "M" },
     { n: "Lognes", branch: "M" },
     { n: "Torcy", branch: "M" },
@@ -828,29 +829,29 @@ const STATIONS = {
     { n: "Marne-la-Vall\xE9e Chessy (Disneyland)", branch: "M" }
   ],
   "B": [
-    // Branche CDG (D) — terminus en premier, va jusqu'à la fourche nord
-    { n: "A\xE9roport CDG 2 - TGV", branch: "D" },
+    // Branche CDG (D) - terminus en premier, va jusqu'à la fourche nord
+    { n: "A\xE9roport Charles de Gaulle 2 - TGV", branch: "D" },
     { n: "A\xE9roport CDG 1", branch: "D" },
-    { n: "Le Parc des Expositions", branch: "D" },
+    { n: "Parc des Expositions", branch: "D" },
     { n: "Villepinte", branch: "D" },
-    { n: "Sevran - Beaudottes", branch: "D" },
+    { n: "Sevran - Beaudottes", c: ["16"], branch: "D" },
     { n: "Aulnay-sous-Bois", c: ["T4"], branch: "D" },
     { n: "Le Blanc-Mesnil", branch: "D" },
     { n: "Drancy", branch: "D" },
-    { n: "Le Bourget", c: ["T11"], branch: "D" },
+    { n: "Le Bourget", c: ["T11", "16", "17"], branch: "D" },
     { n: "La Courneuve - Aubervilliers", branch: "D" },
-    { n: "La Plaine - Stade de France", branch: "D" },
+    { n: "La Plaine - Stade de France", c: ["15"], branch: "D" },
     // Branche Mitry (Y)
     { n: "Mitry - Claye", branch: "Y" },
     { n: "Villeparisis - Mitry-le-Neuf", branch: "Y" },
     { n: "Vert Galant", branch: "Y" },
-    { n: "Sevran - Livry", branch: "Y" },
+    { n: "Sevran - Livry", c: ["16"], branch: "Y" },
     { n: "Aulnay-sous-Bois", c: ["T4"], branch: "Y" },
     { n: "Le Blanc-Mesnil", branch: "Y" },
     { n: "Drancy", branch: "Y" },
-    { n: "Le Bourget", c: ["T11"], branch: "Y" },
+    { n: "Le Bourget", c: ["T11", "16", "17"], branch: "Y" },
     { n: "La Courneuve - Aubervilliers", branch: "Y" },
-    { n: "La Plaine - Stade de France", branch: "Y" },
+    { n: "La Plaine - Stade de France", c: ["15"], branch: "Y" },
     // FOURCHE NORD
     { n: "Gare du Nord", c: ["4", "5", "D", "E"], fork: true },
     // Tronc commun Paris
@@ -864,7 +865,7 @@ const STATIONS = {
     // Branche Robinson (R)
     { n: "Gentilly", branch: "R" },
     { n: "Laplace", branch: "R" },
-    { n: "Arcueil - Cachan", branch: "R" },
+    { n: "Arcueil - Cachan", c: ["15"], branch: "R" },
     { n: "Bagneux - Lucie Aubrac", c: ["4"], branch: "R" },
     { n: "Bourg-la-Reine", branch: "R" },
     { n: "Sceaux", branch: "R" },
@@ -873,7 +874,7 @@ const STATIONS = {
     // Branche Saint-Rémy (S)
     { n: "Gentilly", branch: "S" },
     { n: "Laplace", branch: "S" },
-    { n: "Arcueil - Cachan", branch: "S" },
+    { n: "Arcueil - Cachan", c: ["15"], branch: "S" },
     { n: "Bagneux - Lucie Aubrac", c: ["4"], branch: "S" },
     { n: "Bourg-la-Reine", branch: "S" },
     { n: "Parc de Sceaux", branch: "S" },
@@ -882,7 +883,7 @@ const STATIONS = {
     { n: "Fontaine-Michalon", branch: "S" },
     { n: "Les Baconnets", branch: "S" },
     { n: "Massy - Verri\xE8res", branch: "S" },
-    { n: "Massy - Palaiseau", c: ["C", "T12"], branch: "S" },
+    { n: "Massy - Palaiseau", c: ["C", "T12", "18"], branch: "S" },
     { n: "Palaiseau", branch: "S" },
     { n: "Palaiseau - Villebon", branch: "S" },
     { n: "Loz\xE8re", branch: "S" },
@@ -895,7 +896,7 @@ const STATIONS = {
     { n: "Saint-R\xE9my-l\xE8s-Chevreuse", branch: "S" }
   ],
   "C": [
-    // Branche Pontoise (PT) — terminus en premier
+    // Branche Pontoise (PT) - terminus en premier
     { n: "Pontoise", branch: "PT" },
     { n: "Saint-Ouen-l'Aum\xF4ne", branch: "PT" },
     { n: "Saint-Ouen-l'Aum\xF4ne - Liesse", branch: "PT" },
@@ -907,7 +908,7 @@ const STATIONS = {
     { n: "Saint-Gratien", branch: "PT" },
     { n: "\xC9pinay-sur-Seine", c: ["T8", "T11"], branch: "PT" },
     { n: "Gennevilliers", branch: "PT" },
-    { n: "Les Gr\xE9sillons", branch: "PT" },
+    { n: "Les Gr\xE9sillons", c: ["15"], branch: "PT" },
     { n: "Saint-Ouen", c: ["14"], branch: "PT" },
     { n: "Porte de Clichy", c: ["13", "14"], walk: ["T3b"], branch: "PT" },
     { n: "Pereire - Levallois", walk: ["3"], branch: "PT" },
@@ -924,7 +925,7 @@ const STATIONS = {
     { n: "Viroflay - Rive Gauche", c: ["T6"], branch: "VC" },
     { n: "Chaville - V\xE9lizy", branch: "VC" },
     { n: "Meudon - Val Fleury", branch: "VC" },
-    { n: "Issy", branch: "VC" },
+    { n: "Issy", c: ["15"], branch: "VC" },
     { n: "Issy - Val de Seine", c: ["T2"], branch: "VC" },
     { n: "Pont du Garigliano - HEGP", branch: "VC" },
     { n: "Javel", c: ["10"], branch: "VC" },
@@ -933,11 +934,11 @@ const STATIONS = {
     // Branche Saint-Quentin-en-Yvelines (SQ)
     { n: "Saint-Quentin-en-Yvelines", branch: "SQ" },
     { n: "Saint-Cyr", c: ["T13"], branch: "SQ" },
-    { n: "Versailles - Chantiers", branch: "SQ" },
+    { n: "Versailles - Chantiers", c: ["18"], branch: "SQ" },
     { n: "Viroflay - Rive Gauche", c: ["T6"], branch: "SQ" },
     { n: "Chaville - V\xE9lizy", branch: "SQ" },
     { n: "Meudon - Val Fleury", branch: "SQ" },
-    { n: "Issy", branch: "SQ" },
+    { n: "Issy", c: ["15"], branch: "SQ" },
     { n: "Issy - Val de Seine", c: ["T2"], branch: "SQ" },
     { n: "Pont du Garigliano - HEGP", branch: "SQ" },
     { n: "Javel", c: ["10"], branch: "SQ" },
@@ -954,7 +955,7 @@ const STATIONS = {
     // Branche Massy-Palaiseau / Pont de Rungis - Orly (MY)
     { n: "Ivry-sur-Seine", branch: "MY" },
     { n: "Vitry-sur-Seine", branch: "MY" },
-    { n: "Les Ardoines", branch: "MY" },
+    { n: "Les Ardoines", c: ["15"], branch: "MY" },
     { n: "Choisy-le-Roi", branch: "MY" },
     { n: "Les Saules", branch: "MY" },
     { n: "Orly - Ville", c: ["T7"], branch: "MY" },
@@ -962,11 +963,11 @@ const STATIONS = {
     { n: "Rungis - La Fraternelle", c: ["T7"], branch: "MY" },
     { n: "Chemin d'Antony", branch: "MY" },
     { n: "Massy - Verri\xE8res", branch: "MY" },
-    { n: "Massy - Palaiseau", c: ["B", "T12"], branch: "MY" },
+    { n: "Massy - Palaiseau", c: ["B", "T12", "18"], branch: "MY" },
     // Branche Dourdan (DO)
     { n: "Ivry-sur-Seine", branch: "DO" },
     { n: "Vitry-sur-Seine", branch: "DO" },
-    { n: "Les Ardoines", branch: "DO" },
+    { n: "Les Ardoines", c: ["15"], branch: "DO" },
     { n: "Choisy-le-Roi", branch: "DO" },
     { n: "Villeneuve-le-Roi", branch: "DO" },
     { n: "Ablon", branch: "DO" },
@@ -989,7 +990,7 @@ const STATIONS = {
     // Branche Saint-Martin d'Étampes (ET)
     { n: "Ivry-sur-Seine", branch: "ET" },
     { n: "Vitry-sur-Seine", branch: "ET" },
-    { n: "Les Ardoines", branch: "ET" },
+    { n: "Les Ardoines", c: ["15"], branch: "ET" },
     { n: "Choisy-le-Roi", branch: "ET" },
     { n: "Villeneuve-le-Roi", branch: "ET" },
     { n: "Ablon", branch: "ET" },
@@ -1022,7 +1023,7 @@ const STATIONS = {
     { n: "Garges - Sarcelles", c: ["T5"], branch: "CR" },
     { n: "Pierrefitte - Stains", c: ["T11"], branch: "CR" },
     { n: "Saint-Denis", c: ["13", "T1", "T5", "T8"], branch: "CR" },
-    { n: "Stade de France - Saint-Denis", branch: "CR" },
+    { n: "Stade de France - Saint-Denis", walk: ["14", "15", "16", "17"], branch: "CR" },
     // FOURCHE NORD
     { n: "Gare du Nord", c: ["2", "4", "5", "B", "E"], fork: true },
     // Tronc commun Paris
@@ -1031,7 +1032,7 @@ const STATIONS = {
     { n: "Gare de Lyon", c: ["1", "14", "A"], fork: true },
     // Branche Melun directe (ME)
     { n: "Maisons-Alfort - Alfortville", branch: "ME" },
-    { n: "Le Vert de Maisons", branch: "ME" },
+    { n: "Le Vert de Maisons", c: ["15"], branch: "ME" },
     { n: "Cr\xE9teil - Pompadour", branch: "ME" },
     { n: "Villeneuve - Triage", branch: "ME" },
     { n: "Villeneuve - Saint-Georges", branch: "ME" },
@@ -1047,7 +1048,7 @@ const STATIONS = {
     { n: "Melun", branch: "ME" },
     // Branche Malesherbes (MA) - via Corbeil
     { n: "Maisons-Alfort - Alfortville", branch: "MA" },
-    { n: "Le Vert de Maisons", branch: "MA" },
+    { n: "Le Vert de Maisons", c: ["15"], branch: "MA" },
     { n: "Cr\xE9teil - Pompadour", branch: "MA" },
     { n: "Villeneuve - Triage", branch: "MA" },
     { n: "Villeneuve - Saint-Georges", branch: "MA" },
@@ -1069,7 +1070,7 @@ const STATIONS = {
     { n: "Malesherbes", branch: "MA" },
     // Branche Melun via Corbeil (MC)
     { n: "Maisons-Alfort - Alfortville", branch: "MC" },
-    { n: "Le Vert de Maisons", branch: "MC" },
+    { n: "Le Vert de Maisons", c: ["15"], branch: "MC" },
     { n: "Cr\xE9teil - Pompadour", branch: "MC" },
     { n: "Villeneuve - Triage", branch: "MC" },
     { n: "Villeneuve - Saint-Georges", branch: "MC" },
@@ -1091,7 +1092,7 @@ const STATIONS = {
     { n: "Melun", branch: "MC" },
     // Branche Corbeil via Évry-Courcouronnes (CO)
     { n: "Maisons-Alfort - Alfortville", branch: "CO" },
-    { n: "Le Vert de Maisons", branch: "CO" },
+    { n: "Le Vert de Maisons", c: ["15"], branch: "CO" },
     { n: "Cr\xE9teil - Pompadour", branch: "CO" },
     { n: "Villeneuve - Triage", branch: "CO" },
     { n: "Villeneuve - Saint-Georges", branch: "CO" },
@@ -1105,24 +1106,24 @@ const STATIONS = {
     { n: "Corbeil-Essonnes", branch: "CO" }
   ],
   "E": [
-    // Branche Ouest Nanterre - La Folie (NF) — terminus actuel ouest
+    // Branche Ouest Nanterre - La Folie (NF) - terminus actuel ouest
     { n: "Nanterre - La Folie", c: ["A"], branch: "NF" },
     { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "T2"], branch: "NF" },
     { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "NF" },
-    // Branche FUTURE Mantes-la-Jolie (MJ) — mise en service 2027-2029
-    { n: "Mantes-la-Jolie", branch: "MJ", futurBranch: "MJ" },
-    { n: "Mantes Station", branch: "MJ", futurBranch: "MJ" },
-    { n: "\xC9p\xF4ne-M\xE9zi\xE8res", branch: "MJ", futurBranch: "MJ" },
-    { n: "Aubergenville-\xC9lisabethville", branch: "MJ", futurBranch: "MJ" },
-    { n: "Les Mureaux", branch: "MJ", futurBranch: "MJ" },
-    { n: "Les Clairi\xE8res de Verneuil", branch: "MJ", futurBranch: "MJ" },
-    { n: "Vernouillet - Verneuil", branch: "MJ", futurBranch: "MJ" },
-    { n: "Villennes-sur-Seine", branch: "MJ", futurBranch: "MJ" },
-    { n: "Poissy", c: ["A", "T13"], branch: "MJ", futurBranch: "MJ" },
-    { n: "Houilles - Carri\xE8res-sur-Seine", c: ["A"], branch: "MJ", futurBranch: "MJ" },
-    { n: "Nanterre - La Folie", c: ["A"], branch: "MJ", futurBranch: "MJ" },
-    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "T2"], branch: "MJ", futurBranch: "MJ" },
-    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "MJ", futurBranch: "MJ" },
+    // Branche FUTURE Mantes-la-Jolie (MJ) - mise en service 2027-2029
+    { n: "Mantes-la-Jolie", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Mantes Station", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "\xC9p\xF4ne-M\xE9zi\xE8res", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Aubergenville-\xC9lisabethville", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Les Mureaux", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Les Clairi\xE8res de Verneuil", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Vernouillet - Verneuil", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Villennes-sur-Seine", branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Poissy", c: ["A", "T13"], branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Houilles - Carri\xE8res-sur-Seine", c: ["A"], branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Nanterre - La Folie", c: ["A"], branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "La D\xE9fense - Grande Arche", c: ["1", "A", "T2"], branch: "MJ", futurBranch: "MJ", futur: true },
+    { n: "Neuilly - Porte Maillot", c: ["1", "C", "T3b"], branch: "MJ", futurBranch: "MJ", futur: true },
     // FOURCHE OUEST
     { n: "Haussmann - Saint-Lazare", c: ["3", "9", "12", "13", "14"], walk: ["A"], fork: true },
     // FOURCHE EST
@@ -1133,8 +1134,8 @@ const STATIONS = {
     { n: "Noisy-le-Sec", c: ["T1"], branch: "TO" },
     { n: "Rosny - Bois-Perrier", c: ["11"], branch: "TO" },
     { n: "Rosny-sous-Bois", branch: "TO" },
-    { n: "Val de Fontenay", c: ["A"], branch: "TO" },
-    { n: "Nogent - Le Perreux", branch: "TO" },
+    { n: "Val de Fontenay", c: ["A", "15"], branch: "TO" },
+    { n: "Nogent - Le Perreux", c: ["15"], branch: "TO" },
     { n: "Les Boullereaux - Champigny", branch: "TO" },
     { n: "Villiers-sur-Marne - Le Plessis-Tr\xE9vise", branch: "TO" },
     { n: "Les Yvris - Noisy-le-Grand", branch: "TO" },
@@ -1147,11 +1148,11 @@ const STATIONS = {
     { n: "Rosa Parks", c: ["T3b"], branch: "CH" },
     { n: "Pantin", c: ["T1"], walk: ["T3b"], branch: "CH" },
     { n: "Noisy-le-Sec", c: ["T1"], branch: "CH" },
-    { n: "Bondy", c: ["T4"], branch: "CH" },
+    { n: "Bondy", c: ["T4", "15"], branch: "CH" },
     { n: "Le Raincy - Villemomble - Montfermeil", branch: "CH" },
     { n: "Gagny", branch: "CH" },
     { n: "Le Ch\xE9nay - Gagny", branch: "CH" },
-    { n: "Chelles - Gournay", branch: "CH" }
+    { n: "Chelles - Gournay", c: ["16"], branch: "CH" }
   ],
   "T1": [
     { n: "Asni\xE8res - Quatre Routes" },
@@ -1172,7 +1173,7 @@ const STATIONS = {
     { n: "Cimeti\xE8re de Saint-Denis" },
     { n: "H\xF4pital Delafontaine" },
     { n: "Cosmonautes" },
-    { n: "La Courneuve - Six Routes" },
+    { n: "La Courneuve - Six Routes", c: ["16", "17"] },
     { n: "H\xF4tel de Ville de La Courneuve" },
     { n: "Stade G\xE9o Andr\xE9" },
     { n: "Danton" },
@@ -1180,15 +1181,16 @@ const STATIONS = {
     { n: "Maurice Lach\xE2tre" },
     { n: "Drancy - Avenir" },
     { n: "H\xF4pital Avicenne" },
+    { n: "Drancy - Bobigny", c: ["15"], futur: true },
     { n: "Gaston Roulaud" },
     { n: "Escadrille" },
     { n: "Normandie-Ni\xE9men" },
     { n: "La Ferme" },
     { n: "Lib\xE9ration" },
     { n: "H\xF4tel de Ville de Bobigny" },
-    { n: "Bobigny - Pablo Picasso", c: ["5"] },
+    { n: "Bobigny - Pablo Picasso", c: ["5", "15"] },
     { n: "Auguste Delaune" },
-    { n: "Pont de Bondy" },
+    { n: "Pont de Bondy", c: ["15"] },
     { n: "Petit Noisy" },
     { n: "Gare de Noisy-le-Sec", c: ["E"] }
   ],
@@ -1282,7 +1284,7 @@ const STATIONS = {
   ],
   "T4": [
     // Terminus Bondy
-    { n: "Bondy", c: ["E"] },
+    { n: "Bondy", c: ["E", "15"] },
     { n: "La Remise \xE0 Jorelle" },
     { n: "Les Coquetiers" },
     { n: "All\xE9e de la Tour-Rendez-vous" },
@@ -1291,19 +1293,19 @@ const STATIONS = {
     { n: "Gargan", fork: true },
     { n: "Gargan", branch: "A" },
     { n: "Gargan", branch: "M" },
-    // Branche Aulnay (A) — terminus en dernier
+    // Branche Aulnay (A) - terminus en dernier
     { n: "Lyc\xE9e Henri Sellier", branch: "A" },
     { n: "L'Abbaye", branch: "A" },
     { n: "Freinville - Sevran", branch: "A" },
     { n: "Rougemont - Chanteloup", branch: "A" },
     { n: "Aulnay-sous-Bois", c: ["B"], branch: "A" },
-    // Branche Montfermeil (M) — terminus en dernier
+    // Branche Montfermeil (M) - terminus en dernier
     { n: "R\xE9publique - Marx Dormoy", branch: "M" },
     { n: "L\xE9on Blum", branch: "M" },
     { n: "Maurice Audin", branch: "M" },
     { n: "Clichy-sous-Bois - Mairie", branch: "M" },
     { n: "Romain Rolland", branch: "M" },
-    { n: "Clichy - Montfermeil", branch: "M" },
+    { n: "Clichy - Montfermeil", c: ["16"], branch: "M" },
     { n: "Notre-Dame-des-Anges", branch: "M" },
     { n: "Arboretum", branch: "M" },
     { n: "H\xF4pital de Montfermeil", branch: "M" }
@@ -1350,7 +1352,7 @@ const STATIONS = {
     { n: "Ch\xE2tillon - Montrouge", c: ["13", "15"] }
   ],
   "T7": [
-    { n: "Villejuif - Louis Aragon", c: ["7"] },
+    { n: "Villejuif - Louis Aragon", c: ["7", "15"] },
     { n: "Lamartine" },
     { n: "Domaine Ch\xE9rioux" },
     { n: "Moulin Vert" },
@@ -1366,7 +1368,7 @@ const STATIONS = {
     { n: "H\xE9l\xE8ne Boucher" },
     { n: "Caroline Aigle" },
     { n: "C\u0153ur d'Orly" },
-    { n: "A\xE9roport d'Orly", c: ["14"] },
+    { n: "A\xE9roport d'Orly", c: ["14", "18"] },
     { n: "Porte de l'Essonne" }
   ],
   "T8": [
@@ -1375,7 +1377,7 @@ const STATIONS = {
     { n: "Pierre De Geyter" },
     { n: "Saint-Denis - Gare", c: ["D", "T1"] },
     { n: "Paul \xC9luard" },
-    // FOURCHE — station pivot
+    // FOURCHE - station pivot
     { n: "Delaunay-Belleville", fork: true },
     // Branche V : Villetaneuse Universit\xE9
     { n: "Delaunay-Belleville", branch: "V" },
@@ -1402,7 +1404,7 @@ const STATIONS = {
     { n: "Germaine Tailleferre" },
     { n: "Beethoven - Concorde" },
     { n: "Mus\xE9e MAC VAL" },
-    { n: "Mairie de Vitry-sur-Seine" },
+    { n: "Mairie de Vitry-sur-Seine", c: ["15"] },
     { n: "Camille Groult" },
     { n: "Constant Coquelin" },
     { n: "Watteau - Rondenay" },
@@ -1437,10 +1439,11 @@ const STATIONS = {
     { n: "Pierrefitte - Stains", c: ["D"] },
     { n: "Stains - La Cerisaie" },
     { n: "Dugny La Courneuve - Parc Georges Valbon" },
-    { n: "Le Bourget", c: ["B"] }
+    { n: "Le Bourget", c: ["B", "16", "17"] },
+    { n: "Drancy - Bobigny", c: ["15"], futur: true }
   ],
   "T12": [
-    { n: "Massy - Palaiseau", c: ["B", "C"] },
+    { n: "Massy - Palaiseau", c: ["B", "C", "18"] },
     { n: "Massy Europe" },
     { n: "Champlan" },
     { n: "Longjumeau" },
@@ -1533,7 +1536,7 @@ const TRAIN_DATA = {
     ]
   },
   // ══════════════════════════════════════════════════════════
-  // T13 — Citadis Dualis, 2 caisses
+  // T13 - Citadis Dualis, 2 caisses
   "T13::Saint-Germain-en-Laye": {
     voitures: 2,
     direction: "Saint-Cyr",
@@ -1574,7 +1577,7 @@ const TRAIN_DATA = {
     ]
   },
   // ══════════════════════════════════════════════════════════
-  // T14 — tram-train, 2 caisses
+  // T14 - tram-train, 2 caisses
   "T14::Esbly": {
     voitures: 2,
     direction: "Cr\xE9cy-la-Chapelle",
@@ -1602,7 +1605,7 @@ const TRAIN_DATA = {
     ]
   },
   // ══════════════════════════════════════════════════════════
-  // C1 — Câble téléphérique (1 cabine)
+  // C1 - Câble téléphérique (1 cabine)
   "C1::Villeneuve-Saint-Georges - Villa Nova": {
     voitures: 1,
     direction: "Cr\xE9teil - Pointe du Lac",
@@ -2992,11 +2995,44 @@ function TrainDiagram({ trainData, lineColor, userDirection }) {
   }))));
 }
 const SK_FAV = "mpv4_fav", SK_NOTES = "mpv4_notes";
-function buildGraph() {
+// === SYSTÈME FUTUR (actif) ===
+function isStationActive(stationObj, futurActifs) {
+  if (!stationObj || !stationObj.futur) return true;
+  var stations = (futurActifs && futurActifs.stations) || {};
+  return stations[stationObj.n] === true;
+}
+function isLineActive(lineId, futurActifs) {
+  var lineStations = (typeof STATIONS !== "undefined" && STATIONS[lineId]) ||
+                     (typeof CABLE_STATIONS !== "undefined" && CABLE_STATIONS[lineId]) || [];
+  if (lineStations.length === 0) return true;
+  var hasFutur = lineStations.some(function(s) { return s.futur; });
+  if (!hasFutur) return true;
+  var allFutur = lineStations.every(function(s) { return !s.n || s.futur; });
+  if (allFutur) {
+    return lineStations.some(function(s) { return isStationActive(s, futurActifs); });
+  }
+  return true;
+}
+function isCorrespondenceVisible(stationName, corrLineId, futurActifs) {
+  var corrStations = (typeof STATIONS !== "undefined" && STATIONS[corrLineId]) ||
+                     (typeof CABLE_STATIONS !== "undefined" && CABLE_STATIONS[corrLineId]) || [];
+  var matches = corrStations.filter(function(s) { return s.n === stationName; });
+  if (matches.length === 0) return false;
+  return matches.some(function(s) { return isStationActive(s, futurActifs); });
+}
+function buildGraph(futurActifs) {
   // Le graphe utilise des noeuds "station|ligne" pour distinguer
   // la même station physique sur des lignes différentes.
   // Une correspondance = arête entre "station|ligneA" et "station|ligneB" (coût 3).
   // Un trajet = arête entre "stationA|ligne" et "stationB|ligne" (coût 1).
+  //
+  // futurActifs.stations : { "Nom de station": true/false }
+  // Une station avec futur: true n'est incluse que si futurActifs.stations[nom] === true.
+  var stations = (futurActifs && futurActifs.stations) || {};
+  function isStationActive(stationObj) {
+    if (!stationObj.futur) return true;
+    return stations[stationObj.n] === true;
+  }
   var graph = {};
   function ensureNode(key) { if (!graph[key]) graph[key] = []; }
   function addTrajet(s1, s2, lineId) {
@@ -3006,40 +3042,42 @@ function buildGraph() {
     graph[k2].push({ key: k1, station: s1, line: lineId, cost: 1 });
   }
   var allLineStations = Object.assign({}, STATIONS, CABLE_STATIONS);
-  // 1. Arêtes de trajet (stations consécutives sur chaque ligne)
+  // 1. Arêtes de trajet (stations consécutives actives sur chaque ligne)
   Object.keys(allLineStations).forEach(function(lineId) {
-    var stations = allLineStations[lineId].filter(function(s) { return s.n; });
-    for (var i = 0; i < stations.length - 1; i++) {
-      var s1 = stations[i], s2 = stations[i+1];
-      if (s1.branch && s2.branch && s1.branch !== s2.branch) continue;
-      addTrajet(s1.n, s2.n, lineId);
+    var stationsList = allLineStations[lineId].filter(function(s) { return s.n; });
+    // On parcourt en sautant les stations inactives : on relie chaque station active
+    // à la prochaine station active de la même branche
+    for (var i = 0; i < stationsList.length; i++) {
+      var s1 = stationsList[i];
+      if (!isStationActive(s1)) continue;
+      // Chercher la prochaine station active dans la même branche
+      for (var j = i + 1; j < stationsList.length; j++) {
+        var s2 = stationsList[j];
+        // Changement de branche : on s'arrête
+        if (s1.branch && s2.branch && s1.branch !== s2.branch) break;
+        if (!isStationActive(s2)) continue;
+        addTrajet(s1.n, s2.n, lineId);
+        break;
+      }
     }
   });
   // 2. Arêtes de correspondance (même station, lignes différentes)
-  // On collecte d'abord toutes les lignes disponibles pour chaque station
-  var stationLines = {};
   Object.keys(allLineStations).forEach(function(lineId) {
     allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
-      if (!stationLines[s.n]) stationLines[s.n] = new Set();
-      stationLines[s.n].add(lineId);
-    });
-  });
-  // Puis on ajoute les correspondances déclarées (c et walk)
-  Object.keys(allLineStations).forEach(function(lineId) {
-    allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
+      if (!isStationActive(s)) return;
       var corrs = (s.c || []).concat(s.walk || []);
       corrs.forEach(function(corrLine) {
         var corrSts = allLineStations[corrLine] || [];
-        if (corrSts.find(function(cs) { return cs.n === s.n; })) {
-          var k1 = s.n + "|" + lineId, k2 = s.n + "|" + corrLine;
-          ensureNode(k1); ensureNode(k2);
-          // Éviter les doublons
-          if (!graph[k1].find(function(e) { return e.key === k2; })) {
-            graph[k1].push({ key: k2, station: s.n, line: corrLine, cost: 3, transfer: true });
-          }
-          if (!graph[k2].find(function(e) { return e.key === k1; })) {
-            graph[k2].push({ key: k1, station: s.n, line: lineId, cost: 3, transfer: true });
-          }
+        var corrSt = corrSts.find(function(cs) { return cs.n === s.n; });
+        if (!corrSt) return;
+        if (!isStationActive(corrSt)) return;
+        var k1 = s.n + "|" + lineId, k2 = s.n + "|" + corrLine;
+        ensureNode(k1); ensureNode(k2);
+        if (!graph[k1].find(function(e) { return e.key === k2; })) {
+          graph[k1].push({ key: k2, station: s.n, line: corrLine, cost: 3, transfer: true });
+        }
+        if (!graph[k2].find(function(e) { return e.key === k1; })) {
+          graph[k2].push({ key: k1, station: s.n, line: lineId, cost: 3, transfer: true });
         }
       });
     });
@@ -3050,6 +3088,7 @@ function buildGraph() {
 function normStation(s) {
   return (s || "").toLowerCase()
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/-/g, " ")
     .replace(/\s+/g, " ").trim();
 }
 
@@ -3104,8 +3143,8 @@ function dijkstra(graph, start, end) {
   return null;
 }
 
-function findPath(start, end, viaList) {
-  var graph = buildGraph();
+function findPath(start, end, viaList, futurActifs) {
+  var graph = buildGraph(futurActifs);
   var waypoints = [start].concat(viaList.filter(function(v) { return v && v.trim(); })).concat([end]);
   var fullPath = [];
   for (var w = 0; w < waypoints.length - 1; w++) {
@@ -3139,14 +3178,14 @@ function formatPath(path) {
 
 setProgress(96,'Chargement...');
 
-function getUniqueStations() {
+function getUniqueStations(futurActifs) {
   var seen = {};
   var result = [];
   var allStationMaps = [STATIONS, CABLE_STATIONS];
   allStationMaps.forEach(function(stationsMap) {
     Object.keys(stationsMap).forEach(function(lineId) {
       (stationsMap[lineId] || []).forEach(function(st) {
-        if (st.n && !seen[st.n]) {
+        if (st.n && !seen[st.n] && isStationActive(st, futurActifs)) {
           seen[st.n] = true;
           result.push({ name: st.n, corr: st.c || [] });
         }
@@ -3156,7 +3195,7 @@ function getUniqueStations() {
   return result.sort(function(a,b) { return a.name.localeCompare(b.name, 'fr'); });
 }
 
-function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
+function StationAutocomplete({ value, onChange, placeholder, inputStyle, futurActifs }) {
   var queryState = React.useState(value || "");
   var query = queryState[0]; var setQuery = queryState[1];
   var openState = React.useState(false);
@@ -3167,10 +3206,10 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
   var suggestions = React.useMemo(function() {
     if (query.length < 2) return [];
     var q = query.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
-    return getUniqueStations().filter(function(s) {
+    return getUniqueStations(futurActifs).filter(function(s) {
       return s.name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/-/g, ' ').includes(q);
     }).slice(0, 8);
-  }, [query]);
+  }, [query, futurActifs]);
 
   function handleChange(e) {
     setQuery(e.target.value);
@@ -3221,7 +3260,7 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle }) {
   );
 }
 
-function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setItiArrivee, itiEtapes, setItiEtapes, itiResult, setItiResult }) {
+function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setItiArrivee, itiEtapes, setItiEtapes, itiResult, setItiResult, futurActifs }) {
   var loading = React.useState(false);
   var setLoading = loading[1]; loading = loading[0];
   var errorState = React.useState(null);
@@ -3286,7 +3325,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
     if (!itiDepart.trim() || !itiArrivee.trim()) { setError("Renseignez le d\u00E9part et l'arriv\u00E9e."); return; }
     setLoading(true); setError(null);
     setTimeout(function() {
-      var path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes);
+      var path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes, futurActifs);
       if (!path) { setError("Itin\u00E9raire introuvable. V\u00E9rifiez les noms de stations."); setLoading(false); return; }
       setItiResult(formatPath(path));
       setLoading(false);
@@ -3324,7 +3363,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
       !itiResult ? React.createElement("div", { onTouchMove: handleTouchMove, onTouchEnd: handleTouchEnd },
         React.createElement("div", { style: { marginBottom: 10 } },
           React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#2e7d32", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF D\u00E9part"),
-          React.createElement(StationAutocomplete, { value: itiDepart, onChange: function(v) { setItiDepart(v); }, placeholder: "Station de d\u00E9part...", inputStyle: inputStyle })
+          React.createElement(StationAutocomplete, { value: itiDepart, onChange: function(v) { setItiDepart(v); }, placeholder: "Station de d\u00E9part...", inputStyle: inputStyle, futurActifs: futurActifs })
         ),
         itiEtapes.map(function(etape, i) {
           return React.createElement(React.Fragment, { key: i },
@@ -3333,7 +3372,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
             React.createElement("div", { onTouchStart: handleTouchStart(i), style: { fontSize: 22, color: "#999", cursor: "grab", padding: "0 6px", touchAction: "none", userSelect: "none" } }, "\u2630"),
             React.createElement("div", { style: { flex: 1 } },
               React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#1565C0", marginBottom: 5, textTransform: "uppercase" } }, "\u25CF \u00C9tape " + (i+1)),
-              React.createElement(StationAutocomplete, { value: etape, onChange: function(v) { updateEtape(i, v); }, placeholder: "Station...", inputStyle: Object.assign({}, inputStyle, dragIdx === i ? { color: "#fff", background: "#1565C0", border: "2px solid #0d47a1" } : {}) })
+              React.createElement(StationAutocomplete, { value: etape, onChange: function(v) { updateEtape(i, v); }, placeholder: "Station...", inputStyle: Object.assign({}, inputStyle, dragIdx === i ? { color: "#fff", background: "#1565C0", border: "2px solid #0d47a1" } : {}), futurActifs: futurActifs })
             ),
             React.createElement("button", { onClick: function() { removeEtape(i); }, style: { background: "#ffebee", border: "none", borderRadius: 8, padding: "8px 11px", color: "#c00", fontWeight: 700, fontSize: 16, cursor: "pointer", marginTop: 16 } }, "\u00D7")
           ));
@@ -3343,7 +3382,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
         ),
         React.createElement("div", { style: { marginBottom: 12 } },
           React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#c62828", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
-          React.createElement(StationAutocomplete, { value: itiArrivee, onChange: function(v) { setItiArrivee(v); }, placeholder: "Station d'arriv\u00E9e...", inputStyle: inputStyle })
+          React.createElement(StationAutocomplete, { value: itiArrivee, onChange: function(v) { setItiArrivee(v); }, placeholder: "Station d'arriv\u00E9e...", inputStyle: inputStyle, futurActifs: futurActifs })
         ),
         React.createElement("button", { onClick: addEtape, style: { width: "100%", padding: 10, background: "#fff", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 14 } }, "+ Ajouter une \u00E9tape"),
         error && React.createElement("div", { style: { background: "#ffebee", borderRadius: 10, padding: "10px 14px", color: "#c00", fontSize: 13, fontWeight: 600, marginBottom: 12 } }, "\u26A0\uFE0F ", error),
@@ -3352,7 +3391,7 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
       : React.createElement("div", null,
         React.createElement("div", { style: { background: "#fff", borderRadius: 12, padding: "12px 14px", marginBottom: 14, border: "1px solid #e0e0e0" } },
           React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 4 } }, itiDepart, " \u2192 ", itiArrivee),
-          React.createElement("div", { style: { fontSize: 12, color: "#888" } }, itiResult.length <= 1 ? "Direct \u2014 sans correspondance" : (itiResult.length - 1) + " correspondance" + (itiResult.length > 2 ? "s" : ""))
+          React.createElement("div", { style: { fontSize: 12, color: "#888" } }, itiResult.length <= 1 ? "Direct - sans correspondance" : (itiResult.length - 1) + " correspondance" + (itiResult.length > 2 ? "s" : ""))
         ),
         itiResult.map(function(seg, i) {
           var lineObj = getLine(seg.line);
@@ -3605,6 +3644,7 @@ function App() {
   const [itiEtapes, setItiEtapes] = useState([]);
   const [itiResult, setItiResult] = useState(null);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [showLoopInfo, setShowLoopInfo] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
   const [adminSavedCode, setAdminSavedCode] = useState(() => { try { return localStorage.getItem("mpe_admin_code") || ""; } catch(e) { return ""; } });
   const [adminCodeInput, setAdminCodeInput] = useState("");
@@ -3612,7 +3652,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "14"); } catch(e) { return 14; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "88"); } catch(e) { return 88; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -3627,9 +3667,17 @@ function App() {
   });
   const [futurActifs, setFuturActifs] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("mpe_futur_actifs")) || { "15": [], "16": false, "17": false, "18": false, "E-MJ": false };
+      var raw = JSON.parse(localStorage.getItem("mpe_futur_actifs"));
+      // Migration depuis l'ancienne structure (toggles par ligne/tronçon)
+      // vers la nouvelle structure (toggles par station individuelle).
+      if (raw && typeof raw === "object" && !raw.stations) {
+        // Ancienne structure détectée : on repart de zéro avec stations vides.
+        // L'utilisateur réactivera les stations qu'il souhaite voir.
+        return { stations: {} };
+      }
+      return raw || { stations: {} };
     } catch(e) {
-      return { "15": [], "16": false, "17": false, "18": false };
+      return { stations: {} };
     }
   });
   useEffect(() => {
@@ -3668,6 +3716,7 @@ function App() {
         const sts = stationsMap[line2.id] || [];
         sts.forEach((st) => {
           if (!st.n) return;
+          if (!isStationActive(st, futurActifs)) return;
           results.push({
             lineId: line2.id,
             transport: tp,
@@ -3679,7 +3728,7 @@ function App() {
       });
     });
     return results;
-  }, []);
+  }, [futurActifs]);
   const [searchStation, setSearchStation] = useState(null);
   const searchResults = React.useMemo(() => {
     if (searchQuery.length < 2) return [];
@@ -3742,7 +3791,7 @@ function App() {
     var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
     var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
     var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " à " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
-    var entry = label + " — " + msg;
+    var entry = label + " - " + msg;
     setUpdateLog(function(prev) {
       var next = [entry, ...prev].slice(0, 300);
       localStorage.setItem("mpe_log", JSON.stringify(next));
@@ -3772,7 +3821,7 @@ function App() {
       }
       return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
-    if (station) addLog((Array.isArray(group) && group.length === 0) ? "🗑 " + station.n + " — Suppression de toutes les données" : (editIndex !== null && editIndex !== void 0 ? "✏️ " : "➕ ") + station.n + " — " + (group.type === "corr" ? "Correspondance " + (group.corr || []).join("+") : "Sortie " + (group.sorties || []).map(function(s){return s.num;}).join("+")));
+    if (station) addLog((Array.isArray(group) && group.length === 0) ? "🗑 " + station.n + " - Suppression de toutes les données" : (editIndex !== null && editIndex !== void 0 ? "✏️ " : "➕ ") + station.n + " - " + (group.type === "corr" ? "Correspondance " + (group.corr || []).join("+") : "Sortie " + (group.sorties || []).map(function(s){return s.num;}).join("+")));
     setShowEditor(false);
     setShowPhotoAI(false);
   };
@@ -3786,7 +3835,7 @@ function App() {
         delete next[stKey];
         return next;
       }
-      if (station) addLog("❌ " + station.n + " — Suppression panneau " + (groupIndex + 1));
+      if (station) addLog("❌ " + station.n + " - Suppression panneau " + (groupIndex + 1));
       return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
   };
@@ -3794,8 +3843,8 @@ function App() {
   const is15 = lineId === "15";
   const L15_TRONCONS = [
     { id: "E", label: "Est", terminus: ["Saint-Denis - Pleyel", "Champigny Centre"] },
-    { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres", "Noisy \u2013 Champs"] },
-    { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres"] }
+    { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres (Sc\xE8ne Musicale)", "Noisy - Champs"] },
+    { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres (Sc\xE8ne Musicale)"] }
   ];
   const termA = is15 && troncon15
     ? (L15_TRONCONS.find((t) => t.id === troncon15) || {terminus:[]}).terminus[0]
@@ -3938,9 +3987,11 @@ function App() {
   }, [stations, hasFork, branch, is15, troncon15]);
   const filteredFirstName = filteredStations.length > 0 ? filteredStations[0].n : null;
   const filteredLastName = filteredStations.length > 0 ? filteredStations[filteredStations.length - 1].n : null;
-  const displayed = is15
+  const displayedRaw = is15
     ? (direction === termB ? [...filteredStations].reverse() : filteredStations)
     : (direction === filteredLastName ? [...filteredStations].reverse() : filteredStations);
+  // Filtrer les stations futures non actives
+  const displayed = displayedRaw.filter((s) => isStationActive(s, futurActifs));
   const displayedTerminus = direction;
   const isFav = stKey ? favorites.includes(stKey) : false;
   const linesForType = transport === "metro" ? METRO_LINES : transport === "rer" ? RER_LINES : transport === "tram" ? TRAM_LINES : CABLE_LINES;
@@ -4195,10 +4246,7 @@ function App() {
         border: "none",
         cursor: "pointer",
         padding: 4,
-        opacity: l.future ? (() => {
-          if (l.id === "15") return futurActifs["15"].length > 0 ? 1 : 0.45;
-          return futurActifs[l.id] ? 1 : 0.45;
-        })() : 1,
+        opacity: l.future ? (isLineActive(l.id, futurActifs) ? 1 : 0.45) : 1,
         position: "relative"
       }
     },
@@ -4233,11 +4281,11 @@ function App() {
     /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 16 } }, /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 38 }), /* @__PURE__ */ React.createElement("span", { style: { color: "#111", fontWeight: 900, fontSize: 17, letterSpacing: 0.2 } }, "Choisir la direction")),
     (() => {
       var _a2, _b2, _c2, _d2, _e2, _f;
-      // LIGNE 15 — sélection tronçon + terminus sur un seul écran
+      // LIGNE 15 - sélection tronçon + terminus sur un seul écran
       if (lineId === "15" && forkConfig && forkConfig.tronconMode) {
         const troncons = [
-          { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres"] },
-          { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres", "Noisy \u2013 Champs"] },
+          { id: "O", label: "Ouest", terminus: ["Saint-Denis - Pleyel", "Pont de S\xE8vres (Sc\xE8ne Musicale)"] },
+          { id: "S", label: "Sud", terminus: ["Pont de S\xE8vres (Sc\xE8ne Musicale)", "Noisy - Champs"] },
           { id: "E", label: "Est", terminus: ["Saint-Denis - Pleyel", "Champigny Centre"] }
         ];
         const lineColor = "#B90845";
@@ -4247,7 +4295,7 @@ function App() {
         return /* @__PURE__ */ React.createElement(React.Fragment, null,
           /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8, marginBottom: 14 } },
             troncons.map((tr) => {
-              const actif = futurActifs["15"].includes(tr.id);
+              const actif = stations.some((s) => s.branch === tr.id && s.n && isStationActive(s, futurActifs));
               const isSel = tr.id === selectedId;
               return /* @__PURE__ */ React.createElement(
                 "button",
@@ -4728,6 +4776,8 @@ function App() {
       } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#111" } }, st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#111", fontWeight: 700 } }, "Choisissez votre branche ci-dessus")));
     }
     const isTerminus = idx === 0 || idx === displayed.length - 1;
+    const hasVisibleCorr = ((st.c || []).some((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs))) ||
+                           ((st.walk || []).some((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs)));
     return /* @__PURE__ */ React.createElement(
       "button",
       {
@@ -4755,20 +4805,20 @@ function App() {
       /* @__PURE__ */ React.createElement("div", { style: { position: "absolute", left: 27, top: idx === 0 ? "50%" : 0, bottom: idx === displayed.length - 1 ? "50%" : 0, width: 5, background: line.color + "99" } }),
       /* @__PURE__ */ React.createElement("div", { style: {
         position: "absolute",
-        left: (st.c && st.c.length > 0) || isTerminus ? 21 : 22,
+        left: hasVisibleCorr || isTerminus ? 21 : 22,
         top: "50%",
         transform: "translateY(-50%)",
-        width: (st.c && st.c.length > 0) || isTerminus ? 16 : 12,
-        height: (st.c && st.c.length > 0) || isTerminus ? 16 : 12,
+        width: hasVisibleCorr || isTerminus ? 16 : 12,
+        height: hasVisibleCorr || isTerminus ? 16 : 12,
         borderRadius: "50%",
         background: line.color,
-        border: (st.c && st.c.length > 0) || isTerminus ? "3px solid #fff" : "2px solid #fff",
-        boxShadow: (st.c && st.c.length > 0) || isTerminus ? "0 0 0 2px " + line.color : "none",
+        border: hasVisibleCorr || isTerminus ? "3px solid #fff" : "2px solid #fff",
+        boxShadow: hasVisibleCorr || isTerminus ? "0 0 0 2px " + line.color : "none",
         zIndex: 1
       } }),
       /* @__PURE__ */ React.createElement("div", { style: { marginLeft: 28, flex: 1, paddingTop: 5, paddingBottom: 5, minWidth: 0 } }, (() => {
-        const cList = (st.c || []).filter((c) => c !== lineId);
-        const wList = (st.walk || []).filter((c) => c !== lineId);
+        const cList = (st.c || []).filter((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs));
+        const wList = (st.walk || []).filter((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs));
         const hasBadges = cList.length > 0 || wList.length > 0;
         const parenIdx = st.n.indexOf(" (");
         const mainName = parenIdx > 0 ? st.n.substring(0, parenIdx) : st.n;
@@ -4781,21 +4831,59 @@ function App() {
           lineHeight: 1.2,
           fontStyle: "italic"
         } }, subName) : null;
+        const directionEl = st.direction ? /* @__PURE__ */ React.createElement("div", { style: {
+          fontSize: 11,
+          fontWeight: 500,
+          color: "#000",
+          marginTop: 3,
+          lineHeight: 1.2,
+          display: "inline-block",
+          border: "1px solid #000",
+          borderRadius: 3,
+          padding: "2px 6px"
+        } }, st.direction) : null;
+        const loopInfoEl = st.loopInfo ? /* @__PURE__ */ React.createElement("button", {
+          onClick: (e) => { e.stopPropagation(); setShowLoopInfo(true); },
+          style: {
+            background: "#fff",
+            border: "1.5px solid #000",
+            borderRadius: "50%",
+            width: 22,
+            height: 22,
+            marginLeft: 6,
+            fontSize: 13,
+            fontWeight: 900,
+            color: "#000",
+            cursor: "pointer",
+            padding: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            fontFamily: "serif",
+            lineHeight: 1
+          },
+          "aria-label": "Information sur la boucle d'Auteuil"
+        }, "i") : null;
         if (!hasBadges) {
           return /* @__PURE__ */ React.createElement("div", null,
-            /* @__PURE__ */ React.createElement("span", { style: {
-              fontWeight: 900,
-              fontSize: 16,
-              color: isTerminus ? line.text || "#fff" : "#111",
-              background: isTerminus ? line.color : "transparent",
-              padding: isTerminus ? "2px 8px" : "0",
-              borderRadius: isTerminus ? 6 : 0,
-              textShadow: isTerminus ? line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.95), 2px -2px 0 rgba(255,255,255,0.95), -2px 2px 0 rgba(255,255,255,0.95), 2px 2px 0 rgba(255,255,255,0.95)" : "-2px -2px 0 rgba(0,0,0,0.95), 2px -2px 0 rgba(0,0,0,0.95), -2px 2px 0 rgba(0,0,0,0.95), 2px 2px 0 rgba(0,0,0,0.95)" : "none",
-              whiteSpace: "normal",
-              lineHeight: 1.25,
-              display: "inline"
-            } }, mainName),
-            subNameEl
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", flexWrap: "nowrap" } },
+              /* @__PURE__ */ React.createElement("span", { style: {
+                fontWeight: 900,
+                fontSize: 16,
+                color: isTerminus ? line.text || "#fff" : "#111",
+                background: isTerminus ? line.color : "transparent",
+                padding: isTerminus ? "2px 8px" : "0",
+                borderRadius: isTerminus ? 6 : 0,
+                textShadow: isTerminus ? line.text === "#000" ? "-2px -2px 0 rgba(255,255,255,0.95), 2px -2px 0 rgba(255,255,255,0.95), -2px 2px 0 rgba(255,255,255,0.95), 2px 2px 0 rgba(255,255,255,0.95)" : "-2px -2px 0 rgba(0,0,0,0.95), 2px -2px 0 rgba(0,0,0,0.95), -2px 2px 0 rgba(0,0,0,0.95), 2px 2px 0 rgba(0,0,0,0.95)" : "none",
+                whiteSpace: "normal",
+                lineHeight: 1.25,
+                display: "inline"
+              } }, mainName),
+              loopInfoEl
+            ),
+            subNameEl,
+            directionEl
           );
         }
         const nameW = mainName.length * 9;
@@ -4833,14 +4921,20 @@ function App() {
               /* @__PURE__ */ React.createElement("span", { style: nameStyle }, mainName),
               ...cList.map((c, i) => renderBadge(c, "c" + i, 21)),
               walkIcon,
-              ...wList.map((c, i) => renderBadge(c, "w" + i, 21))
+              ...wList.map((c, i) => renderBadge(c, "w" + i, 21)),
+              loopInfoEl
             ),
-            subNameEl
+            subNameEl,
+            directionEl
           );
         } else {
           return /* @__PURE__ */ React.createElement("div", null,
-            /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25, display: "inline-block" }) }, mainName),
+            /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", flexWrap: "nowrap" } },
+              /* @__PURE__ */ React.createElement("div", { style: __spreadProps(__spreadValues({}, nameStyle), { whiteSpace: "normal", lineHeight: 1.25, display: "inline-block" }) }, mainName),
+              loopInfoEl
+            ),
             subNameEl,
+            directionEl,
             /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "nowrap", gap: 4, marginTop: 2, alignItems: "center" } },
               ...cList.map((c, i) => renderBadge(c, "c" + i, 22)),
               walkIcon,
@@ -4870,7 +4964,52 @@ function App() {
       }
     },
     "\u270F\uFE0F"
-  ))), showStationEditor && line && /* @__PURE__ */ React.createElement("div", { style: {
+  ))), showLoopInfo && /* @__PURE__ */ React.createElement("div", { style: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.75)",
+    zIndex: 350,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20
+  }, onClick: () => setShowLoopInfo(false) }, /* @__PURE__ */ React.createElement("div", {
+    onClick: (e) => e.stopPropagation(),
+    style: {
+      background: "#fff",
+      borderRadius: 12,
+      padding: "20px 22px",
+      maxWidth: 420,
+      width: "100%",
+      maxHeight: "85vh",
+      overflowY: "auto",
+      border: "2px solid #000",
+      boxShadow: "0 4px 24px rgba(0,0,0,0.3)"
+    }
+  },
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
+      /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 18, color: "#000" } }, "Boucle d'Auteuil"),
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: () => setShowLoopInfo(false),
+        style: { background: "none", border: "none", fontSize: 24, cursor: "pointer", padding: 0, color: "#000", lineHeight: 1 },
+        "aria-label": "Fermer"
+      }, "\u00D7")
+    ),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, lineHeight: 1.5, color: "#222", margin: "0 0 10px 0" } },
+      "Entre Boulogne - Jean Jaur\xE8s et Javel - Andr\xE9 Citro\xEBn, la ligne 10 forme une boucle \xE0 sens unique."
+    ),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, lineHeight: 1.5, color: "#222", margin: "0 0 8px 0" } },
+      /* @__PURE__ */ React.createElement("strong", null, "Vers Boulogne"),
+      " : passage par \xC9glise d'Auteuil, Michel-Ange - Auteuil, Porte d'Auteuil."
+    ),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 14, lineHeight: 1.5, color: "#222", margin: "0 0 12px 0" } },
+      /* @__PURE__ */ React.createElement("strong", null, "Vers Austerlitz"),
+      " : passage par Michel-Ange - Molitor, Chardon-Lagache, Mirabeau."
+    ),
+    /* @__PURE__ */ React.createElement("p", { style: { fontSize: 13, lineHeight: 1.5, color: "#444", margin: 0, fontStyle: "italic" } },
+      "Les stations de la boucle ne fonctionnent que dans un seul sens. V\xE9rifiez votre direction avant de descendre."
+    )
+  )), showStationEditor && line && /* @__PURE__ */ React.createElement("div", { style: {
     position: "fixed",
     inset: 0,
     background: "rgba(0,0,0,0.75)",
@@ -4942,7 +5081,7 @@ function App() {
         background: "#fff"
       }
     },
-    /* @__PURE__ */ React.createElement("option", { value: "" }, "\u2014 En d\xE9but de liste \u2014"),
+    /* @__PURE__ */ React.createElement("option", { value: "" }, "- En d\xE9but de liste -"),
     displayed.filter((s) => !s.fork).map((s, i) => /* @__PURE__ */ React.createElement("option", { key: i, value: s.n }, s.n))
   ), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     const corrArr = newStationCorr.split(",").map((x) => x.trim()).filter(Boolean);
@@ -5060,7 +5199,7 @@ function App() {
       }
     },
     isFav ? "\u2B50" : "\u2606"
-  ))), (station.c && station.c.length > 0 || station.walk && station.walk.length > 0) && /* @__PURE__ */ React.createElement("div", { style: {
+  ))), ((station.c || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs)) || (station.walk || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs))) && /* @__PURE__ */ React.createElement("div", { style: {
     background: "#fff",
     margin: "6px 12px 0",
     borderRadius: 12,
@@ -5074,8 +5213,8 @@ function App() {
     marginBottom: 6,
     letterSpacing: 1
   } }, "\u{1F500} Correspondances"), (() => {
-    const allC = station.c || [];
-    const allW = station.walk || [];
+    const allC = (station.c || []).filter((c) => isCorrespondenceVisible(station.n, c, futurActifs));
+    const allW = (station.walk || []).filter((c) => isCorrespondenceVisible(station.n, c, futurActifs));
     const allIds = [...allC, ...allW];
     let sz = 34;
     for (let s = 34; s >= 16; s--) {
@@ -5249,7 +5388,7 @@ function App() {
           var existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
           return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { voitures: newN }) });
         });
-        if (station) addLog("🚆 " + station.n + " — Voitures : " + newN);
+        if (station) addLog("🚆 " + station.n + " - Voitures : " + newN);
       },
       onClose: () => setShowEditor(false)
     }
@@ -5378,7 +5517,8 @@ function App() {
     itiDepart: itiDepart, setItiDepart: setItiDepart,
     itiArrivee: itiArrivee, setItiArrivee: setItiArrivee,
     itiEtapes: itiEtapes, setItiEtapes: setItiEtapes,
-    itiResult: itiResult, setItiResult: setItiResult
+    itiResult: itiResult, setItiResult: setItiResult,
+    futurActifs: futurActifs
   }),
   showAdmin && /* @__PURE__ */ React.createElement("div", { style: {
     position: "fixed",
@@ -5410,8 +5550,8 @@ function App() {
     var d = new Date();
     var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
     var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
-    return "\u2699\uFE0F Administration v" + appVersion + " \u2014 " + jours[d.getDay()] + " " + d.getDate() + " " + mois[d.getMonth()] + " " + d.getFullYear() + " " + String(d.getHours()).padStart(2,"0") + "h" + String(d.getMinutes()).padStart(2,"0");
-  })()), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
+    return "\u2699\uFE0F Administration v" + appVersion + " - " + jours[d.getDay()] + " " + d.getDate() + " " + mois[d.getMonth()] + " " + d.getFullYear() + " " + String(d.getHours()).padStart(2,"0") + "h" + String(d.getMinutes()).padStart(2,"0");
+  })()), /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 11 } }, !adminUnlocked ? "Acc\xE8s s\xE9curis\xE9" : adminScreen === "menu" ? "Tableau de bord" : adminScreen === "selectLine" ? "Choisir une ligne" : adminScreen === "editLine" ? `Ligne ${adminLineId}` : adminScreen === "editStation" ? `${adminStation == null ? void 0 : adminStation.n}` : adminScreen === "stationsFutures" ? "Stations futures" : "")), /* @__PURE__ */ React.createElement("button", { onClick: () => {
     setShowAdmin(false);
     setAdminUnlocked(false);
     setAdminPassword("");
@@ -5484,6 +5624,12 @@ function App() {
       label: "Modifier une station",
       sub: "Nom, correspondances directes et \xE0 pied",
       action: () => setAdminScreen("selectLine")
+    },
+    {
+      icon: "\u{1F6A7}",
+      label: "Stations futures",
+      sub: "Activer les stations \xE0 mesure de leur mise en service",
+      action: () => setAdminScreen("stationsFutures")
     },
     {
       icon: "🔍",
@@ -5625,7 +5771,7 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
         // Mettre à jour la version et logger SEULEMENT si tout a réussi
         setAppVersion(newVersion);
         localStorage.setItem("mpe_version", String(newVersion));
-        addLog("\u2705 SAUVEGARDE v" + newVersion + " \u2014 " + label);
+        addLog("\u2705 SAUVEGARDE v" + newVersion + " - " + label);
 
         // Toast de confirmation
         var toast = document.createElement('div');
@@ -5700,7 +5846,7 @@ adminUnlocked && adminScreen === "restaurer" && /* @__PURE__ */ React.createElem
             if (data.favorites) setFavorites(data.favorites);
             if (data.futurActifs) setFuturActifs(data.futurActifs);
             if (data.version) { setAppVersion(data.version); localStorage.setItem("mpe_version", String(data.version)); }
-            addLog("\u2705 RESTAURATION v" + (data.version || "?") + " \u2014 depuis fichier");
+            addLog("\u2705 RESTAURATION v" + (data.version || "?") + " - depuis fichier");
             alert("\u2705 Donn\u00E9es restaur\u00E9es avec succ\u00E8s !");
             setAdminScreen("menu");
           } catch(err) {
@@ -5754,11 +5900,117 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
           borderRadius: 12, padding: "14px 18px", marginBottom: 10, cursor: "pointer"
         }},
           React.createElement("span", { style: { color: zoomLevel === z ? "#fff" : "#111", fontWeight: 700, fontSize: 15 } },
-            z === 1.0 ? "100% — Normal" : Math.round(z*100) + "% — Agrandi"),
+            z === 1.0 ? "100% - Normal" : Math.round(z*100) + "% - Agrandi"),
           zoomLevel === z && React.createElement("span", { style: { color: "#FFD700", fontSize: 20 } }, "✓")
         )
       )
     ),
+    adminUnlocked && adminScreen === "stationsFutures" && (() => {
+      const allFuturStations = {};
+      const allData = Object.assign({}, STATIONS, CABLE_STATIONS);
+      Object.keys(allData).forEach((lineId) => {
+        (allData[lineId] || []).forEach((s) => {
+          if (s && s.futur && s.n) {
+            if (!allFuturStations[s.n]) allFuturStations[s.n] = new Set();
+            allFuturStations[s.n].add(lineId);
+          }
+        });
+      });
+      const sortedNames = Object.keys(allFuturStations).sort(function(a, b) {
+        return normStation(a).localeCompare(normStation(b));
+      });
+      const stationsActives = (futurActifs && futurActifs.stations) || {};
+      const nbActives = sortedNames.filter(function(n) { return stationsActives[n] === true; }).length;
+      return React.createElement("div", { style: { maxWidth: 420, margin: "0 auto" } },
+        React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, gap: 12 } },
+          React.createElement("div", { style: { fontWeight: 800, fontSize: 17, color: "#111" } }, "\u{1F6A7} Stations futures"),
+          React.createElement("div", { style: { fontWeight: 900, fontSize: 18, color: "#111", whiteSpace: "nowrap", flexShrink: 0 } }, nbActives + " / " + sortedNames.length)
+        ),
+        React.createElement("div", { style: { color: "#555", fontSize: 13, marginBottom: 14, lineHeight: 1.4 } }, "Activez les stations \xE0 mesure de leur mise en service. Une station activ\xE9e appara\xEEt automatiquement sur toutes les lignes o\xF9 elle figure."),
+        React.createElement("div", { style: { background: "#fff", border: "1.5px solid #ddd", borderRadius: 10, overflow: "hidden" } },
+          sortedNames.map(function(name, idx) {
+            const linesList = Array.from(allFuturStations[name]).sort();
+            const actif = stationsActives[name] === true;
+            return React.createElement("div", {
+              key: name,
+              style: {
+                display: "flex", alignItems: "center", padding: "10px 12px",
+                borderBottom: idx === sortedNames.length - 1 ? "none" : "1px solid #f0f0f0",
+                background: actif ? "#f5fff5" : "#fff"
+              }
+            },
+              React.createElement("div", { style: { flex: 1, minWidth: 0, marginRight: 10 } },
+                React.createElement("div", { style: { fontWeight: 700, fontSize: 14, color: "#111", marginBottom: 4, lineHeight: 1.3 } }, name),
+                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 4, alignItems: "center" } },
+                  linesList.map(function(lid, j) {
+                    const isT = !!TRAM_LINES.find(function(l) { return l.id === lid; });
+                    const isR = !!RER_LINES.find(function(l) { return l.id === lid; });
+                    return React.createElement("span", {
+                      key: j,
+                      style: {
+                        display: "inline-flex", flexShrink: 0,
+                        borderRadius: isT ? "4px" : isR ? "4px" : "50%",
+                        outline: "1.5px solid rgba(0,0,0,0.6)", outlineOffset: "1px"
+                      }
+                    }, React.createElement(Badge, { id: lid, size: 22 }));
+                  })
+                )
+              ),
+              React.createElement("button", {
+                onClick: function() {
+                  setFuturActifs(function(prev) {
+                    const prevStations = (prev && prev.stations) || {};
+                    return Object.assign({}, prev, {
+                      stations: Object.assign({}, prevStations, {
+                        [name]: !prevStations[name]
+                      })
+                    });
+                  });
+                },
+                "aria-label": (actif ? "D\xE9sactiver" : "Activer") + " " + name,
+                style: {
+                  width: 52, height: 28, borderRadius: 14, border: "2px solid #111", cursor: "pointer",
+                  background: actif ? "#4caf50" : "#ddd", position: "relative", flexShrink: 0, padding: 0
+                }
+              },
+                React.createElement("div", { style: {
+                  width: 20, height: 20, borderRadius: "50%", background: "#fff", border: "1.5px solid #111",
+                  position: "absolute", top: 2, left: actif ? 26 : 4, transition: "left 0.15s"
+                } })
+              )
+            );
+          })
+        ),
+        React.createElement("div", { style: { marginTop: 16, display: "flex", gap: 8 } },
+          React.createElement("button", {
+            onClick: function() {
+              setFuturActifs(function(prev) {
+                const newStations = {};
+                sortedNames.forEach(function(n) { newStations[n] = false; });
+                return Object.assign({}, prev, { stations: newStations });
+              });
+            },
+            style: {
+              flex: 1, padding: "10px", borderRadius: 10, border: "1.5px solid #ccc",
+              background: "#fff", color: "#555", fontWeight: 700, fontSize: 13, cursor: "pointer"
+            }
+          }, "Tout d\xE9sactiver"),
+          React.createElement("button", {
+            onClick: function() {
+              setFuturActifs(function(prev) {
+                const newStations = {};
+                sortedNames.forEach(function(n) { newStations[n] = true; });
+                return Object.assign({}, prev, { stations: newStations });
+              });
+            },
+            style: {
+              flex: 1, padding: "10px", borderRadius: 10, border: "1.5px solid #4caf50",
+              background: "#f5fff5", color: "#2e7d32", fontWeight: 700, fontSize: 13, cursor: "pointer"
+            }
+          }, "Tout activer")
+        )
+      );
+    })(),
     adminUnlocked && adminScreen === "selectLine" && /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 380, margin: "0 auto" } }, [
     { cat: "M\xC9TRO", lines: METRO_LINES },
     { cat: "RER", lines: RER_LINES },
@@ -5792,55 +6044,11 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
   )))))), adminUnlocked && adminScreen === "editLine" && adminLineId && (() => {
     const sts = STATIONS[adminLineId] || CABLE_STATIONS[adminLineId] || [];
     const lineEdits = adminEdits[adminLineId] || {};
-    const isFutur = ["15","16","17","18"].includes(adminLineId);
-    const lineColors = { "15": "#B90845", "16": "#F3A002", "17": "#D5C900", "18": "#00A88F" };
     return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 400, margin: "0 auto" } },
-      // Bandeau activation pour lignes futures
-      isFutur && /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "2px solid #111", borderRadius: 12, padding: "12px 14px", marginBottom: 14 } },
-        adminLineId === "15"
-          ? /* @__PURE__ */ React.createElement(React.Fragment, null,
-              /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 700, fontSize: 13, color: "#555", marginBottom: 10 } }, "Tron\xE7ons actifs"),
-              /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } },
-                [{ id: "O", label: "Ouest" }, { id: "S", label: "Sud" }, { id: "E", label: "Est" }].map((t) => {
-                  const actif = futurActifs["15"].includes(t.id);
-                  return /* @__PURE__ */ React.createElement("button", {
-                    key: t.id,
-                    onClick: () => setFuturActifs((prev) => {
-                      const arr = prev["15"] || [];
-                      return { ...prev, "15": actif ? arr.filter((x) => x !== t.id) : [...arr, t.id] };
-                    }),
-                    style: {
-                      flex: 1, padding: "10px 4px", borderRadius: 10, fontWeight: 900, fontSize: 15,
-                      border: "2.5px solid #111", cursor: "pointer",
-                      background: actif ? "#B90845" : "#f0f0f0",
-                      color: actif ? "#fff" : "#aaa"
-                    }
-                  }, t.label);
-                })
-              )
-            )
-          : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-between" } },
-              /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 700, fontSize: 14, color: "#111" } }, futurActifs[adminLineId] ? "Ligne active" : "Ligne inactive"),
-              /* @__PURE__ */ React.createElement("button", {
-                onClick: () => setFuturActifs((prev) => ({ ...prev, [adminLineId]: !prev[adminLineId] })),
-                style: {
-                  width: 52, height: 28, borderRadius: 14, border: "2px solid #111", cursor: "pointer",
-                  background: futurActifs[adminLineId] ? lineColors[adminLineId] : "#ddd",
-                  position: "relative"
-                }
-              },
-                /* @__PURE__ */ React.createElement("div", { style: {
-                  width: 20, height: 20, borderRadius: "50%", background: "#fff", border: "1.5px solid #111",
-                  position: "absolute", top: 2, left: futurActifs[adminLineId] ? 26 : 4
-                } })
-              )
-            )
-      ),
       /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 12, marginBottom: 12 } }, "Touchez une station pour la modifier :"),
       /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #ddd", borderRadius: 10, overflow: "hidden" } }, sts.filter((s) => !s.fork).map((st, i) => {
       const edited = lineEdits[st.n];
-      // Pour ligne 15 : griser les stations du tronçon inactif
-      const tronconInactif = adminLineId === "15" && st.branch && !futurActifs["15"].includes(st.branch);
+      const tronconInactif = false;
       return /* @__PURE__ */ React.createElement(
         "button",
         {
@@ -6094,7 +6302,7 @@ try {
   setProgress(95,'Lancement');
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(React.createElement(App));
-  // Indicateur de scroll global — monté séparément
+  // Indicateur de scroll global - monté séparément
   const scrollContainer = document.createElement('div');
   scrollContainer.id = 'mpe-scroll-indicator';
   document.body.appendChild(scrollContainer);
