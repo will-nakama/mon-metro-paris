@@ -2348,8 +2348,9 @@ function Panel({ group, lineColor, zoomed, onToggle }) {
     whiteSpace: "nowrap"
   } }, s.label))))), /* @__PURE__ */ React.createElement("div", { style: { textAlign: "right", marginTop: 2, opacity: 0.25, lineHeight: 1 } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 7, color: isCorr ? "#F57C00" : "#fff" } }, zoomed ? "\u25BC" : "\u25B6")));
 }
-function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onChangeVoitures, onClose }) {
+function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onChangeVoitures, onClose, directionInfo, onToggleDirection }) {
   const [type, setType] = useState("sortie");
+  const [showDirMenu, setShowDirMenu] = useState(false);
   const [position, setPosition] = useState("tete");
   const [voitureNum, setVoitureNum] = useState("1");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -2358,6 +2359,26 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
   const [pictos, setPictos] = useState([]);
   const [sorties, setSorties] = useState([{ num: "1", label: "" }]);
   const [editIndex, setEditIndex] = useState(null);
+  const [savedToast, setSavedToast] = useState(false);
+  // Import automatique des données builtin au chargement du panneau,
+  // si la station a des données builtin et qu'il n'y a encore aucune donnée custom.
+  // Évite à l'utilisateur d'avoir à cliquer sur "Importer pour modifier".
+  React.useEffect(function() {
+    if (!hasCustomData && builtinGroups && builtinGroups.length > 0 && onImportBuiltin) {
+      onImportBuiltin();
+    }
+  }, [stKey]); // Se redéclenche à chaque changement de station/quai
+  // Vide le formulaire de saisie (sortie / correspondance) pour préparer un nouveau panneau
+  const resetForm = function() {
+    setType("sortie");
+    setPosition("tete");
+    setVoitureNum("1");
+    setBordered(false);
+    setCorr("");
+    setPictos([]);
+    setSorties([{ num: "1", label: "" }]);
+    setEditIndex(null);
+  };
   const getVoitures = () => {
     if (position === "voiture") return [parseInt(voitureNum)];
     if (position === "voiture") return [parseInt(voitureNum)];
@@ -2388,12 +2409,11 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     const sortiesClean = sorties.filter((s) => s.label.trim() || s.num.trim());
     const group = { voitures: getVoitures(), type, sorties: sortiesClean, pictos, corr: corrArr, bordered: bordered };
     onSave(group, editIndex);
-    setEditIndex(null);
-    setType("sortie");
-    setPosition("tete");
-    setCorr("");
-    setPictos([]);
-    setSorties([{ num: "1", label: "" }]);
+    // Vider le formulaire pour préparer la prochaine saisie
+    resetForm();
+    // Afficher la notification verte "Enregistré" pendant 2 secondes
+    setSavedToast(true);
+    setTimeout(function() { setSavedToast(false); }, 2000);
   };
   const inputStyle = {
     width: "100%",
@@ -2424,7 +2444,24 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     zIndex: 300,
     display: "flex",
     alignItems: "flex-end"
-  }, onClick: onClose }, /* @__PURE__ */ React.createElement("div", { style: {
+  }, onClick: onClose }, savedToast && /* @__PURE__ */ React.createElement("div", {
+    style: {
+      position: "fixed",
+      bottom: 90,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#1b5e20",
+      color: "#fff",
+      padding: "12px 22px",
+      borderRadius: 28,
+      fontWeight: 800,
+      fontSize: 15,
+      boxShadow: "0 4px 16px rgba(0,0,0,0.35)",
+      zIndex: 99999,
+      letterSpacing: 0.3,
+      pointerEvents: "none"
+    }
+  }, "\u2705 Enregistr\xE9"), /* @__PURE__ */ React.createElement("div", { style: {
     background: "#fff",
     borderRadius: "20px 20px 0 0",
     width: "100%",
@@ -2433,7 +2470,88 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     maxHeight: "90vh",
     overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch",
     padding: "20px 16px 40px"
-  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })), // Liste fusionnée : builtin + saisis, tous éditables/supprimables
+  }, onClick: (e) => e.stopPropagation() }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", marginBottom: 14 } }, React.createElement("button", { onClick: (e) => { const overlay = e.currentTarget.closest('div').parentElement.parentElement; if(overlay) overlay.click(); }, style: { background: "none", border: "none", fontSize: 30, cursor: "pointer", color: "#333", lineHeight: 1, padding: "0 10px 0 0", fontWeight: 900, flexShrink: 0 } }, "\u2039"), React.createElement("div", { style: { flex: 1, height: 4, background: "#ddd", borderRadius: 4, margin: "0 auto" } })),
+// Bouton bascule de direction (uniquement pour les lignes avec directions canoniques)
+directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 14, position: "relative" } },
+  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 } }, "Quai en cours d'\xE9dition"),
+  /* @__PURE__ */ React.createElement("button", {
+    onClick: function() {
+      if (directionInfo.all.length === 2) {
+        // 2 quais : bascule directe
+        onToggleDirection(directionInfo.next);
+      } else {
+        // 3+ quais : ouvre/ferme le menu déroulant
+        setShowDirMenu(function(v) { return !v; });
+      }
+    },
+    "aria-label": "Quai actuel : " + directionInfo.current + ". " + (directionInfo.all.length === 2 ? "Cliquer pour basculer vers " + directionInfo.next : "Cliquer pour afficher tous les quais"),
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      width: "100%",
+      padding: "10px 14px",
+      background: lineColor,
+      border: "2.5px solid #000",
+      borderRadius: 12,
+      color: lineText || "#fff",
+      fontWeight: 900,
+      fontSize: 16,
+      cursor: "pointer",
+      textAlign: "center",
+      lineHeight: 1.3,
+      textShadow: lineText === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)"
+    }
+  },
+    /* @__PURE__ */ React.createElement("span", null, "\u2192 " + directionInfo.current),
+    directionInfo.all.length > 2 && /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 900 } }, showDirMenu ? "\u25B2" : "\u25BC")
+  ),
+  // Liste déroulante (uniquement pour 3+ quais et si ouverte)
+  directionInfo.all.length > 2 && showDirMenu && /* @__PURE__ */ React.createElement("div", { style: {
+    marginTop: 6,
+    background: "#fff",
+    border: "2px solid #000",
+    borderRadius: 10,
+    overflow: "hidden",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.2)"
+  } },
+    directionInfo.all.map(function(dir, dIdx) {
+      var isCurrent = dir === directionInfo.current;
+      return /* @__PURE__ */ React.createElement("button", {
+        key: dIdx,
+        onClick: function() {
+          setShowDirMenu(false);
+          if (!isCurrent) onToggleDirection(dir);
+        },
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          width: "100%",
+          padding: "11px 14px",
+          background: isCurrent ? lineColor : "#fff",
+          border: "none",
+          borderBottom: dIdx === directionInfo.all.length - 1 ? "none" : "1px solid #eee",
+          color: isCurrent ? (lineText || "#fff") : "#111",
+          fontWeight: isCurrent ? 900 : 700,
+          fontSize: 15,
+          cursor: "pointer",
+          textAlign: "left",
+          textShadow: isCurrent ? (lineText === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)") : "none"
+        }
+      },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, opacity: isCurrent ? 1 : 0 } }, "\u2713"),
+        /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, "\u2192 " + dir)
+      );
+    })
+  ),
+  // Texte d'aide (uniquement pour 2 quais)
+  directionInfo.all.length === 2 && /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#666", marginTop: 5, textAlign: "center", fontStyle: "italic" } },
+    "Toucher pour basculer vers l'autre quai"
+  )
+),
+ // Liste fusionnée : builtin + saisis, tous éditables/supprimables
 // Si pas encore importés, les builtin sont affichés en grisé avec un bouton "📥 Importer pour modifier"
 (() => {
   const allGroups = [];
@@ -2500,26 +2618,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     }),
     /* @__PURE__ */ React.createElement("div", { style: { height: 1, background: "#eee", margin: "14px 0" } })
   );
-})(), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18, padding: "12px 14px", background: "#f0f7ff", border: "2px solid #1565C0", borderRadius: 12 } },
-  /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: "#1565C0", marginBottom: 10, textTransform: "uppercase", letterSpacing: 1 } }, "🚆 Nombre de voitures de la station"),
-  /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-    Array.from({ length: 10 }, (_, i) => i + 1).map(function(n) {
-      const isSel = (nVoitures || 5) === n;
-      return /* @__PURE__ */ React.createElement("button", {
-        key: n,
-        onClick: function() { if (onChangeVoitures) onChangeVoitures(n); },
-        style: {
-          width: 38, height: 38,
-          border: "2px solid " + (isSel ? "#1565C0" : "#ccc"),
-          borderRadius: 8,
-          background: isSel ? "#1565C0" : "#fff",
-          color: isSel ? "#fff" : "#555",
-          fontWeight: 900, fontSize: 14, cursor: "pointer"
-        }
-      }, n);
-    })
-  )
-), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 14 } }, editIndex !== null ? "\u270F\uFE0F Modifier le panneau" : "\u2795 Ajouter un panneau"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Type"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
+})(), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 16, color: "#111", marginBottom: 14 } }, editIndex !== null ? "\u270F\uFE0F Modifier le panneau" : "\u2795 Ajouter un panneau"), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Type"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 8 } }, /* @__PURE__ */ React.createElement(
     "button",
     {
       style: __spreadProps(__spreadValues({}, btnPos(type === "sortie", "#222")), { color: type === "sortie" ? "#fff" : "#555" }),
@@ -2569,6 +2668,8 @@ type === "sortie" && /* @__PURE__ */ React.createElement("div", { style: { margi
     {
       value: s.num,
       onChange: (e) => updateSortie(i, "num", e.target.value),
+      onFocus: (e) => e.target.select(),
+      inputMode: "numeric",
       placeholder: "N\xB0",
       style: __spreadProps(__spreadValues({}, inputStyle), { width: 44, textAlign: "center", fontWeight: 900 })
     }
@@ -3591,6 +3692,43 @@ function App() {
       return {};
     }
   });
+  // Nombre de voitures par ligne (1 valeur par ligne, partagée par toutes ses stations)
+  // Valeurs par défaut : 5 pour métros/RER, 3 pour tramways, 1 pour câble
+  const [lineVoitures, setLineVoitures] = useState(() => {
+    try {
+      var stored = JSON.parse(localStorage.getItem("mpv4_line_voitures"));
+      if (stored && typeof stored === "object") return stored;
+    } catch (e) {}
+    // Migration : on extrait la valeur la plus fréquente depuis customTrainData puis TRAIN_DATA
+    var defaults = {};
+    try {
+      var existingTrain = JSON.parse(localStorage.getItem("mpv4_train")) || {};
+      var sources = [existingTrain, typeof TRAIN_DATA !== "undefined" ? TRAIN_DATA : {}];
+      sources.forEach(function(src) {
+        Object.keys(src).forEach(function(key) {
+          var parts = key.split("::");
+          var lid = parts[0];
+          var v = src[key] && src[key].voitures;
+          if (lid && v && !defaults[lid]) defaults[lid] = v;
+        });
+      });
+    } catch(e) {}
+    // Compléter pour toutes les lignes connues
+    var allLineIds = (typeof STATIONS !== "undefined" ? Object.keys(STATIONS) : []).concat(
+      typeof CABLE_STATIONS !== "undefined" ? Object.keys(CABLE_STATIONS) : []
+    );
+    allLineIds.forEach(function(lid) {
+      if (!defaults[lid]) {
+        if (lid.indexOf("T") === 0) defaults[lid] = 3;
+        else if (lid === "C1") defaults[lid] = 1;
+        else defaults[lid] = 5;
+      }
+    });
+    return defaults;
+  });
+  useEffect(function() {
+    try { localStorage.setItem("mpv4_line_voitures", JSON.stringify(lineVoitures)); } catch(e) {}
+  }, [lineVoitures]);
   const [showEditor, setShowEditor] = useState(false);
   const [showPhotoAI, setShowPhotoAI] = useState(false);
   const [branch, setBranch] = useState(null);
@@ -3652,7 +3790,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "95"); } catch(e) { return 95; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "103"); } catch(e) { return 103; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -3774,9 +3912,21 @@ function App() {
       return s;
     }).flat().concat(custom.filter((c) => !c._after));
   }, [lineId, baseStations, customStations]);
+  // Clé de stockage TRAIN_DATA : lineId::stationName::direction (nom officiel)
+  // Si pas de direction définie, fallback sur clé sans direction (rétrocompatibilité)
   const stKey = station && lineId ? `${lineId}::${station.n}` : null;
-  const builtinTrain = stKey ? TRAIN_DATA[stKey] : null;
-  const customTrain = stKey ? customTrainData[stKey] : null;
+  const stKeyDir = station && lineId && direction
+    ? `${lineId}::${station.n}::${direction}`
+    : null;
+  // Chargement : on essaie d'abord avec la direction, puis sans (rétrocompatibilité)
+  const builtinTrain = stKeyDir && TRAIN_DATA[stKeyDir]
+    ? TRAIN_DATA[stKeyDir]
+    : (stKey ? TRAIN_DATA[stKey] : null);
+  const customTrain = stKeyDir && customTrainData[stKeyDir]
+    ? customTrainData[stKeyDir]
+    : (stKey ? customTrainData[stKey] : null);
+  // Clé d'écriture : on privilégie la clé avec direction
+  const writeKey = stKeyDir || stKey;
   const trainData = React.useMemo(() => {
     if (!builtinTrain && !customTrain) return null;
     if (!customTrain) return builtinTrain;
@@ -3784,8 +3934,8 @@ function App() {
     return __spreadProps(__spreadValues({}, builtinTrain), {
       groups: [...builtinTrain.groups, ...customTrain.groups || []]
     });
-  }, [stKey, builtinTrain, customTrain]);
-  const nVoitures = (trainData == null ? void 0 : trainData.voitures) || 5;
+  }, [writeKey, builtinTrain, customTrain]);
+  const nVoitures = (lineVoitures && lineId && lineVoitures[lineId]) || (trainData == null ? void 0 : trainData.voitures) || 5;
   const addLog = (msg) => {
     var now = new Date();
     var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
@@ -3804,7 +3954,7 @@ function App() {
     if (Array.isArray(group) && group.length === 0) {
       setCustomTrainData((prev) => {
         const next = Object.assign({}, prev);
-        delete next[stKey];
+        delete next[writeKey];
         return next;
       });
       setShowEditor(false);
@@ -3812,31 +3962,32 @@ function App() {
       return;
     }
     setCustomTrainData((prev) => {
-      const existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
+      const existing = prev[writeKey] || { voitures: nVoitures, direction: direction || "", groups: [] };
       const groups = [...existing.groups || []];
       if (editIndex !== null && editIndex !== void 0) {
         groups[editIndex] = group;
       } else {
         groups.push(group);
       }
-      return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
+      return __spreadProps(__spreadValues({}, prev), { [writeKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
-    if (station) addLog((Array.isArray(group) && group.length === 0) ? "🗑 " + station.n + " - Suppression de toutes les données" : (editIndex !== null && editIndex !== void 0 ? "✏️ " : "➕ ") + station.n + " - " + (group.type === "corr" ? "Correspondance " + (group.corr || []).join("+") : "Sortie " + (group.sorties || []).map(function(s){return s.num;}).join("+")));
-    setShowEditor(false);
+    if (station) addLog((Array.isArray(group) && group.length === 0) ? "🗑 " + station.n + " - Suppression de toutes les données" : (editIndex !== null && editIndex !== void 0 ? "✏️ " : "➕ ") + station.n + " - " + (group.type === "corr" ? "Correspondance " + (group.corr || []).join("+") : "Sortie " + (group.sorties || []).map(function(s){return s.num;}).join("+")) + (direction ? " (" + direction + ")" : ""));
+    // Garder le panneau d'édition ouvert pour permettre de saisir d'autres panneaux
+    // sans avoir à rouvrir le panneau ou à changer de quai manuellement
     setShowPhotoAI(false);
   };
   const deleteGroup = (groupIndex) => {
     setCustomTrainData((prev) => {
-      const existing = prev[stKey];
+      const existing = prev[writeKey];
       if (!existing) return prev;
       const groups = existing.groups.filter((_, i) => i !== groupIndex);
       if (groups.length === 0) {
         const next = __spreadValues({}, prev);
-        delete next[stKey];
+        delete next[writeKey];
         return next;
       }
-      if (station) addLog("❌ " + station.n + " - Suppression panneau " + (groupIndex + 1));
-      return __spreadProps(__spreadValues({}, prev), { [stKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
+      if (station) addLog("❌ " + station.n + " - Suppression panneau " + (groupIndex + 1) + (direction ? " (" + direction + ")" : ""));
+      return __spreadProps(__spreadValues({}, prev), { [writeKey]: __spreadProps(__spreadValues({}, existing), { groups }) });
     });
   };
   const hasFork = stations.some((s) => s.fork);
@@ -4787,15 +4938,30 @@ function App() {
   })()
   ), /* @__PURE__ */ React.createElement("div", { className: "scroll-list", style: { flexGrow: 1, flexShrink: 1, flexBasis: "0px", overflowY: "auto", touchAction: "pan-y", WebkitOverflowScrolling: "touch", paddingBottom: 80 } }, displayed.map((st, idx) => {
     if (st.fork) {
-      return /* @__PURE__ */ React.createElement("div", { key: idx, style: {
-        background: "#FFF3E0",
-        borderTop: "2px solid #FF9800",
-        borderBottom: "2px solid #FF9800",
-        padding: "10px 16px",
-        display: "flex",
-        alignItems: "center",
-        gap: 10
-      } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#111" } }, st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#111", fontWeight: 700 } }, "Choisissez votre branche ci-dessus")));
+      return /* @__PURE__ */ React.createElement("button", {
+        key: idx,
+        onClick: () => {
+          setStation(st);
+          setNoteText(notes[`${lineId}::${st.n}`] || "");
+          setTab("train");
+          setScreen("station");
+        },
+        style: {
+          background: "#FFF3E0",
+          borderTop: "2px solid #FF9800",
+          borderBottom: "2px solid #FF9800",
+          borderLeft: "none",
+          borderRight: "none",
+          padding: "10px 16px",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          width: "100%",
+          cursor: "pointer",
+          textAlign: "left",
+          font: "inherit"
+        }
+      }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F500}"), /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 900, fontSize: 15, color: "#111" } }, st.n), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, color: "#111", fontWeight: 700 } }, "Station fourche \u2014 touchez pour acc\xE9der")));
     }
     const isTerminus = idx === 0 || idx === displayed.length - 1;
     const hasVisibleCorr = ((st.c || []).some((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs))) ||
@@ -5496,22 +5662,114 @@ function App() {
       nVoitures,
       onSave: saveGroup,
       onDelete: deleteGroup,
-      existingGroups: ((_e = customTrainData[stKey]) == null ? void 0 : _e.groups) || [],
+      existingGroups: ((_e = customTrainData[writeKey]) == null ? void 0 : _e.groups) || [],
       builtinGroups: (builtinTrain == null ? void 0 : builtinTrain.groups) || [],
-      hasCustomData: !!customTrainData[stKey],
+      hasCustomData: !!customTrainData[writeKey],
+      directionInfo: (function() {
+        // Calcule les directions disponibles pour CETTE station précise (NOMS OFFICIELS).
+        // Pour les lignes à fourche, on filtre selon où on est physiquement :
+        //   - Sur une branche : 2 directions (tronc + cette branche-là)
+        //   - Sur le tronc commun : 2 directions (tronc + "combo des branches")
+        //   - Sur la station pivot (fork) : toutes les directions
+        if (!lineId || !direction) return null;
+        var sts = STATIONS[lineId] || CABLE_STATIONS[lineId] || [];
+        var realSts = sts.filter(function(s) { return s.n; });
+        if (realSts.length < 2) return null;
+
+        // Configuration des lignes à fourche
+        var FORK_MAP = {
+          "7":  ["I", "V"],
+          "13": ["A", "B"],
+          "T4": ["A", "M"],
+          "T8": ["V", "E"]
+        };
+        var forkBranches = FORK_MAP[lineId];
+
+        // Terminus officiels
+        var troncStations = realSts.filter(function(s) { return !s.branch && !s.fork; });
+        var termTronc = troncStations.length > 0 ? troncStations[0].n : null;
+
+        if (forkBranches && station && termTronc) {
+          // Identifier où se trouve la station
+          var currentSt = sts.find(function(s) { return s.n === station.n; });
+          var stationBranch = currentSt ? currentSt.branch : null;
+          var isFork = currentSt ? currentSt.fork : false;
+
+          // Calculer les terminus officiels de chaque branche
+          var branchTerms = {};
+          forkBranches.forEach(function(bId) {
+            var bSts = realSts.filter(function(s) { return s.branch === bId; });
+            if (bSts.length > 0) branchTerms[bId] = bSts[bSts.length - 1].n;
+          });
+
+          if (isFork) {
+            // Station pivot : toutes les directions (tronc + chaque branche)
+            var allDirs = [termTronc].concat(forkBranches.map(function(bId) { return branchTerms[bId]; }).filter(Boolean));
+            var idx = allDirs.indexOf(direction);
+            return {
+              current: direction,
+              next: allDirs[(idx >= 0 ? idx + 1 : 1) % allDirs.length],
+              all: allDirs
+            };
+          } else if (stationBranch && branchTerms[stationBranch]) {
+            // Sur une branche : tronc + terminus de cette branche
+            var branchTerm = branchTerms[stationBranch];
+            var available = [termTronc, branchTerm];
+            var currentDir = available.indexOf(direction) >= 0 ? direction : termTronc;
+            var nextDir = currentDir === termTronc ? branchTerm : termTronc;
+            return { current: currentDir, next: nextDir, all: available };
+          } else {
+            // Sur le tronc commun : tronc + "combo officiel des branches"
+            var comboLabel = forkBranches.map(function(bId) { return branchTerms[bId]; }).filter(Boolean).join(" / ");
+            var available2 = [termTronc, comboLabel];
+            // Si direction matche un des terminus de branche, on affiche le combo
+            var currentDir2 = direction;
+            if (forkBranches.some(function(bId) { return branchTerms[bId] === direction; })) {
+              currentDir2 = comboLabel;
+            } else if (direction !== termTronc && direction !== comboLabel) {
+              currentDir2 = termTronc;
+            }
+            var nextDir2 = currentDir2 === termTronc ? comboLabel : termTronc;
+            return { current: currentDir2, next: nextDir2, all: available2 };
+          }
+        }
+
+        // Cas ligne sans fourche : 2 terminus (première et dernière station)
+        var termA = realSts[realSts.length - 1].n;
+        var termB = realSts[0].n;
+        if (direction !== termA && direction !== termB) return null;
+        return {
+          current: direction,
+          next: direction === termA ? termB : termA,
+          all: [termA, termB]
+        };
+      })(),
+      onToggleDirection: function(newDir) {
+        // newDir = nom officiel direct OU label combo "X / Y"
+        // Pour un combo, on choisit le terminus officiel de la première branche
+        // pour rester cohérent avec le bouton bascule du schéma train
+        if (!newDir || !lineId || !station) { setDirection(newDir); return; }
+        if (newDir.indexOf(" / ") !== -1) {
+          // Combo : prendre la première partie (terminus de la première branche)
+          var firstTerm = newDir.split(" / ")[0];
+          setDirection(firstTerm);
+          return;
+        }
+        setDirection(newDir);
+      },
       onImportBuiltin: function() {
         if (!builtinTrain) return;
         setCustomTrainData(function(prev) {
-          var existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
+          var existing = prev[writeKey] || { voitures: nVoitures, direction: direction || "", groups: [] };
           var builtinGroups = (builtinTrain.groups || []).map(function(g) { return Object.assign({}, g, { fromBuiltin: true }); });
           var customGroups = existing.groups || [];
-          return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { groups: [...builtinGroups, ...customGroups] }) });
+          return Object.assign({}, prev, { [writeKey]: Object.assign({}, existing, { groups: [...builtinGroups, ...customGroups] }) });
         });
       },
       onChangeVoitures: function(newN) {
         setCustomTrainData(function(prev) {
-          var existing = prev[stKey] || { voitures: nVoitures, direction: "", groups: [] };
-          return Object.assign({}, prev, { [stKey]: Object.assign({}, existing, { voitures: newN }) });
+          var existing = prev[writeKey] || { voitures: nVoitures, direction: direction || "", groups: [] };
+          return Object.assign({}, prev, { [writeKey]: Object.assign({}, existing, { voitures: newN }) });
         });
         if (station) addLog("🚆 " + station.n + " - Voitures : " + newN);
       },
@@ -6169,7 +6427,37 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
   )))))), adminUnlocked && adminScreen === "editLine" && adminLineId && (() => {
     const sts = STATIONS[adminLineId] || CABLE_STATIONS[adminLineId] || [];
     const lineEdits = adminEdits[adminLineId] || {};
+    const currentVoitures = lineVoitures[adminLineId] || 5;
+    const lineObj = ALL_LINES.find(function(l) { return l.id === adminLineId; });
+    const lcolor = (lineObj && lineObj.color) || "#666";
+    const ltext = (lineObj && lineObj.text) || "#fff";
     return /* @__PURE__ */ React.createElement("div", { style: { maxWidth: 400, margin: "0 auto" } },
+      // Sélecteur de voitures (par ligne)
+      /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1.5px solid #ddd", borderRadius: 10, padding: "10px 12px", marginBottom: 12 } },
+        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 7, textTransform: "uppercase", letterSpacing: 0.5 } }, "\uD83D\uDE86 Nombre de voitures de la ligne"),
+        /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4 } },
+          Array.from({ length: 10 }, function(_, i) { return i + 1; }).map(function(n) {
+            const isSel = currentVoitures === n;
+            return /* @__PURE__ */ React.createElement("button", {
+              key: n,
+              onClick: function() { setLineVoitures(function(prev) { return Object.assign({}, prev, { [adminLineId]: n }); }); },
+              style: {
+                flex: 1,
+                height: 30,
+                border: "1.5px solid " + (isSel ? "#000" : "#ccc"),
+                borderRadius: 6,
+                background: isSel ? lcolor : "#fff",
+                color: isSel ? (ltext || "#fff") : "#555",
+                fontWeight: 900,
+                fontSize: 13,
+                cursor: "pointer",
+                padding: 0,
+                textShadow: isSel ? (ltext === "#000" ? "-1px -1px 0 rgba(255,255,255,0.9), 1px -1px 0 rgba(255,255,255,0.9), -1px 1px 0 rgba(255,255,255,0.9), 1px 1px 0 rgba(255,255,255,0.9)" : "-1px -1px 0 rgba(0,0,0,0.9), 1px -1px 0 rgba(0,0,0,0.9), -1px 1px 0 rgba(0,0,0,0.9), 1px 1px 0 rgba(0,0,0,0.9)") : "none"
+              }
+            }, n);
+          })
+        )
+      ),
       /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 12, marginBottom: 12 } }, "Touchez une station pour la modifier :"),
       /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #ddd", borderRadius: 10, overflow: "hidden" } }, sts.filter((s) => !s.fork).map((st, i) => {
       const edited = lineEdits[st.n];
