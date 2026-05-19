@@ -239,13 +239,13 @@ const STATIONS = {
     { n: "La D\xE9fense - Grande Arche", c: ["A", "E", "T2"] },
     { n: "Esplanade de la D\xE9fense" },
     { n: "Pont de Neuilly" },
-    { n: "Les Sablons (Jardin d'Acclimatation)" },
-    { n: "Porte Maillot (Palais des Congr\xE8s)", c: ["C", "E", "T3b"] },
+    { n: "Les Sablons", sub: "Jardin d'Acclimatation" },
+    { n: "Porte Maillot", c: ["C", "E", "T3b"], sub: "Palais des Congr\xE8s" },
     { n: "Argentine" },
-    { n: "Charles de Gaulle - \xC9toile (Arc de Triomphe)", c: ["2", "6", "A"] },
+    { n: "Charles de Gaulle - \xC9toile", c: ["2", "6", "A"], sub: "Arc de Triomphe" },
     { n: "George V" },
     { n: "Franklin D. Roosevelt", c: ["9"] },
-    { n: "Champs-\xC9lys\xE9es - Clemenceau (Grand / Petit Palais)", c: ["13"] },
+    { n: "Champs-\xC9lys\xE9es - Clemenceau", c: ["13"], sub: "Grand / Petit Palais" },
     { n: "Concorde", c: ["8", "12"] },
     { n: "Tuileries" },
     { n: "Palais Royal - Mus\xE9e du Louvre", c: ["7"] },
@@ -253,7 +253,7 @@ const STATIONS = {
     { n: "Ch\xE2telet", c: ["4", "7", "11", "14", "A", "B", "D"] },
     { n: "H\xF4tel de Ville", c: ["11"] },
     { n: "Saint-Paul" },
-    { n: "Bastille (Opéra Bastille)", c: ["5", "8"] },
+    { n: "Bastille", c: ["5", "8"] },
     { n: "Gare de Lyon", c: ["14", "A", "D"] },
     { n: "Reuilly - Diderot", c: ["8"] },
     { n: "Nation", c: ["2", "6", "9", "A"] },
@@ -265,19 +265,19 @@ const STATIONS = {
   "2": [
     { n: "Porte Dauphine", c: ["T3b"], walk: ["C"] },
     { n: "Victor Hugo" },
-    { n: "Charles de Gaulle - \xC9toile (Arc de Triomphe)", c: ["1", "6", "A"] },
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "6", "A"], sub: "Arc de Triomphe" },
     { n: "Ternes" },
     { n: "Courcelles" },
     { n: "Monceau" },
     { n: "Villiers", c: ["3"] },
     { n: "Rome" },
     { n: "Place de Clichy", c: ["13"] },
-    { n: "Blanche (Moulin Rouge)" },
+    { n: "Blanche" },
     { n: "Pigalle", c: ["12"] },
-    { n: "Anvers (Sacr\xE9-C\u0153ur)" },
+    { n: "Anvers", sub: "Sacr\xE9-C\u0153ur" },
     { n: "Barb\xE8s - Rochechouart", c: ["4"] },
     { n: "La Chapelle", walk: ["B", "D", "E"] },
-    { n: "Stalingrad (Canal de l'Ourcq)", c: ["5", "7"] },
+    { n: "Stalingrad", c: ["5", "7"], sub: "Canal de l'Ourcq" },
     { n: "Jaur\xE8s", c: ["5", "7bis"] },
     { n: "Colonel Fabien" },
     { n: "Belleville", c: ["11"] },
@@ -301,7 +301,7 @@ const STATIONS = {
     { n: "Europe" },
     { n: "Saint-Lazare", c: ["12", "13", "14", "E"], walk: ["9"] },
     { n: "Havre - Caumartin", c: ["9", "A"] },
-    { n: "Opéra (Opéra Garnier)", c: ["7", "8", "A"] },
+    { n: "Opéra", c: ["7", "8", "A"] },
     { n: "Quatre-Septembre" },
     { n: "Bourse" },
     { n: "Sentier" },
@@ -342,7 +342,7 @@ const STATIONS = {
     { n: "Saint-Germain-des-Pr\xE9s" },
     { n: "Saint-Sulpice" },
     { n: "Saint-Placide" },
-    { n: "Montparnasse - Bienven\xFCe (gare)", c: ["6", "12", "13"] },
+    { n: "Montparnasse - Bienven\xFCe", c: ["6", "12", "13"], sub: "gare" },
     { n: "Vavin" },
     { n: "Raspail", c: ["6"] },
     { n: "Denfert-Rochereau", c: ["6", "B"] },
@@ -361,7 +361,7 @@ const STATIONS = {
     { n: "Ourcq" },
     { n: "Laumi\xE8re" },
     { n: "Jaur\xE8s", c: ["2", "7bis"] },
-    { n: "Stalingrad (Canal de l'Ourcq)", c: ["2", "7"] },
+    { n: "Stalingrad", c: ["2", "7"], sub: "Canal de l'Ourcq" },
     { n: "Gare du Nord", c: ["4", "B", "D", "E"] },
     { n: "Gare de l'Est", c: ["4", "7"] },
     { n: "Jacques Bonsergent" },
@@ -369,26 +369,26 @@ const STATIONS = {
     { n: "Oberkampf", c: ["9"] },
     { n: "Richard-Lenoir" },
     { n: "Br\xE9guet - Sabin" },
-    { n: "Bastille (Opéra Bastille)", c: ["1", "8"] },
+    { n: "Bastille", c: ["1", "8"] },
     { n: "Quai de la Rap\xE9e" },
-    { n: "Gare d'Austerlitz (Jardin des Plantes)", c: ["10", "C"] },
+    { n: "Gare d'Austerlitz", c: ["10", "C"], sub: "Jardin des Plantes" },
     { n: "Saint-Marcel" },
     { n: "Campo-Formio" },
     { n: "Place d'Italie", c: ["6", "7"] }
   ],
   "6": [
-    { n: "Charles de Gaulle - \xC9toile (Arc de Triomphe)", c: ["1", "2", "A"] },
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "A"], sub: "Arc de Triomphe" },
     { n: "Kl\xE9ber" },
     { n: "Boissi\xE8re" },
     { n: "Trocad\xE9ro", c: ["9"] },
     { n: "Passy" },
-    { n: "Bir-Hakeim (Tour Eiffel)", walk: ["C"] },
+    { n: "Bir-Hakeim", walk: ["C"], sub: "Tour Eiffel" },
     { n: "Dupleix" },
     { n: "La Motte-Picquet - Grenelle", c: ["8", "10"] },
     { n: "Cambronne" },
     { n: "S\xE8vres - Lecourbe" },
     { n: "Pasteur", c: ["12"] },
-    { n: "Montparnasse - Bienven\xFCe (gare)", c: ["4", "12", "13"] },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "12", "13"], sub: "gare" },
     { n: "Edgar Quinet" },
     { n: "Raspail", c: ["4"] },
     { n: "Denfert-Rochereau", c: ["4", "B"] },
@@ -410,24 +410,24 @@ const STATIONS = {
     { n: "La Courneuve - 8 Mai 1945", c: ["T1"] },
     { n: "Fort d'Aubervilliers", c: ["15"] },
     { n: "Aubervilliers - Pantin - Quatre Chemins" },
-    { n: "Porte de la Villette (Cit\xE9 des Sciences)", c: ["T3b"] },
+    { n: "Porte de la Villette", c: ["T3b"], sub: "Cit\xE9 des Sciences" },
     { n: "Corentin Cariou" },
     { n: "Crim\xE9e" },
     { n: "Riquet" },
-    { n: "Stalingrad (Canal de l'Ourcq)", c: ["2", "5"] },
+    { n: "Stalingrad", c: ["2", "5"], sub: "Canal de l'Ourcq" },
     { n: "Louis Blanc", c: ["7bis"] },
     { n: "Ch\xE2teau-Landon" },
     { n: "Gare de l'Est", c: ["4", "5"] },
     { n: "Poissonni\xE8re" },
-    { n: "Cadet (Folies Berg\xE8re)" },
+    { n: "Cadet" },
     { n: "Le Peletier" },
     { n: "Chauss\xE9e d'Antin - La Fayette", c: ["9"] },
-    { n: "Opéra (Opéra Garnier)", c: ["3", "8", "A"] },
+    { n: "Opéra", c: ["3", "8", "A"] },
     { n: "Pyramides", c: ["14"] },
     { n: "Palais Royal - Mus\xE9e du Louvre", c: ["1"] },
     { n: "Pont Neuf" },
     { n: "Ch\xE2telet", c: ["1", "4", "11", "14", "A", "B", "D"] },
-    { n: "Pont Marie (\xCEle Saint-Louis)" },
+    { n: "Pont Marie", sub: "\xCEle Saint-Louis" },
     { n: "Sully - Morland" },
     { n: "Jussieu", c: ["10"] },
     { n: "Place Monge" },
@@ -473,7 +473,7 @@ const STATIONS = {
     { n: "Invalides", c: ["13", "C"] },
     { n: "Concorde", c: ["1", "12"] },
     { n: "Madeleine", c: ["12", "14"] },
-    { n: "Opéra (Opéra Garnier)", c: ["3", "7", "A"] },
+    { n: "Opéra", c: ["3", "7", "A"] },
     { n: "Richelieu - Drouot", c: ["9"] },
     { n: "Grands Boulevards", c: ["9"] },
     { n: "Bonne Nouvelle", c: ["9"] },
@@ -482,7 +482,7 @@ const STATIONS = {
     { n: "Filles du Calvaire" },
     { n: "Saint-S\xE9bastien - Froissart" },
     { n: "Chemin Vert" },
-    { n: "Bastille (Opéra Bastille)", c: ["1", "5"] },
+    { n: "Bastille", c: ["1", "5"] },
     { n: "Ledru-Rollin" },
     { n: "Faidherbe - Chaligny" },
     { n: "Reuilly - Diderot", c: ["1"] },
@@ -496,13 +496,13 @@ const STATIONS = {
     { n: "\xC9cole V\xE9t\xE9rinaire de Maisons-Alfort" },
     { n: "Maisons-Alfort - Stade" },
     { n: "Maisons-Alfort - Les Juilliottes" },
-    { n: "Cr\xE9teil - L'\xC9chat (H\xF4pital Henri Mondor)", c: ["15"] },
+    { n: "Cr\xE9teil - L'\xC9chat", c: ["15"] },
     { n: "Cr\xE9teil - Universit\xE9" },
     { n: "Cr\xE9teil - Pr\xE9fecture" },
     { n: "Cr\xE9teil - Pointe du Lac", c: ["C1"] }
   ],
   "9": [
-    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["15"], walk: ["T2"] },
+    { n: "Pont de S\xE8vres", c: ["15"], walk: ["T2"], sub: "Sc\xE8ne Musicale" },
     { n: "Billancourt" },
     { n: "Marcel Sembat" },
     { n: "Porte de Saint-Cloud" },
@@ -514,7 +514,7 @@ const STATIONS = {
     { n: "La Muette", walk: ["C"] },
     { n: "Rue de la Pompe" },
     { n: "Trocad\xE9ro", c: ["6"] },
-    { n: "I\xE9na (Mus\xE9e Guimet / Palais de Tokyo)" },
+    { n: "I\xE9na", sub: "Mus\xE9e Guimet / Palais de Tokyo" },
     { n: "Alma - Marceau", walk: ["C"] },
     { n: "Franklin D. Roosevelt", c: ["1"] },
     { n: "Saint-Philippe du Roule" },
@@ -563,12 +563,12 @@ const STATIONS = {
     { n: "Maubert - Mutualit\xE9" },
     { n: "Cardinal Lemoine" },
     { n: "Jussieu", c: ["7"] },
-    { n: "Gare d'Austerlitz (Jardin des Plantes)", c: ["5", "C"] }
+    { n: "Gare d'Austerlitz", c: ["5", "C"], sub: "Jardin des Plantes" }
   ],
   "11": [
     { n: "Ch\xE2telet", c: ["1", "4", "7", "14", "A", "B", "D"] },
     { n: "H\xF4tel de Ville", c: ["1"] },
-    { n: "Rambuteau (Centre Pompidou)" },
+    { n: "Rambuteau", sub: "Centre Pompidou" },
     { n: "Arts et M\xE9tiers", c: ["3"] },
     { n: "R\xE9publique", c: ["3", "5", "8", "9"] },
     { n: "Goncourt" },
@@ -597,7 +597,7 @@ const STATIONS = {
     { n: "Marcadet - Poissonniers", c: ["4"] },
     { n: "Jules Joffrin" },
     { n: "Lamarck - Caulaincourt" },
-    { n: "Abbesses (Montmartre)" },
+    { n: "Abbesses", sub: "Montmartre" },
     { n: "Pigalle", c: ["2"] },
     { n: "Saint-Georges" },
     { n: "Notre-Dame-de-Lorette" },
@@ -606,18 +606,18 @@ const STATIONS = {
     { n: "Madeleine", c: ["8", "14"] },
     { n: "Concorde", c: ["1", "8"] },
     { n: "Assembl\xE9e Nationale" },
-    { n: "Solf\xE9rino (Mus\xE9e d'Orsay)", walk: ["C"] },
+    { n: "Solf\xE9rino", walk: ["C"], sub: "Mus\xE9e d'Orsay" },
     { n: "Rue du Bac" },
     { n: "S\xE8vres - Babylone", c: ["10"] },
     { n: "Rennes" },
     { n: "Notre-Dame-des-Champs" },
-    { n: "Montparnasse - Bienven\xFCe (gare)", c: ["4", "6", "13"] },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "6", "13"], sub: "gare" },
     { n: "Falgui\xE8re" },
     { n: "Pasteur", c: ["6"] },
     { n: "Volontaires" },
     { n: "Vaugirard" },
     { n: "Convention" },
-    { n: "Porte de Versailles (Parc des Expositions / Dôme de Paris)", c: ["T3a"], walk: ["T2"] },
+    { n: "Porte de Versailles", c: ["T3a"], walk: ["T2"], sub: "Parc des Expositions" },
     { n: "Corentin Celton" },
     { n: "Mairie d'Issy", c: ["T2"] }
   ],
@@ -630,12 +630,12 @@ const STATIONS = {
     { n: "Plaisance" },
     { n: "Pernety" },
     { n: "Ga\xEEt\xE9" },
-    { n: "Montparnasse - Bienven\xFCe (gare)", c: ["4", "6", "12"] },
+    { n: "Montparnasse - Bienven\xFCe", c: ["4", "6", "12"], sub: "gare" },
     { n: "Duroc", c: ["10"] },
     { n: "Saint-Fran\xE7ois-Xavier" },
     { n: "Varenne" },
     { n: "Invalides", c: ["8", "C"] },
-    { n: "Champs-\xC9lys\xE9es - Clemenceau (Grand / Petit Palais)", c: ["1"] },
+    { n: "Champs-\xC9lys\xE9es - Clemenceau", c: ["1"], sub: "Grand / Petit Palais" },
     { n: "Miromesnil", c: ["9"] },
     { n: "Saint-Lazare", c: ["3", "12", "14", "E"], walk: ["9"] },
     { n: "Li\xE8ge" },
@@ -657,7 +657,7 @@ const STATIONS = {
     { n: "Garibaldi", branch: "B" },
     { n: "Mairie de Saint-Ouen", c: ["14"], branch: "B" },
     { n: "Carrefour Pleyel", walk: ["14"], branch: "B" },
-    { n: "Saint-Denis - Porte de Paris (Stade de France)", c: ["T8"], branch: "B" },
+    { n: "Saint-Denis - Porte de Paris", c: ["T8"], branch: "B", sub: "Stade de France" },
     { n: "Basilique de Saint-Denis", walk: ["T1", "T5"], branch: "B" },
     { n: "Saint-Denis - Universit\xE9", walk: ["T5"], branch: "B" }
   ],
@@ -700,7 +700,7 @@ const STATIONS = {
     { n: "Nogent - Le Perreux", c: ["E"], branch: "E", futur: true },
     { n: "Champigny Centre", branch: "E", futur: true },
     // Tronçon SUD - branch "S"
-    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["9", "T2"], branch: "S", futur: true },
+    { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "S", futur: true, sub: "Sc\xE8ne Musicale" },
     { n: "Issy", c: ["C"], branch: "S", futur: true },
     { n: "Clamart", branch: "S", futur: true },
     { n: "Ch\xE2tillon - Montrouge", c: ["13", "T6"], branch: "S", futur: true },
@@ -711,7 +711,7 @@ const STATIONS = {
     { n: "Mairie de Vitry-sur-Seine", c: ["T9"], branch: "S", futur: true },
     { n: "Les Ardoines", c: ["C"], branch: "S", futur: true },
     { n: "Le Vert de Maisons", c: ["D"], branch: "S", futur: true },
-    { n: "Cr\xE9teil - L'\xC9chat (H\xF4pital Henri Mondor)", c: ["8"], branch: "S", futur: true },
+    { n: "Cr\xE9teil - L'\xC9chat", c: ["8"], branch: "S", futur: true },
     { n: "Saint-Maur - Cr\xE9teil", c: ["A"], branch: "S", futur: true },
     { n: "Champigny Centre", branch: "S", futur: true },
     { n: "Villiers - Champigny - Bry", c: ["E"], branch: "S", futur: true },
@@ -727,7 +727,7 @@ const STATIONS = {
     { n: "Nanterre - La Boule", c: ["T1"], branch: "O", futur: true },
     { n: "Rueil - Suresnes Mont-Val\xE9rien", branch: "O", futur: true },
     { n: "Saint-Cloud", branch: "O", futur: true },
-    { n: "Pont de S\xE8vres (Sc\xE8ne Musicale)", c: ["9", "T2"], branch: "O", futur: true }
+    { n: "Pont de S\xE8vres", c: ["9", "T2"], branch: "O", futur: true, sub: "Sc\xE8ne Musicale" }
   ],
   "16": [
     { n: "Saint-Denis - Pleyel", c: ["14", "15", "17"], walk: ["D"], futur: true },
@@ -745,7 +745,7 @@ const STATIONS = {
     { n: "Saint-Denis - Pleyel", c: ["14", "15", "16"], walk: ["D"], futur: true },
     { n: "La Courneuve - Six Routes", c: ["16", "T1"], futur: true },
     { n: "Le Bourget", c: ["16", "B", "T11"], futur: true },
-    { n: "Le Bourget A\xE9roport (Mus\xE9e de l'Air et de l'Espace)", futur: true },
+    { n: "Le Bourget A\xE9roport", futur: true, sub: "Mus\xE9e de l'Air et de l'Espace" },
     { n: "Gonesse", futur: true },
     { n: "Parc des Expositions", c: ["B"], futur: true },
     { n: "A\xE9roport Charles de Gaulle 2 - TGV", c: ["B"], futur: true },
@@ -796,7 +796,7 @@ const STATIONS = {
     { n: "Nanterre - Pr\xE9fecture", branch: "P" },
     { n: "La D\xE9fense - Grande Arche", c: ["1", "E", "T2"], branch: "P" },
     // FOURCHE OUEST
-    { n: "Charles de Gaulle - \xC9toile (Arc de Triomphe)", c: ["1", "2", "6"], fork: true },
+    { n: "Charles de Gaulle - \xC9toile", c: ["1", "2", "6"], fork: true, sub: "Arc de Triomphe" },
     // Tronc commun Paris
     { n: "Auber", c: ["E"] },
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "B", "D"] },
@@ -826,7 +826,7 @@ const STATIONS = {
     { n: "Torcy", branch: "M" },
     { n: "Bussy - Saint-Georges", branch: "M" },
     { n: "Val d'Europe", branch: "M" },
-    { n: "Marne-la-Vall\xE9e Chessy (Disneyland)", branch: "M" }
+    { n: "Marne-la-Vall\xE9e Chessy", branch: "M", sub: "Disneyland" }
   ],
   "B": [
     // Branche CDG (D) - terminus en premier, va jusqu'à la fourche nord
@@ -857,7 +857,7 @@ const STATIONS = {
     // Tronc commun Paris
     { n: "Ch\xE2telet - Les Halles", c: ["1", "4", "7", "11", "14", "A", "D"] },
     { n: "Saint-Michel - Notre-Dame", c: ["4", "C"] },
-    { n: "Luxembourg (Panth\xE9on / S\xE9nat)" },
+    { n: "Luxembourg", sub: "Panth\xE9on / S\xE9nat" },
     { n: "Port-Royal" },
     { n: "Denfert-Rochereau", c: ["4", "6", "T3a"] },
     // FOURCHE SUD
@@ -912,7 +912,7 @@ const STATIONS = {
     { n: "Saint-Ouen", c: ["14"], branch: "PT" },
     { n: "Porte de Clichy", c: ["13", "14"], walk: ["T3b"], branch: "PT" },
     { n: "Pereire - Levallois", walk: ["3"], branch: "PT" },
-    { n: "Neuilly - Porte Maillot (Palais des Congr\xE8s)", c: ["1", "T3b"], branch: "PT" },
+    { n: "Neuilly - Porte Maillot", c: ["1", "T3b"], branch: "PT", sub: "Palais des Congr\xE8s" },
     { n: "Avenue Foch", branch: "PT" },
     { n: "Avenue Henri Martin", branch: "PT" },
     { n: "Boulainvilliers", branch: "PT" },
@@ -1218,13 +1218,13 @@ const STATIONS = {
     { n: "Henri Farman" },
     { n: "Suzanne Lenglen", walk: ["8", "T3a"] },
     { n: "Porte d'Issy" },
-    { n: "Porte de Versailles (Parc des Expositions / Dôme de Paris)", walk: ["12", "T3a"] }
+    { n: "Porte de Versailles", walk: ["12", "T3a"], sub: "Parc des Expositions" }
   ],
   "T3a": [
     { n: "Pont du Garigliano", walk: ["C"] },
     { n: "Balard", c: ["8"], walk: ["T2"] },
     { n: "Desnouettes" },
-    { n: "Porte de Versailles (Parc des Expositions / Dôme de Paris)", c: ["12"], walk: ["T2"] },
+    { n: "Porte de Versailles", c: ["12"], walk: ["T2"], sub: "Parc des Expositions" },
     { n: "Georges Brassens" },
     { n: "Brancion" },
     { n: "Porte de Vanves", c: ["13"] },
@@ -1260,7 +1260,7 @@ const STATIONS = {
     { n: "Porte de Pantin", walk: ["5", "E"] },
     { n: "Delphine Seyrig" },
     { n: "Ella Fitzgerald", walk: ["E"] },
-    { n: "Porte de la Villette (Cit\xE9 des Sciences)", c: ["7"] },
+    { n: "Porte de la Villette", c: ["7"], sub: "Cit\xE9 des Sciences" },
     { n: "Canal Saint-Denis" },
     { n: "Rosa Parks", c: ["E"] },
     { n: "Porte d'Aubervilliers" },
@@ -1373,7 +1373,7 @@ const STATIONS = {
   ],
   "T8": [
     // Tronc commun (de Saint-Denis - Porte de Paris vers le nord)
-    { n: "Saint-Denis - Porte de Paris (Stade de France)", c: ["13"] },
+    { n: "Saint-Denis - Porte de Paris", c: ["13"], sub: "Stade de France" },
     { n: "Pierre De Geyter" },
     { n: "Saint-Denis - Gare", c: ["D", "T1"] },
     { n: "Paul \xC9luard" },
@@ -3652,7 +3652,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "88"); } catch(e) { return 88; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "95"); } catch(e) { return 95; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -4082,8 +4082,30 @@ function App() {
       setDirection(null);
       setNoteText(notes[`${l.lineId}::${l.name}`] || "");
       setTab("train");
-      setScreen("station");
-      setShowDir(true);
+      // Lignes nécessitant l'écran direction : ligne 15, RER (multimode)
+      const needsDirectionScreen = l.lineId === "15" || l.transport === "rer";
+      if (needsDirectionScreen) {
+        setScreen("station");
+        setShowDir(true);
+      } else {
+        // Sinon : aller directement à l'écran station, sans panneau direction
+        // Définir une direction par défaut (premier terminus) et la branche si fourche
+        const lineStations = STATIONS[l.lineId] || CABLE_STATIONS[l.lineId] || [];
+        const firstBranch = lineStations.find((s) => s.branch);
+        if (firstBranch) {
+          setBranch(firstBranch.branch);
+          const branchStations = lineStations.filter((s) => s.branch === firstBranch.branch);
+          const firstBranchIdx = lineStations.findIndex((s) => s.branch === firstBranch.branch);
+          const firstForkIdx = lineStations.findIndex((s) => s.fork);
+          const term = (firstBranchIdx < firstForkIdx) ? branchStations[0] : branchStations[branchStations.length - 1];
+          if (term) setDirection(term.n);
+        } else {
+          const filtered = lineStations.filter((s) => !s.branch && !s.fork);
+          if (filtered[0]) setDirection(filtered[0].n);
+        }
+        setScreen("station");
+        setShowDir(false);
+      }
     },
     style: {
       width: "100%", display: "flex", alignItems: "center",
@@ -4820,9 +4842,8 @@ function App() {
         const cList = (st.c || []).filter((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs));
         const wList = (st.walk || []).filter((c) => c !== lineId && isCorrespondenceVisible(st.n, c, futurActifs));
         const hasBadges = cList.length > 0 || wList.length > 0;
-        const parenIdx = st.n.indexOf(" (");
-        const mainName = parenIdx > 0 ? st.n.substring(0, parenIdx) : st.n;
-        const subName = parenIdx > 0 ? st.n.substring(parenIdx + 1) : null;
+        const mainName = st.n;
+        const subName = st.sub || null;
         const subNameEl = subName ? /* @__PURE__ */ React.createElement("div", { style: {
           fontSize: 11,
           fontWeight: 500,
@@ -5157,21 +5178,23 @@ function App() {
         background: "rgba(0,0,0,0.15)",
         border: "none",
         color: line.text || "#fff",
-        fontSize: 24,
+        fontSize: 32,
         cursor: "pointer",
         borderRadius: 8,
-        width: 34,
-        height: 34,
+        width: 44,
+        height: 44,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        fontWeight: 900,
+        lineHeight: 1,
         textShadow: line.text === "#000" ? "-1px -1px 0 rgba(255,255,255,0.95), 1px -1px 0 rgba(255,255,255,0.95), -1px 1px 0 rgba(255,255,255,0.95), 1px 1px 0 rgba(255,255,255,0.95)" : "-1px -1px 0 rgba(0,0,0,0.95), 1px -1px 0 rgba(0,0,0,0.95), -1px 1px 0 rgba(0,0,0,0.95), 1px 1px 0 rgba(0,0,0,0.95)"
       }
     },
     "\u2039"
   ), /* @__PURE__ */ React.createElement("div", { style: {
     fontWeight: 900,
-    fontSize: 20,
+    fontSize: 22,
     color: line.text || "#fff",
     flex: 1,
     textAlign: "center",
@@ -5199,7 +5222,109 @@ function App() {
       }
     },
     isFav ? "\u2B50" : "\u2606"
-  ))), ((station.c || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs)) || (station.walk || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs))) && /* @__PURE__ */ React.createElement("div", { style: {
+  )), (() => {
+    // Bouton direction sous le nom de la station
+    // Affiche le terminus dans la direction actuelle, cliquable pour basculer
+    if (!direction) return null;
+    const sts = STATIONS[lineId] || CABLE_STATIONS[lineId] || [];
+    const realSts = sts.filter((s) => s.n);
+    if (realSts.length < 2) return null;
+
+    // Labels courts pour les lignes à fourche
+    const FORK_LABELS = {
+      "7":  { tronc: "La Courneuve", combo: "Mairie d'Ivry / Villejuif", branchA: { id: "V", label: "Villejuif" }, branchB: { id: "I", label: "Mairie d'Ivry" } },
+      "13": { tronc: "Ch\xE2tillon", combo: "Asni\xE8res / Saint-Denis", branchA: { id: "A", label: "Asni\xE8res" }, branchB: { id: "B", label: "Saint-Denis" } },
+      "T4": { tronc: "Bondy", combo: "Aulnay / Montfermeil", branchA: { id: "A", label: "Aulnay" }, branchB: { id: "M", label: "Montfermeil" } },
+      "T8": { tronc: "Saint-Denis", combo: "Villetaneuse / \xC9pinay", branchA: { id: "V", label: "Villetaneuse" }, branchB: { id: "E", label: "\xC9pinay" } }
+    };
+    const forkInfo = FORK_LABELS[lineId];
+
+    let currentLabel, otherDir;
+
+    if (forkInfo && hasFork) {
+      // Ligne à fourche : 3 cas selon où on est
+      const currentSt = realSts.find((s) => s.n === station.n);
+      const stationBranch = currentSt ? currentSt.branch : null;
+      // Terminus de chaque branche (dernière station de chaque branche)
+      const branchAStations = realSts.filter((s) => s.branch === forkInfo.branchA.id);
+      const branchBStations = realSts.filter((s) => s.branch === forkInfo.branchB.id);
+      const termBranchA = branchAStations.length > 0 ? branchAStations[branchAStations.length - 1].n : null;
+      const termBranchB = branchBStations.length > 0 ? branchBStations[branchBStations.length - 1].n : null;
+      // Terminus du tronc (première station)
+      const troncStations = realSts.filter((s) => !s.branch && !s.fork);
+      const termTronc = troncStations.length > 0 ? troncStations[0].n : null;
+
+      if (!stationBranch) {
+        // Tronc commun OU station pivot (fork)
+        // 2 directions : tronc <-> "Asnières / Saint-Denis"
+        if (direction === termTronc) {
+          currentLabel = forkInfo.tronc;
+          // Bascule : on prend une direction par défaut (terminus de la première branche)
+          otherDir = termBranchA;
+        } else {
+          // Direction = un des terminus de branche, ou "combo" virtuel
+          currentLabel = forkInfo.combo;
+          otherDir = termTronc;
+        }
+      } else if (stationBranch === forkInfo.branchA.id) {
+        // Sur branche A : tronc <-> branche A
+        if (direction === termTronc) {
+          currentLabel = forkInfo.tronc;
+          otherDir = termBranchA;
+        } else {
+          currentLabel = forkInfo.branchA.label;
+          otherDir = termTronc;
+        }
+      } else if (stationBranch === forkInfo.branchB.id) {
+        // Sur branche B : tronc <-> branche B
+        if (direction === termTronc) {
+          currentLabel = forkInfo.tronc;
+          otherDir = termBranchB;
+        } else {
+          currentLabel = forkInfo.branchB.label;
+          otherDir = termTronc;
+        }
+      } else {
+        return null;
+      }
+    } else {
+      // Ligne simple : 2 terminus = première et dernière station
+      const termA = realSts[realSts.length - 1].n;
+      const termB = realSts[0].n;
+      if (direction !== termA && direction !== termB) return null;
+      currentLabel = direction;
+      otherDir = (direction === termA) ? termB : termA;
+    }
+
+    if (!currentLabel || !otherDir) return null;
+
+    return /* @__PURE__ */ React.createElement(
+      "button",
+      {
+        onClick: () => { setDirection(otherDir); },
+        "aria-label": "Changer de direction, actuellement vers " + currentLabel,
+        style: {
+          display: "block",
+          width: "calc(100% - 8px)",
+          margin: "8px 4px 0",
+          padding: "5px 12px",
+          background: line.color,
+          border: "2px solid #000",
+          borderRadius: 10,
+          color: line.text || "#fff",
+          fontWeight: 900,
+          fontSize: 16,
+          cursor: "pointer",
+          textAlign: "center",
+          lineHeight: 1.25,
+          letterSpacing: 0.2,
+          textShadow: line.text === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
+        }
+      },
+      "\u2192 " + currentLabel
+    );
+  })()), ((station.c || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs)) || (station.walk || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs))) && /* @__PURE__ */ React.createElement("div", { style: {
     background: "#fff",
     margin: "6px 12px 0",
     borderRadius: 12,
@@ -5216,8 +5341,8 @@ function App() {
     const allC = (station.c || []).filter((c) => isCorrespondenceVisible(station.n, c, futurActifs));
     const allW = (station.walk || []).filter((c) => isCorrespondenceVisible(station.n, c, futurActifs));
     const allIds = [...allC, ...allW];
-    let sz = 34;
-    for (let s = 34; s >= 16; s--) {
+    let sz = 26;
+    for (let s = 26; s >= 16; s--) {
       const totalW = allIds.reduce((acc, c) => {
         const isTram = !!TRAM_LINES.find((l) => l.id === c);
         return acc + (isTram ? s * 1.3 : s) + 5;
