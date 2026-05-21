@@ -3793,7 +3793,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "115"); } catch(e) { return 115; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "116"); } catch(e) { return 116; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -6439,46 +6439,84 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
         }
       }
 
-      // Tentative de récupération du fichier source via fetch
-      // On utilise response.arrayBuffer() puis TextDecoder pour éviter les troncatures
-      // que peut causer response.text() sur certains navigateurs Android avec GitHub Pages (gzip)
-      fetch(window.location.href, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Accept': 'text/html,*/*'
-        }
-      })
-        .then(function(response) {
-          if (!response.ok) throw new Error("HTTP " + response.status);
-          // Récupérer comme ArrayBuffer (plus fiable que .text() qui peut tronquer)
-          return response.arrayBuffer();
-        })
-        .then(function(buffer) {
-          // Décoder le buffer en texte UTF-8
-          var decoder = new TextDecoder('utf-8');
-          var htmlContent = decoder.decode(buffer);
-          // Vérification : si le contenu est trop petit, c'est suspect (fichier tronqué)
-          if (htmlContent.length < 300000) {
-            // Tentative de secours : essayer avec response.text() classique sur une URL avec timestamp
-            return fetch(window.location.href + '?nocache=' + Date.now(), { cache: 'no-store' })
-              .then(function(r) { return r.text(); })
-              .then(function(htmlRetry) {
-                if (htmlRetry.length > htmlContent.length) {
-                  showDiagnostic(htmlRetry, "fetch+retry (" + Math.round(htmlRetry.length / 1024) + " Ko)");
-                } else {
-                  showDiagnostic(htmlContent, "fetch (arrayBuffer)");
-                }
-              });
-          }
-          showDiagnostic(htmlContent, "fetch (arrayBuffer)");
-        })
-        .catch(function(err) {
-          // Pas de fallback cloneNode (il capturerait l'écran admin et casserait l'app)
-          loadingDiv.remove();
-          alert("\u274C Impossible de r\u00E9cup\u00E9rer le fichier source via fetch :\n\n" + err.message + "\n\nCela peut arriver si l'application est ouverte directement depuis un fichier local (file://) sur certains navigateurs. Essayez d'h\u00E9berger le fichier sur GitHub Pages.");
+      // Tentative de récupération du fichier source.
+      // On utilise XMLHttpRequest (plus fiable sur Chrome Android avec gzip de GitHub Pages)
+      // ET fetch en parallèle, et on garde le résultat le plus volumineux.
+      function tryXHR() {
+        return new Promise(function(resolve, reject) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', window.location.href + '?xhr=' + Date.now(), true);
+          xhr.responseType = 'text';
+          xhr.setRequestHeader('Cache-Control', 'no-cache, no-store');
+          xhr.setRequestHeader('Pragma', 'no-cache');
+          xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve({ text: xhr.responseText, source: "XMLHttpRequest" });
+            } else {
+              reject(new Error("XHR HTTP " + xhr.status));
+            }
+          };
+          xhr.onerror = function() { reject(new Error("XHR network error")); };
+          xhr.send();
         });
+      }
+
+      function tryFetchBuffer() {
+        return fetch(window.location.href + '?fetch=' + Date.now(), {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Accept': 'text/html,*/*'
+          }
+        }).then(function(response) {
+          if (!response.ok) throw new Error("HTTP " + response.status);
+          return response.arrayBuffer();
+        }).then(function(buffer) {
+          var decoder = new TextDecoder('utf-8');
+          return { text: decoder.decode(buffer), source: "fetch (arrayBuffer)" };
+        });
+      }
+
+      function tryFetchText() {
+        return fetch(window.location.href + '?text=' + Date.now(), {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' }
+        }).then(function(response) {
+          if (!response.ok) throw new Error("HTTP " + response.status);
+          return response.text();
+        }).then(function(text) {
+          return { text: text, source: "fetch (text)" };
+        });
+      }
+
+      // On essaie les 3 méthodes en parallèle et on garde la plus volumineuse
+      var attempts = [
+        tryXHR().catch(function(e) { return { text: "", source: "XHR (échec : " + e.message + ")" }; }),
+        tryFetchBuffer().catch(function(e) { return { text: "", source: "fetch buffer (échec : " + e.message + ")" }; }),
+        tryFetchText().catch(function(e) { return { text: "", source: "fetch text (échec : " + e.message + ")" }; })
+      ];
+
+      Promise.all(attempts).then(function(results) {
+        // Garder le résultat avec la plus grande taille
+        var best = results.reduce(function(acc, r) {
+          return r.text.length > acc.text.length ? r : acc;
+        }, { text: "", source: "aucune méthode n'a réussi" });
+
+        if (!best.text || best.text.length < 100) {
+          loadingDiv.remove();
+          alert("\u274C Toutes les m\u00E9thodes de r\u00E9cup\u00E9ration ont \u00E9chou\u00E9.\n\nD\u00E9tails :\n" + results.map(function(r) { return "- " + r.source + " : " + r.text.length + " caract\u00E8res"; }).join("\n"));
+          return;
+        }
+
+        // Construire un récapitulatif des méthodes pour le diagnostic
+        var methodsSummary = "meilleure m\u00E9thode : " + best.source + " (" + Math.round(best.text.length / 1024) + " Ko)\n" +
+          results.map(function(r) { return "  \u2022 " + r.source + " : " + Math.round(r.text.length / 1024) + " Ko"; }).join("\n");
+        showDiagnostic(best.text, best.source + " — comparaison : XHR=" + Math.round(results[0].text.length / 1024) + " Ko, fetch buffer=" + Math.round(results[1].text.length / 1024) + " Ko, fetch text=" + Math.round(results[2].text.length / 1024) + " Ko");
+      }).catch(function(err) {
+        loadingDiv.remove();
+        alert("\u274C Erreur inattendue : " + err.message);
+      });
     }, style: {
       width: "100%", padding: 16,
       background: "#1b5e20", border: "none", borderRadius: 12,
