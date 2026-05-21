@@ -2351,6 +2351,7 @@ function Panel({ group, lineColor, zoomed, onToggle }) {
 function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete, existingGroups, builtinGroups, hasCustomData, onImportBuiltin, onChangeVoitures, onClose, directionInfo, onToggleDirection }) {
   const [type, setType] = useState("sortie");
   const [showDirMenu, setShowDirMenu] = useState(false);
+  const [pendingDir, setPendingDir] = useState(null); // Direction "en cours de sélection" (feedback visuel)
   const [position, setPosition] = useState("tete");
   const [voitureNum, setVoitureNum] = useState("1");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -2518,11 +2519,21 @@ directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div",
   } },
     directionInfo.all.map(function(dir, dIdx) {
       var isCurrent = dir === directionInfo.current;
+      var isPending = dir === pendingDir;
+      var isHighlighted = isCurrent || isPending;
       return /* @__PURE__ */ React.createElement("button", {
         key: dIdx,
         onClick: function() {
-          setShowDirMenu(false);
-          if (!isCurrent) onToggleDirection(dir);
+          if (!isCurrent) {
+            setPendingDir(dir);
+            setTimeout(function() {
+              setShowDirMenu(false);
+              onToggleDirection(dir);
+              setPendingDir(null);
+            }, 200);
+          } else {
+            setShowDirMenu(false);
+          }
         },
         style: {
           display: "flex",
@@ -2530,18 +2541,19 @@ directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div",
           gap: 10,
           width: "100%",
           padding: "11px 14px",
-          background: isCurrent ? lineColor : "#fff",
+          background: isHighlighted ? lineColor : "#fff",
           border: "none",
-          borderBottom: dIdx === directionInfo.all.length - 1 ? "none" : "1px solid #eee",
-          color: isCurrent ? (lineText || "#fff") : "#111",
-          fontWeight: isCurrent ? 900 : 700,
+          borderBottom: dIdx === directionInfo.all.length - 1 ? "none" : "1px solid #d4d4d4",
+          color: isHighlighted ? (lineText || "#fff") : "#111",
+          fontWeight: isHighlighted ? 900 : 700,
           fontSize: 15,
           cursor: "pointer",
           textAlign: "left",
-          textShadow: isCurrent ? (lineText === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)") : "none"
+          transition: "background 0.08s ease, color 0.08s ease",
+          textShadow: isHighlighted ? (lineText === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)") : "none"
         }
       },
-        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, opacity: isCurrent ? 1 : 0 } }, "\u2713"),
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, opacity: isHighlighted ? 1 : 0 } }, "\u2713"),
         /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, "\u2192 " + dir)
       );
     })
@@ -3655,6 +3667,8 @@ function App() {
   const [buttonOrder, setButtonOrder] = useState(null); // Ordre figé des boutons de bascule (mémorisé à l'arrivée sur la liste)
   React.useEffect(() => { setButtonOrder(null); }, [lineId]);
   const [showDir, setShowDir] = useState(false);
+  const [showForkDirMenu, setShowForkDirMenu] = useState(false); // Pour le bouton bascule des stations pivots
+  const [pendingForkDir, setPendingForkDir] = useState(null); // Direction "en cours de sélection" (pour feedback visuel)
   const [station, setStation] = useState(null);
   const [tab, setTab] = useState("train");
   const [noteText, setNoteText] = useState("");
@@ -3679,6 +3693,10 @@ function App() {
       if (d.customTrainData) setCustomTrainData(d.customTrainData);
       if (d.adminEdits) setAdminEdits(d.adminEdits);
       if (d.favorites) setFavorites(d.favorites);
+      if (d.futurActifs) setFuturActifs(d.futurActifs);
+      if (d.lineVoitures) setLineVoitures(d.lineVoitures);
+      if (d.customStations) setCustomStations(d.customStations);
+      if (d.notes) setNotes(d.notes);
       if (d.version) { setAppVersion(d.version); localStorage.setItem("mpe_version", String(d.version)); }
       setScreen("home");
       setShowAdmin(false);
@@ -3790,7 +3808,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "103"); } catch(e) { return 103; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "110"); } catch(e) { return 110; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -5407,10 +5425,104 @@ function App() {
 
     let currentLabel, otherDir;
 
+    // === CAS RER (multiMode) : liste déroulante avec tous les terminus ===
+    if (transport === "rer" && forkConfig && forkConfig.multiMode && forkConfig.branches) {
+      // Liste de toutes les missions disponibles (label = terminus officiel)
+      const rerOptions = forkConfig.branches
+        .filter(b => !b.futur || isLineActive(b.id, futurActifs))
+        .map(b => b.label);
+      if (rerOptions.length < 2) return null;
+      // Direction courante : on cherche si direction matche une des missions
+      // Sinon on prend la première mission par défaut
+      const currentDir = rerOptions.indexOf(direction) >= 0 ? direction : rerOptions[0];
+      return /* @__PURE__ */ React.createElement("div", { style: { margin: "8px 4px 0", position: "relative" } },
+        /* @__PURE__ */ React.createElement("button", {
+          onClick: () => setShowForkDirMenu((v) => !v),
+          "aria-label": "Mission actuelle : " + currentDir + ". Cliquer pour afficher les autres missions",
+          style: {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            padding: "5px 12px",
+            background: line.color,
+            border: "2px solid #000",
+            borderRadius: 10,
+            color: line.text || "#fff",
+            fontWeight: 900,
+            fontSize: 15,
+            cursor: "pointer",
+            textAlign: "center",
+            lineHeight: 1.25,
+            letterSpacing: 0.2,
+            textShadow: line.text === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
+          }
+        },
+          /* @__PURE__ */ React.createElement("span", null, "\u2192 " + currentDir),
+          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 900 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+        ),
+        showForkDirMenu && /* @__PURE__ */ React.createElement("div", { style: {
+          position: "absolute",
+          top: "calc(100% + 4px)",
+          left: 0, right: 0,
+          background: "#fff",
+          border: "2px solid #000",
+          borderRadius: 10,
+          overflow: "hidden",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
+          zIndex: 100
+        } },
+          rerOptions.map((opt, i) => {
+            const isCurrent = opt === currentDir;
+            const isPending = opt === pendingForkDir;
+            const isHighlighted = isCurrent || isPending;
+            return /* @__PURE__ */ React.createElement("button", {
+              key: i,
+              onClick: () => {
+                if (!isCurrent) {
+                  setPendingForkDir(opt);
+                  setTimeout(() => {
+                    setShowForkDirMenu(false);
+                    setDirection(opt);
+                    setPendingForkDir(null);
+                  }, 200);
+                } else {
+                  setShowForkDirMenu(false);
+                }
+              },
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                width: "100%",
+                padding: "11px 14px",
+                background: isHighlighted ? line.color : "#fff",
+                border: "none",
+                borderBottom: i === rerOptions.length - 1 ? "none" : "1px solid #d4d4d4",
+                color: isHighlighted ? (line.text || "#fff") : "#111",
+                fontWeight: isHighlighted ? 900 : 700,
+                fontSize: 14,
+                cursor: "pointer",
+                textAlign: "left",
+                transition: "background 0.08s ease, color 0.08s ease",
+                textShadow: isHighlighted ? (line.text === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)") : "none"
+              }
+            },
+              /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, opacity: isHighlighted ? 1 : 0 } }, "\u2713"),
+              /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, "\u2192 " + opt)
+            );
+          })
+        )
+      );
+    }
+
     if (forkInfo && hasFork) {
       // Ligne à fourche : 3 cas selon où on est
       const currentSt = realSts.find((s) => s.n === station.n);
       const stationBranch = currentSt ? currentSt.branch : null;
+      const isStPivot = currentSt ? !!currentSt.fork : false;
       // Terminus de chaque branche (dernière station de chaque branche)
       const branchAStations = realSts.filter((s) => s.branch === forkInfo.branchA.id);
       const branchBStations = realSts.filter((s) => s.branch === forkInfo.branchB.id);
@@ -5420,9 +5532,98 @@ function App() {
       const troncStations = realSts.filter((s) => !s.branch && !s.fork);
       const termTronc = troncStations.length > 0 ? troncStations[0].n : null;
 
+      // === CAS SPÉCIAL : station pivot (La Fourche, Maison Blanche, Gargan, Delaunay-Belleville) ===
+      // 3 voies physiques distinctes => liste déroulante avec 3 choix (noms complets)
+      if (isStPivot && termTronc && termBranchA && termBranchB) {
+        const allOptions = [termTronc, termBranchA, termBranchB];
+        // Affichage : le terminus officiel correspondant à direction (ou tronc par défaut)
+        const currentDir = allOptions.indexOf(direction) >= 0 ? direction : termTronc;
+        return /* @__PURE__ */ React.createElement("div", { style: { margin: "8px 4px 0", position: "relative" } },
+          /* @__PURE__ */ React.createElement("button", {
+            onClick: () => setShowForkDirMenu((v) => !v),
+            "aria-label": "Quai actuel : " + currentDir + ". Cliquer pour afficher les autres quais",
+            style: {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              width: "100%",
+              padding: "5px 12px",
+              background: line.color,
+              border: "2px solid #000",
+              borderRadius: 10,
+              color: line.text || "#fff",
+              fontWeight: 900,
+              fontSize: 16,
+              cursor: "pointer",
+              textAlign: "center",
+              lineHeight: 1.25,
+              letterSpacing: 0.2,
+              textShadow: line.text === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
+            }
+          },
+            /* @__PURE__ */ React.createElement("span", null, "\u2192 " + currentDir),
+            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 900 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+          ),
+          showForkDirMenu && /* @__PURE__ */ React.createElement("div", { style: {
+            position: "absolute",
+            top: "calc(100% + 4px)",
+            left: 0, right: 0,
+            background: "#fff",
+            border: "2px solid #000",
+            borderRadius: 10,
+            overflow: "hidden",
+            boxShadow: "0 4px 14px rgba(0,0,0,0.25)",
+            zIndex: 100
+          } },
+            allOptions.map((opt, i) => {
+              const isCurrent = opt === currentDir;
+              const isPending = opt === pendingForkDir;
+              const isHighlighted = isCurrent || isPending;
+              return /* @__PURE__ */ React.createElement("button", {
+                key: i,
+                onClick: () => {
+                  // Petit délai pour voir la sélection s'allumer avant fermeture
+                  if (!isCurrent) {
+                    setPendingForkDir(opt);
+                    setTimeout(() => {
+                      setShowForkDirMenu(false);
+                      setDirection(opt);
+                      setPendingForkDir(null);
+                    }, 200);
+                  } else {
+                    setShowForkDirMenu(false);
+                  }
+                },
+                style: {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  width: "100%",
+                  padding: "11px 14px",
+                  background: isHighlighted ? line.color : "#fff",
+                  border: "none",
+                  borderBottom: i === allOptions.length - 1 ? "none" : "1px solid #d4d4d4",
+                  color: isHighlighted ? (line.text || "#fff") : "#111",
+                  fontWeight: isHighlighted ? 900 : 700,
+                  fontSize: 15,
+                  cursor: "pointer",
+                  textAlign: "left",
+                  transition: "background 0.08s ease, color 0.08s ease",
+                  textShadow: isHighlighted ? (line.text === "#000" ? "-1.5px -1.5px 0 rgba(255,255,255,0.95), 1.5px -1.5px 0 rgba(255,255,255,0.95), -1.5px 1.5px 0 rgba(255,255,255,0.95), 1.5px 1.5px 0 rgba(255,255,255,0.95)" : "-1.5px -1.5px 0 rgba(0,0,0,0.95), 1.5px -1.5px 0 rgba(0,0,0,0.95), -1.5px 1.5px 0 rgba(0,0,0,0.95), 1.5px 1.5px 0 rgba(0,0,0,0.95)") : "none"
+                }
+              },
+                /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, opacity: isHighlighted ? 1 : 0 } }, "\u2713"),
+                /* @__PURE__ */ React.createElement("span", { style: { flex: 1 } }, "\u2192 " + opt)
+              );
+            })
+          )
+        );
+      }
+
       if (!stationBranch) {
-        // Tronc commun OU station pivot (fork)
-        // 2 directions : tronc <-> "Asnières / Saint-Denis"
+        // Tronc commun (hors pivot) : 2 directions (tronc <-> combo des branches)
         if (direction === termTronc) {
           currentLabel = forkInfo.tronc;
           // Bascule : on prend une direction par défaut (terminus de la première branche)
@@ -6097,29 +6298,25 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
     "G\u00E9n\u00E8re un nouveau fichier ", /* @__PURE__ */ React.createElement("b", null, "index.html"), " avec toutes vos donn\u00E9es int\u00E9gr\u00E9es."
   ),
   (() => {
-    var isGitHub = window.location.hostname.indexOf("github.io") !== -1 || window.location.protocol === "https:" || window.location.protocol === "http:";
-    var isLocal = window.location.protocol === "file:" || window.location.protocol === "content:" || window.location.protocol === "blob:";
-    if (!isLocal) {
-      return /* @__PURE__ */ React.createElement("div", { style: { background: "#fff3cd", border: "2px solid #ffa726", borderRadius: 12, padding: 16, marginBottom: 14 } },
-        /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 15, color: "#b26500", marginBottom: 8 } }, "\u26A0\uFE0F Mode en ligne d\u00E9tect\u00E9"),
-        /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, color: "#5d4500", lineHeight: 1.5, marginBottom: 12 } },
-          "Vous \u00EAtes sur GitHub Pages. Pour sauvegarder de fa\u00E7on fiable, ", /* @__PURE__ */ React.createElement("b", null, "t\u00E9l\u00E9chargez d'abord ce fichier sur votre t\u00E9l\u00E9phone"), " puis travaillez en local. La sauvegarde sera ensuite fiable \u00E0 100%."
-        ),
-        /* @__PURE__ */ React.createElement("button", { onClick: function() {
-          var a = document.createElement('a');
-          a.href = window.location.href;
-          a.download = 'index.html';
-          a.click();
-        }, style: { width: "100%", padding: 14, background: "#1565C0", border: "none", borderRadius: 10, color: "#fff", fontWeight: 800, fontSize: 15, cursor: "pointer" } }, "\uD83D\uDCF2 T\u00E9l\u00E9charger pour travailler en local")
-      );
-    }
+    // La méthode fetch utilisée ci-dessous marche partout (local OU GitHub Pages),
+    // donc on affiche directement le bouton de sauvegarde principal sans distinction.
     return /* @__PURE__ */ React.createElement("button", { onClick: function() {
       var newVersion = appVersion + 1;
       var now = new Date();
       var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
       var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
       var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " \u00E0 " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
-      var dataStr = JSON.stringify({ customTrainData: customTrainData, adminEdits: adminEdits, favorites: favorites, futurActifs: futurActifs, version: newVersion });
+      // Toutes les données utilisateur à sauvegarder
+      var dataStr = JSON.stringify({
+        customTrainData: customTrainData,
+        adminEdits: adminEdits,
+        favorites: favorites,
+        futurActifs: futurActifs,
+        lineVoitures: lineVoitures,
+        customStations: customStations,
+        notes: notes,
+        version: newVersion
+      });
       var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
 
       function cleanAndDownload(htmlContent) {
@@ -6149,7 +6346,8 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
         a.href = url;
         a.download = 'index.html';
         a.click();
-        URL.revokeObjectURL(url);
+        // Délai avant revoke pour laisser le temps au téléchargement de démarrer
+        setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
 
         // Mettre à jour la version et logger SEULEMENT si tout a réussi
         setAppVersion(newVersion);
@@ -6165,23 +6363,46 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
         return true;
       }
 
-      // Capture propre : cloner le document et nettoyer les éléments transitoires
-      try {
-        var clone = document.documentElement.cloneNode(true);
-        // Supprimer les éléments transitoires injectés dynamiquement
-        var toRemove = clone.querySelectorAll('#mpe-scroll-indicator, [data-transient]');
-        for (var i = 0; i < toRemove.length; i++) toRemove[i].remove();
-        // Nettoyer les inputs en cours de saisie (remettre la valeur originale)
-        var inputs = clone.querySelectorAll('input, textarea');
-        for (var j = 0; j < inputs.length; j++) {
-          inputs[j].removeAttribute('value');
-          if (inputs[j].tagName === 'TEXTAREA') inputs[j].textContent = '';
-        }
-        var htmlContent = '<!DOCTYPE html>\n' + clone.outerHTML;
-        cleanAndDownload(htmlContent);
-      } catch(e) {
-        alert("\u274C Erreur lors de la sauvegarde : " + e.message);
-      }
+      // NOUVELLE MÉTHODE FIABLE : on récupère le fichier source via fetch
+      // au lieu de cloner le DOM (qui est fragile et tronque sur mobile).
+      // Le fetch retourne TOUJOURS le HTML d'origine, complet et propre.
+      var loadingToast = document.createElement('div');
+      loadingToast.textContent = '⏳ G\u00E9n\u00E9ration de la sauvegarde...';
+      loadingToast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1565C0;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
+      document.body.appendChild(loadingToast);
+
+      fetch(window.location.href, { cache: 'no-store' })
+        .then(function(response) {
+          if (!response.ok) throw new Error("fetch a \u00E9chou\u00E9 (HTTP " + response.status + ")");
+          return response.text();
+        })
+        .then(function(htmlContent) {
+          loadingToast.remove();
+          if (!htmlContent || htmlContent.length < 100000) {
+            alert("\u274C Le fichier source r\u00E9cup\u00E9r\u00E9 est trop petit ou vide. R\u00E9essayez.");
+            return;
+          }
+          cleanAndDownload(htmlContent);
+        })
+        .catch(function(err) {
+          loadingToast.remove();
+          // Si le fetch \u00E9choue, on tente la m\u00E9thode de secours (clone du DOM)
+          console.warn("Fetch \u00E9chou\u00E9, m\u00E9thode de secours :", err);
+          try {
+            var clone = document.documentElement.cloneNode(true);
+            var toRemove = clone.querySelectorAll('#mpe-scroll-indicator, [data-transient]');
+            for (var i = 0; i < toRemove.length; i++) toRemove[i].remove();
+            var inputs = clone.querySelectorAll('input, textarea');
+            for (var j = 0; j < inputs.length; j++) {
+              inputs[j].removeAttribute('value');
+              if (inputs[j].tagName === 'TEXTAREA') inputs[j].textContent = '';
+            }
+            var fallbackHtml = '<!DOCTYPE html>\n' + clone.outerHTML;
+            cleanAndDownload(fallbackHtml);
+          } catch(e2) {
+            alert("\u274C Impossible de sauvegarder : " + e2.message);
+          }
+        });
     }, style: {
       width: "100%", padding: 16,
       background: "#1b5e20", border: "none", borderRadius: 12,
