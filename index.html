@@ -2543,7 +2543,7 @@ directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div",
           padding: "11px 14px",
           background: isHighlighted ? lineColor : "#fff",
           border: "none",
-          borderBottom: dIdx === directionInfo.all.length - 1 ? "none" : "1px solid #d4d4d4",
+          borderBottom: dIdx === directionInfo.all.length - 1 ? "none" : "1px solid #000",
           color: isHighlighted ? (lineText || "#fff") : "#111",
           fontWeight: isHighlighted ? 900 : 700,
           fontSize: 15,
@@ -3808,7 +3808,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "110"); } catch(e) { return 110; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "111"); } catch(e) { return 111; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -4398,7 +4398,7 @@ function App() {
       }
     },
     "\u2699\uFE0F"
-  )), screen === "lines" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "16px 16px 8px", display: "flex", alignItems: "center", gap: 10 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", color: "#fff", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 15 } }, transport === "metro" ? "Lignes de M\xE9tro" : transport === "rer" ? "Lignes de RER" : transport === "tram" ? "Lignes de Tramway" : "C\xE2ble")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 } }, linesForType.map((l) => /* @__PURE__ */ React.createElement(
+  )), screen === "lines" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "rgba(255,255,255,0.08)", border: "none", padding: "14px 16px 12px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", color: "#fff" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 30, fontWeight: 900, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 17, color: "#fff" } }, transport === "metro" ? "Lignes de M\xE9tro" : transport === "rer" ? "Lignes de RER" : transport === "tram" ? "Lignes de Tramway" : "C\xE2ble")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 } }, linesForType.map((l) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: l.id,
@@ -5500,7 +5500,7 @@ function App() {
                 padding: "11px 14px",
                 background: isHighlighted ? line.color : "#fff",
                 border: "none",
-                borderBottom: i === rerOptions.length - 1 ? "none" : "1px solid #d4d4d4",
+                borderBottom: i === rerOptions.length - 1 ? "none" : "1px solid #000",
                 color: isHighlighted ? (line.text || "#fff") : "#111",
                 fontWeight: isHighlighted ? 900 : 700,
                 fontSize: 14,
@@ -5604,7 +5604,7 @@ function App() {
                   padding: "11px 14px",
                   background: isHighlighted ? line.color : "#fff",
                   border: "none",
-                  borderBottom: i === allOptions.length - 1 ? "none" : "1px solid #d4d4d4",
+                  borderBottom: i === allOptions.length - 1 ? "none" : "1px solid #000",
                   color: isHighlighted ? (line.text || "#fff") : "#111",
                   fontWeight: isHighlighted ? 900 : 700,
                   fontSize: 15,
@@ -5986,7 +5986,7 @@ function App() {
       onSave: saveGroup,
       onClose: () => setShowPhotoAI(false)
     }
-  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "none", border: "none", fontSize: 24, cursor: "pointer" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { fontWeight: 800, fontSize: 18 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
+  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "#fff", border: "none", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", borderBottom: "1px solid #eee", color: "#111" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 30, fontWeight: 900, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 19 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
     const [lid, sname] = key.split("::");
     const l = getLine(lid);
     if (!l) return null;
@@ -6130,7 +6130,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 26, cursor: "pointer", lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, (() => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 36, fontWeight: 900, cursor: "pointer", lineHeight: 1, padding: "8px 12px 8px 4px", minWidth: 44, minHeight: 44 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, (() => {
     var d = new Date();
     var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
     var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
