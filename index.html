@@ -3686,22 +3686,7 @@ function App() {
       return {};
     }
   });
-  // Charger les données sauvegardées si présentes
-  React.useEffect(function() {
-    if (window.MPE_SAVED_DATA) {
-      var d = window.MPE_SAVED_DATA;
-      if (d.customTrainData) setCustomTrainData(d.customTrainData);
-      if (d.adminEdits) setAdminEdits(d.adminEdits);
-      if (d.favorites) setFavorites(d.favorites);
-      if (d.futurActifs) setFuturActifs(d.futurActifs);
-      if (d.lineVoitures) setLineVoitures(d.lineVoitures);
-      if (d.customStations) setCustomStations(d.customStations);
-      if (d.notes) setNotes(d.notes);
-      if (d.version) { setAppVersion(d.version); localStorage.setItem("mpe_version", String(d.version)); }
-      setScreen("home");
-      setShowAdmin(false);
-    }
-  }, []);
+  // Note: le chargement de MPE_SAVED_DATA se fait plus bas, après que tous les setters soient déclarés
 
   const [customTrainData, setCustomTrainData] = useState(() => {
     try {
@@ -3808,7 +3793,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "111"); } catch(e) { return 111; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "114"); } catch(e) { return 114; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -3845,6 +3830,27 @@ function App() {
     } catch (e) {
     }
   }, [adminEdits]);
+
+  // Charger les données sauvegardées si présentes (window.MPE_SAVED_DATA injecté par la fonction sauvegarde)
+  // Ce useEffect se déclenche une seule fois au montage, après que tous les setters sont déclarés
+  React.useEffect(function() {
+    if (window.MPE_SAVED_DATA) {
+      var d = window.MPE_SAVED_DATA;
+      if (d.customTrainData) setCustomTrainData(d.customTrainData);
+      if (d.adminEdits) setAdminEdits(d.adminEdits);
+      if (d.favorites) setFavorites(d.favorites);
+      if (d.futurActifs) setFuturActifs(d.futurActifs);
+      if (d.lineVoitures) setLineVoitures(d.lineVoitures);
+      if (d.customStations) setCustomStations(d.customStations);
+      if (d.notes) setNotes(d.notes);
+      if (d.version) { setAppVersion(d.version); localStorage.setItem("mpe_version", String(d.version)); }
+      // Forcer le retour à l'écran d'accueil pour éviter de bloquer sur l'écran admin
+      setScreen("home");
+      setShowAdmin(false);
+      setAdminUnlocked(false);
+      setAdminScreen("menu");
+    }
+  }, []);
   const getAdminStations = (lid) => {
     const base = lid ? STATIONS[lid] || CABLE_STATIONS[lid] || [] : [];
     const edits = adminEdits[lid] || {};
@@ -4398,7 +4404,7 @@ function App() {
       }
     },
     "\u2699\uFE0F"
-  )), screen === "lines" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "rgba(255,255,255,0.08)", border: "none", padding: "14px 16px 12px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", color: "#fff" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 30, fontWeight: 900, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 17, color: "#fff" } }, transport === "metro" ? "Lignes de M\xE9tro" : transport === "rer" ? "Lignes de RER" : transport === "tram" ? "Lignes de Tramway" : "C\xE2ble")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 } }, linesForType.map((l) => /* @__PURE__ */ React.createElement(
+  )), screen === "lines" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "rgba(255,255,255,0.08)", border: "none", padding: "14px 16px 12px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", color: "#fff" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 22, fontWeight: 900, lineHeight: 1, display: "inline-flex", alignItems: "center", height: 22 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 17, color: "#fff", lineHeight: 1, display: "inline-flex", alignItems: "center", height: 22 } }, transport === "metro" ? "Lignes de M\xE9tro" : transport === "rer" ? "Lignes de RER" : transport === "tram" ? "Lignes de Tramway" : "C\xE2ble")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch", padding: "16px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14 } }, linesForType.map((l) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: l.id,
@@ -4875,6 +4881,9 @@ function App() {
     // À l'arrivée : bouton sélectionné à gauche. Ensuite, l'ordre est figé.
     const term1 = filteredStations[0].n;
     const term2 = filteredStations[filteredStations.length - 1].n;
+    // Direction effective : si direction est null/undefined, on prend term1 par défaut
+    // (évite le bug visuel où aucun bouton n'apparaît actif au premier rendu)
+    const effectiveDirection = direction || term1;
     const lineColor = line.color || "#111";
     const lineText = line.text || "#fff";
     // Si l'ordre n'a pas encore été figé OU si les terminus actuels ne correspondent pas (changement de ligne) → recalculer
@@ -4882,13 +4891,13 @@ function App() {
     if (buttonOrder && buttonOrder.includes(term1) && buttonOrder.includes(term2)) {
       ordered = buttonOrder;
     } else {
-      ordered = direction === term2 ? [term2, term1] : [term1, term2];
+      ordered = effectiveDirection === term2 ? [term2, term1] : [term1, term2];
       // Figer l'ordre
       setTimeout(() => setButtonOrder(ordered), 0);
     }
     return /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 10 } },
       ordered.map((termName, i) => {
-        const isActive = direction === termName;
+        const isActive = effectiveDirection === termName;
         return /* @__PURE__ */ React.createElement("button", {
           key: i,
           onClick: () => setDirection(termName),
@@ -5986,7 +5995,7 @@ function App() {
       onSave: saveGroup,
       onClose: () => setShowPhotoAI(false)
     }
-  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "#fff", border: "none", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", borderBottom: "1px solid #eee", color: "#111" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 30, fontWeight: 900, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 19 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
+  )), screen === "favorites" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("button", { onClick: () => setScreen("home"), style: { background: "#fff", border: "none", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12, width: "100%", cursor: "pointer", textAlign: "left", borderBottom: "1px solid #eee", color: "#111" } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 24, fontWeight: 900, lineHeight: 1, display: "inline-flex", alignItems: "center", height: 24 } }, "\u2039"), /* @__PURE__ */ React.createElement("span", { style: { fontWeight: 800, fontSize: 19, lineHeight: 1, display: "inline-flex", alignItems: "center", height: 24 } }, "\u2B50 Mes favoris")), /* @__PURE__ */ React.createElement("div", { style: { flex: 1, minHeight: 0, overflowY: "scroll", touchAction: "pan-y", WebkitOverflowScrolling: "touch" } }, favorites.length === 0 ? /* @__PURE__ */ React.createElement("div", { style: { textAlign: "center", color: "#bbb", marginTop: 60, fontSize: 14 } }, "Aucun favori", /* @__PURE__ */ React.createElement("br", null), /* @__PURE__ */ React.createElement("span", { style: { fontSize: 11 } }, "Appuyez sur \u2606 dans une fiche station")) : favorites.map((key, i) => {
     const [lid, sname] = key.split("::");
     const l = getLine(lid);
     if (!l) return null;
@@ -6130,7 +6139,7 @@ function App() {
     } else {
       setAdminScreen("menu");
     }
-  }, style: { background: "none", border: "none", color: "#111", fontSize: 36, fontWeight: 900, cursor: "pointer", lineHeight: 1, padding: "8px 12px 8px 4px", minWidth: 44, minHeight: 44 } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, (() => {
+  }, style: { background: "none", border: "none", color: "#111", fontSize: 22, fontWeight: 900, cursor: "pointer", lineHeight: 1, padding: "8px 12px 8px 4px", minWidth: 44, minHeight: 44, display: "flex", alignItems: "center", justifyContent: "center" } }, "\u2039"), /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: "#111", fontWeight: 900, fontSize: 16 } }, (() => {
     var d = new Date();
     var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
     var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
@@ -6306,8 +6315,9 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
       var jours = ["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
       var mois = ["jan","fév","mar","avr","mai","jun","jul","aoû","sep","oct","nov","déc"];
       var label = jours[now.getDay()] + " " + now.getDate() + " " + mois[now.getMonth()] + " " + now.getFullYear() + " \u00E0 " + String(now.getHours()).padStart(2,"0") + "h" + String(now.getMinutes()).padStart(2,"0");
+
       // Toutes les données utilisateur à sauvegarder
-      var dataStr = JSON.stringify({
+      var dataObj = {
         customTrainData: customTrainData,
         adminEdits: adminEdits,
         favorites: favorites,
@@ -6316,92 +6326,132 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
         customStations: customStations,
         notes: notes,
         version: newVersion
-      });
-      var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
+      };
 
-      function cleanAndDownload(htmlContent) {
-        // Insérer ou remplacer le bloc de données
+      // Construire le diagnostic à afficher AVANT de télécharger
+      var diagnostic = [];
+      // Count helpers
+      var customTrainCount = Object.keys(customTrainData || {}).length;
+      var adminEditsCount = Object.keys(adminEdits || {}).length;
+      var favoritesCount = (favorites || []).length;
+      var lineVoituresCount = Object.keys(lineVoitures || {}).length;
+      var customStationsCount = Object.keys(customStations || {}).length;
+      var notesCount = Object.keys(notes || {}).length;
+      var futurStationsCount = Object.keys((futurActifs && futurActifs.stations) || {}).length;
+      var futurLinesCount = Object.keys((futurActifs && futurActifs.lines) || {}).length;
+
+      var loadingDiv = document.createElement('div');
+      loadingDiv.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+      loadingDiv.innerHTML = '<div style="background:#fff;border-radius:14px;padding:24px;max-width:380px;width:100%;font-family:sans-serif;color:#111;"><div style="font-size:17px;font-weight:800;margin-bottom:14px;text-align:center;">\uD83D\uDD0D V\u00E9rification en cours...</div><div style="text-align:center;color:#666;">R\u00E9cup\u00E9ration du fichier source...</div></div>';
+      document.body.appendChild(loadingDiv);
+
+      function showDiagnostic(htmlContent, sourceMethod) {
+        loadingDiv.remove();
+
+        // Construire le bloc de données
+        var dataStr = JSON.stringify(dataObj);
+        var dataScript = '<script id="mpe-data">window.MPE_SAVED_DATA=' + dataStr + ';<\/script>';
+
+        // Tentative d'insertion
+        var htmlOk = false;
+        var insertMethod = "";
         if (htmlContent.indexOf('id="mpe-data"') !== -1) {
           htmlContent = htmlContent.replace(/<script id="mpe-data">[\s\S]*?<\/script>/, dataScript);
-        } else {
+          htmlOk = true;
+          insertMethod = "remplacement bloc existant";
+        } else if (htmlContent.indexOf('</head>') !== -1) {
           htmlContent = htmlContent.replace('</head>', dataScript + '</head>');
+          htmlOk = true;
+          insertMethod = "insertion avant </head>";
+        } else if (htmlContent.indexOf('</body>') !== -1) {
+          htmlContent = htmlContent.replace('</body>', dataScript + '</body>');
+          htmlOk = true;
+          insertMethod = "insertion avant </body>";
         }
 
-        // VÉRIFICATION D'INTÉGRITÉ
-        var hasDoctype = htmlContent.toLowerCase().indexOf('<!doctype') !== -1 || htmlContent.indexOf('<html') !== -1;
-        var hasClosingHtml = htmlContent.indexOf('</html>') !== -1;
-        var hasData = htmlContent.indexOf('id="mpe-data"') !== -1;
-        var hasReact = htmlContent.indexOf('ReactDOM') !== -1;
-        var minSize = htmlContent.length > 100000;
+        // Vérifications finales
+        var checks = [
+          { ok: !!htmlContent && htmlContent.length > 50000, label: "Fichier HTML source r\u00E9cup\u00E9r\u00E9 (" + Math.round((htmlContent || "").length / 1024) + " Ko, via " + sourceMethod + ")" },
+          { ok: htmlContent.toLowerCase().indexOf('<!doctype') !== -1 || htmlContent.indexOf('<html') !== -1, label: "Balise <!DOCTYPE> ou <html> pr\u00E9sente" },
+          { ok: htmlContent.indexOf('</html>') !== -1, label: "Balise </html> pr\u00E9sente (fichier non tronqu\u00E9)" },
+          { ok: htmlOk && htmlContent.indexOf('id="mpe-data"') !== -1, label: "Bloc de donn\u00E9es ins\u00E9r\u00E9 (" + insertMethod + ")" },
+          { ok: true, label: "Donn\u00E9es panneaux de train : " + customTrainCount + " entr\u00E9e(s)" },
+          { ok: true, label: "Donn\u00E9es corrections admin : " + adminEditsCount + " entr\u00E9e(s)" },
+          { ok: true, label: "Favoris : " + favoritesCount },
+          { ok: true, label: "Voitures par ligne : " + lineVoituresCount + " ligne(s)" },
+          { ok: true, label: "Stations personnalis\u00E9es : " + customStationsCount },
+          { ok: true, label: "Notes par station : " + notesCount },
+          { ok: true, label: "Stations futures activ\u00E9es : " + futurStationsCount + " / lignes futures : " + futurLinesCount }
+        ];
 
-        if (!hasDoctype || !hasClosingHtml || !hasData || !hasReact || !minSize) {
-          alert("\u274C Erreur lors de la sauvegarde : le fichier g\u00E9n\u00E9r\u00E9 n'est pas complet. R\u00E9essayez ou rechargez la page.");
-          return false;
+        var allOk = checks.every(function(c) { return c.ok; });
+
+        // Construire le HTML du diagnostic
+        var diagHtml = '<div style="background:#fff;border-radius:14px;padding:20px;max-width:420px;width:100%;font-family:sans-serif;color:#111;max-height:90vh;overflow-y:auto;">';
+        diagHtml += '<div style="font-size:17px;font-weight:800;margin-bottom:6px;text-align:center;">\uD83D\uDCDD Diagnostic de la sauvegarde</div>';
+        diagHtml += '<div style="font-size:12px;color:#666;text-align:center;margin-bottom:14px;">Version v' + newVersion + ' \u2014 ' + label + '</div>';
+        diagHtml += '<div style="font-size:13px;line-height:1.7;margin-bottom:18px;">';
+        checks.forEach(function(c) {
+          var icon = c.ok ? '<span style="color:#1b5e20;font-weight:900;">\u2705</span>' : '<span style="color:#c62828;font-weight:900;">\u274C</span>';
+          diagHtml += icon + ' ' + c.label + '<br/>';
+        });
+        diagHtml += '</div>';
+
+        if (allOk) {
+          diagHtml += '<button id="mpe-confirm-save" style="width:100%;padding:14px;background:#1b5e20;color:#fff;border:none;border-radius:10px;font-weight:800;font-size:15px;cursor:pointer;margin-bottom:8px;">\uD83D\uDCBE T\u00E9l\u00E9charger le fichier index.html</button>';
+        } else {
+          diagHtml += '<div style="padding:12px;background:#ffebee;border:2px solid #c62828;border-radius:8px;font-size:13px;color:#c62828;font-weight:700;margin-bottom:10px;">\u26A0\uFE0F Probl\u00E8me d\u00E9tect\u00E9 : impossible de g\u00E9n\u00E9rer un fichier valide. Notez les croix rouges ci-dessus et signalez-les.</div>';
         }
+        diagHtml += '<button id="mpe-cancel-save" style="width:100%;padding:12px;background:#eee;color:#333;border:none;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;">Annuler</button>';
+        diagHtml += '</div>';
 
-        // Télécharger
-        var blob = new Blob([htmlContent], { type: 'text/html' });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = 'index.html';
-        a.click();
-        // Délai avant revoke pour laisser le temps au téléchargement de démarrer
-        setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+        var diagOverlay = document.createElement('div');
+        diagOverlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;';
+        diagOverlay.innerHTML = diagHtml;
+        document.body.appendChild(diagOverlay);
 
-        // Mettre à jour la version et logger SEULEMENT si tout a réussi
-        setAppVersion(newVersion);
-        localStorage.setItem("mpe_version", String(newVersion));
-        addLog("\u2705 SAUVEGARDE v" + newVersion + " - " + label);
+        var cancelBtn = diagOverlay.querySelector('#mpe-cancel-save');
+        cancelBtn.onclick = function() { diagOverlay.remove(); };
 
-        // Toast de confirmation
-        var toast = document.createElement('div');
-        toast.textContent = '✅ Fichier v' + newVersion + ' téléchargé avec succès !';
-        toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1b5e20;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
-        document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 4000);
-        return true;
+        if (allOk) {
+          var confirmBtn = diagOverlay.querySelector('#mpe-confirm-save');
+          confirmBtn.onclick = function() {
+            diagOverlay.remove();
+            // Télécharger
+            var blob = new Blob([htmlContent], { type: 'text/html' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            a.click();
+            setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+
+            setAppVersion(newVersion);
+            localStorage.setItem("mpe_version", String(newVersion));
+            addLog("\u2705 SAUVEGARDE v" + newVersion + " - " + label);
+
+            var toast = document.createElement('div');
+            toast.textContent = '\u2705 Fichier v' + newVersion + ' t\u00E9l\u00E9charg\u00E9 (' + Math.round(htmlContent.length / 1024) + ' Ko)';
+            toast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1b5e20;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.remove(); }, 4000);
+          };
+        }
       }
 
-      // NOUVELLE MÉTHODE FIABLE : on récupère le fichier source via fetch
-      // au lieu de cloner le DOM (qui est fragile et tronque sur mobile).
-      // Le fetch retourne TOUJOURS le HTML d'origine, complet et propre.
-      var loadingToast = document.createElement('div');
-      loadingToast.textContent = '⏳ G\u00E9n\u00E9ration de la sauvegarde...';
-      loadingToast.style.cssText = 'position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#1565C0;color:#fff;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.4);text-align:center;';
-      document.body.appendChild(loadingToast);
-
+      // Tentative de récupération du fichier source via fetch
       fetch(window.location.href, { cache: 'no-store' })
         .then(function(response) {
-          if (!response.ok) throw new Error("fetch a \u00E9chou\u00E9 (HTTP " + response.status + ")");
+          if (!response.ok) throw new Error("HTTP " + response.status);
           return response.text();
         })
         .then(function(htmlContent) {
-          loadingToast.remove();
-          if (!htmlContent || htmlContent.length < 100000) {
-            alert("\u274C Le fichier source r\u00E9cup\u00E9r\u00E9 est trop petit ou vide. R\u00E9essayez.");
-            return;
-          }
-          cleanAndDownload(htmlContent);
+          showDiagnostic(htmlContent, "fetch");
         })
         .catch(function(err) {
-          loadingToast.remove();
-          // Si le fetch \u00E9choue, on tente la m\u00E9thode de secours (clone du DOM)
-          console.warn("Fetch \u00E9chou\u00E9, m\u00E9thode de secours :", err);
-          try {
-            var clone = document.documentElement.cloneNode(true);
-            var toRemove = clone.querySelectorAll('#mpe-scroll-indicator, [data-transient]');
-            for (var i = 0; i < toRemove.length; i++) toRemove[i].remove();
-            var inputs = clone.querySelectorAll('input, textarea');
-            for (var j = 0; j < inputs.length; j++) {
-              inputs[j].removeAttribute('value');
-              if (inputs[j].tagName === 'TEXTAREA') inputs[j].textContent = '';
-            }
-            var fallbackHtml = '<!DOCTYPE html>\n' + clone.outerHTML;
-            cleanAndDownload(fallbackHtml);
-          } catch(e2) {
-            alert("\u274C Impossible de sauvegarder : " + e2.message);
-          }
+          // Pas de fallback cloneNode (il capturerait l'écran admin et casserait l'app)
+          loadingDiv.remove();
+          alert("\u274C Impossible de r\u00E9cup\u00E9rer le fichier source via fetch :\n\n" + err.message + "\n\nCela peut arriver si l'application est ouverte directement depuis un fichier local (file://) sur certains navigateurs. Essayez d'h\u00E9berger le fichier sur GitHub Pages.");
         });
     }, style: {
       width: "100%", padding: 16,
