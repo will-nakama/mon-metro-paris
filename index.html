@@ -3793,7 +3793,7 @@ function App() {
     try { return JSON.parse(localStorage.getItem("mpe_log") || "[]"); } catch(e) { return []; }
   });
   const [appVersion, setAppVersion] = useState(() => {
-    try { return parseInt(localStorage.getItem("mpe_version") || "114"); } catch(e) { return 114; }
+    try { return parseInt(localStorage.getItem("mpe_version") || "115"); } catch(e) { return 115; }
   });
   const [adminUnlocked, setAdminUnlocked] = useState(() => { try { return !localStorage.getItem("mpe_admin_code"); } catch(e) { return true; } });
   const [adminScreen, setAdminScreen] = useState("menu");
@@ -6371,7 +6371,7 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
 
         // Vérifications finales
         var checks = [
-          { ok: !!htmlContent && htmlContent.length > 50000, label: "Fichier HTML source r\u00E9cup\u00E9r\u00E9 (" + Math.round((htmlContent || "").length / 1024) + " Ko, via " + sourceMethod + ")" },
+          { ok: !!htmlContent && htmlContent.length > 300000, label: "Fichier HTML source r\u00E9cup\u00E9r\u00E9 (" + Math.round((htmlContent || "").length / 1024) + " Ko, via " + sourceMethod + ") \u2014 minimum requis : 300 Ko" },
           { ok: htmlContent.toLowerCase().indexOf('<!doctype') !== -1 || htmlContent.indexOf('<html') !== -1, label: "Balise <!DOCTYPE> ou <html> pr\u00E9sente" },
           { ok: htmlContent.indexOf('</html>') !== -1, label: "Balise </html> pr\u00E9sente (fichier non tronqu\u00E9)" },
           { ok: htmlOk && htmlContent.indexOf('id="mpe-data"') !== -1, label: "Bloc de donn\u00E9es ins\u00E9r\u00E9 (" + insertMethod + ")" },
@@ -6440,13 +6440,39 @@ adminUnlocked && adminScreen === "sauvegarde" && /* @__PURE__ */ React.createEle
       }
 
       // Tentative de récupération du fichier source via fetch
-      fetch(window.location.href, { cache: 'no-store' })
+      // On utilise response.arrayBuffer() puis TextDecoder pour éviter les troncatures
+      // que peut causer response.text() sur certains navigateurs Android avec GitHub Pages (gzip)
+      fetch(window.location.href, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Accept': 'text/html,*/*'
+        }
+      })
         .then(function(response) {
           if (!response.ok) throw new Error("HTTP " + response.status);
-          return response.text();
+          // Récupérer comme ArrayBuffer (plus fiable que .text() qui peut tronquer)
+          return response.arrayBuffer();
         })
-        .then(function(htmlContent) {
-          showDiagnostic(htmlContent, "fetch");
+        .then(function(buffer) {
+          // Décoder le buffer en texte UTF-8
+          var decoder = new TextDecoder('utf-8');
+          var htmlContent = decoder.decode(buffer);
+          // Vérification : si le contenu est trop petit, c'est suspect (fichier tronqué)
+          if (htmlContent.length < 300000) {
+            // Tentative de secours : essayer avec response.text() classique sur une URL avec timestamp
+            return fetch(window.location.href + '?nocache=' + Date.now(), { cache: 'no-store' })
+              .then(function(r) { return r.text(); })
+              .then(function(htmlRetry) {
+                if (htmlRetry.length > htmlContent.length) {
+                  showDiagnostic(htmlRetry, "fetch+retry (" + Math.round(htmlRetry.length / 1024) + " Ko)");
+                } else {
+                  showDiagnostic(htmlContent, "fetch (arrayBuffer)");
+                }
+              });
+          }
+          showDiagnostic(htmlContent, "fetch (arrayBuffer)");
         })
         .catch(function(err) {
           // Pas de fallback cloneNode (il capturerait l'écran admin et casserait l'app)
