@@ -166,7 +166,49 @@ const TRAM_LINES = [
   { id: "T14", color: "#00A88F", text: "#fff" }
   // Turquoise/vert
 ];
+// Utilitaire : produit une teinte plus claire d'une couleur de ligne, pour que
+// les boutons de bascule de direction se distinguent du bandeau coloré.
+// Sécurité : si la couleur est déjà très claire (ex. jaune L1), on l'assombrit
+// légèrement à la place, pour garder un contraste suffisant.
+function tintDirection(hex) {
+  if (!hex || hex[0] !== "#") return hex;
+  var h = hex.replace("#", "");
+  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+  var r = parseInt(h.substring(0,2),16);
+  var g = parseInt(h.substring(2,4),16);
+  var b = parseInt(h.substring(4,6),16);
+  // Luminance perçue (0-255)
+  var lum = 0.299*r + 0.587*g + 0.114*b;
+  var factor;
+  if (lum > 175) {
+    // couleur déjà claire : on assombrit (vers 0)
+    factor = -0.22;
+  } else {
+    // couleur foncée/moyenne : on éclaircit (vers 255)
+    factor = 0.30;
+  }
+  function adj(c) {
+    if (factor >= 0) return Math.round(c + (255 - c) * factor);
+    return Math.round(c * (1 + factor));
+  }
+  var nr = adj(r), ng = adj(g), nb = adj(b);
+  return "#" + [nr,ng,nb].map(function(x){ return ("0"+x.toString(16)).slice(-2); }).join("");
+}
 const PICTOS = {
+  pmr: {
+    svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 48 48", width: "100%", height: "100%" },
+      React.createElement("rect", { width: "48", height: "48", rx: "10", fill: "#1565C0" }),
+      // Tête
+      React.createElement("circle", { cx: "20", cy: "11", r: "4", fill: "#fff" }),
+      // Dos + assise (le personnage assis)
+      React.createElement("path", { d: "M20 16 L20 27 L31 27", fill: "none", stroke: "#fff", strokeWidth: "3.2", strokeLinecap: "round", strokeLinejoin: "round" }),
+      // Repose-pied (jambe vers l'avant)
+      React.createElement("path", { d: "M31 27 L35 35", fill: "none", stroke: "#fff", strokeWidth: "3.2", strokeLinecap: "round" }),
+      // Roue
+      React.createElement("circle", { cx: "23", cy: "33", r: "8.5", fill: "none", stroke: "#fff", strokeWidth: "2.6" })
+    ),
+    label: "Accessible PMR"
+  },
   escalator_up: {
     svg: /* @__PURE__ */ React.createElement("svg", { viewBox: "0 0 56 56", width: "100%", height: "100%" },
       React.createElement("rect", { width: "56", height: "56", rx: "11", fill: "#fff" }),
@@ -233,6 +275,56 @@ function PictoIcon({ type, size = 22 }) {
   const p = PICTOS[type];
   if (!p) return null;
   return /* @__PURE__ */ React.createElement("span", { title: p.label, style: { display: "inline-block", width: size, height: size, flexShrink: 0 } }, p.svg);
+}
+// ============================================================
+// BASE DE DONNÉES ACCESSIBILITÉ PMR (fauteuil roulant)
+// ============================================================
+// IMPORTANT : ces données doivent provenir de la source OFFICIELLE
+// (jeu de données ouvert IDFM "Accessibilité en gare/station").
+// NE JAMAIS inventer une station accessible : une fausse info
+// "accessible" peut mettre en difficulté une personne en fauteuil.
+//
+// Format : PMR_STATIONS[lineId] = liste des noms EXACTS des stations
+// accessibles (mêmes noms que dans STATIONS, avec tirets normaux).
+// Si une ligne est intégralement accessible, on peut mettre "ALL".
+//
+// État de remplissage :
+//   - "1"  : ✅ renseigné (ligne automatique, 100% accessible)
+//   - autres lignes : ⏳ À REMPLIR avec les données officielles IDFM
+// ============================================================
+const PMR_STATIONS = {
+  "1": "ALL",   // Ligne 1 : automatique, toutes stations équipées d'ascenseurs
+  "2": [],      // ⏳ à remplir
+  "3": [],      // ⏳ à remplir
+  "3bis": [],   // ⏳ à remplir
+  "4": [],      // ⏳ à remplir
+  "5": [],      // ⏳ à remplir
+  "6": [],      // ⏳ à remplir
+  "7": [],      // ⏳ à remplir
+  "7bis": [],   // ⏳ à remplir
+  "8": [],      // ⏳ à remplir
+  "9": [],      // ⏳ à remplir
+  "10": [],     // ⏳ à remplir
+  "11": [],     // ⏳ à remplir
+  "12": [],     // ⏳ à remplir
+  "13": [],     // ⏳ à remplir
+  "14": "ALL",  // Ligne 14 : automatique, toutes stations accessibles
+  // RER (souvent partiellement accessibles - à vérifier station par station)
+  "A": [], "B": [], "C": [], "D": [], "E": [],
+  // Grand Paris Express (toutes les nouvelles lignes sont 100% accessibles par conception)
+  "15": "ALL", "16": "ALL", "17": "ALL", "18": "ALL"
+};
+
+// Renvoie true si la station est accessible PMR, false si non, null si inconnu (non renseigné)
+function isStationPMR(lineId, stationName) {
+  const entry = PMR_STATIONS[lineId];
+  if (entry === undefined) return null;        // ligne non référencée
+  if (entry === "ALL") return true;            // ligne entièrement accessible
+  if (!Array.isArray(entry) || entry.length === 0) return null; // pas encore renseigné
+  // Comparaison insensible aux accents/casse pour robustesse
+  const norm = (s) => (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const target = norm(stationName);
+  return entry.some((n) => norm(n) === target);
 }
 const STATIONS = {
   "1": [
@@ -2354,6 +2446,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
   const [pendingDir, setPendingDir] = useState(null); // Direction "en cours de sélection" (feedback visuel)
   const [position, setPosition] = useState("tete");
   const [voitureNum, setVoitureNum] = useState("1");
+  const [porteNum, setPorteNum] = useState("0"); // 0 = voiture entière, 1/2/3 = porte précise
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [bordered, setBordered] = useState(false);
   const [corr, setCorr] = useState("");
@@ -2374,6 +2467,7 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     setType("sortie");
     setPosition("tete");
     setVoitureNum("1");
+    setPorteNum("0");
     setBordered(false);
     setCorr("");
     setPictos([]);
@@ -2401,6 +2495,14 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     if (v <= 2) setPosition("tete");
     else if (v >= n - 1) setPosition("queue");
     else setPosition("milieu");
+    // Si le groupe cible une porte précise, repositionner sur "voiture" + porte
+    if (g.portes && g.portes.length > 0) {
+      setPosition("voiture");
+      setVoitureNum(String(g.portes[0].voiture));
+      setPorteNum(String(g.portes[0].porte));
+    } else {
+      setPorteNum("0");
+    }
     setCorr((g.corr || []).join(", "));
     setPictos(g.pictos || []);
     setSorties(((_a = g.sorties) == null ? void 0 : _a.length) > 0 ? g.sorties : [{ num: "1", label: "" }]);
@@ -2409,6 +2511,10 @@ function PanneauEditor({ stKey, lineColor, lineText, nVoitures, onSave, onDelete
     const corrArr = corr.split(",").map((x) => x.trim()).filter(Boolean);
     const sortiesClean = sorties.filter((s) => s.label.trim() || s.num.trim());
     const group = { voitures: getVoitures(), type, sorties: sortiesClean, pictos, corr: corrArr, bordered: bordered };
+    // Ciblage par porte précise : uniquement si on cible une voiture ET qu'une porte (1/2/3) est choisie
+    if (position === "voiture" && porteNum !== "0") {
+      group.portes = [{ voiture: parseInt(voitureNum), porte: parseInt(porteNum) }];
+    }
     onSave(group, editIndex);
     // Vider le formulaire pour préparer la prochaine saisie
     resetForm();
@@ -2493,7 +2599,7 @@ directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div",
       gap: 8,
       width: "100%",
       padding: "10px 14px",
-      background: lineColor,
+      background: tintDirection(lineColor),
       border: "2.5px solid #000",
       borderRadius: 12,
       color: lineText || "#fff",
@@ -2666,6 +2772,26 @@ directionInfo && onToggleDirection && /* @__PURE__ */ React.createElement("div",
         }
       }, n);
     })
+  ),
+  // Sélecteur de PORTE précise (apparaît quand une voiture précise est choisie)
+  position === "voiture" && /* @__PURE__ */ React.createElement("div", { style: { marginTop: 10 } },
+    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "Pr\xE9cision \xB7 porte (sinon voiture enti\xE8re)"),
+    /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap" } },
+      [{ v: "1", l: "Porte 1" }, { v: "2", l: "Porte 2" }, { v: "3", l: "Porte 3" }].map(function(opt) {
+        return /* @__PURE__ */ React.createElement("button", {
+          key: opt.v,
+          onClick: function() { setPorteNum(function(p) { return p === opt.v ? "0" : opt.v; }); },
+          style: {
+            padding: "7px 14px",
+            border: "2px solid " + (porteNum === opt.v ? lineColor : "#ccc"),
+            borderRadius: 8,
+            background: porteNum === opt.v ? lineColor : "#fff",
+            color: porteNum === opt.v ? (lineText || "#fff") : "#555",
+            fontWeight: 800, fontSize: 12, cursor: "pointer"
+          }
+        }, opt.l);
+      })
+    )
   )
 ), type === "corr" && /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 12, display: "flex", alignItems: "center", gap: 10 } },
   /* @__PURE__ */ React.createElement("button", { onClick: function() { setBordered(function(b) { return !b; }); }, style: {
@@ -2777,7 +2903,7 @@ type === "sortie" && /* @__PURE__ */ React.createElement("div", { style: { margi
         );
       })
     );
-  })()), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "\xC9quipements"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 7 } }, Object.entries(PICTOS).filter(([k]) => ["escalator_up","escalator_down","elevator"].includes(k)).map(([k, v]) => /* @__PURE__ */ React.createElement(
+  })()), /* @__PURE__ */ React.createElement("div", { style: { marginBottom: 18 } }, /* @__PURE__ */ React.createElement("div", { style: { fontSize: 11, fontWeight: 700, color: "#888", marginBottom: 5, textTransform: "uppercase", letterSpacing: 1 } }, "\xC9quipements"), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 7 } }, Object.entries(PICTOS).filter(([k]) => ["pmr","escalator_up","escalator_down","elevator"].includes(k)).map(([k, v]) => /* @__PURE__ */ React.createElement(
     "button",
     {
       key: k,
@@ -3029,21 +3155,58 @@ function TrainDiagram({ trainData, trainDataOpposite, oppositeDirection, lineCol
   //   - Zone gauche : réservée pour les futurs panneaux du quai opposé (vide pour l'instant)
   //   - Zone centre : le train + ses panneaux actuels (sera scindée en étape 3)
   //   - Le tout est centré horizontalement
+  // === NOUVEAU SCHÉMA TRAIN 3/4 (ligne 1 uniquement, test) ===
+  const isL1 = true; // nouveau schéma 3/4 appliqué à toutes les lignes
+  function renderL1Train() {
+    const W = 54, DEPTH = 20, NOSE_H = 26, TAIL_H = 20;
+    const n = voitures;
+    const ox = 4;
+    const totalW = ox + W + DEPTH + 6;
+    const totalH = NOSE_H + n * CAR_H + TAIL_H;
+    const parts = [];
+    // nez (prolongé vers le bas pour coller à la voiture 1)
+    const cx = W / 2;
+    const noseBot = NOSE_H + CAR_H * 0.06 + 2;
+    parts.push(`<path d="M${ox+4} ${noseBot} L${ox+4} 12 Q${ox+cx} 0 ${ox+W} 12 L${ox+W} ${noseBot} Z" fill="#aeb9bf" stroke="#607d8b" stroke-width="1.3"/>`);
+    parts.push(`<polygon points="${ox+W},${NOSE_H*0.5} ${ox+W+DEPTH},${NOSE_H*0.5-6} ${ox+W+DEPTH},${noseBot-3} ${ox+W},${noseBot}" fill="#9aa7ad" stroke="#607d8b" stroke-width="1"/>`);
+    parts.push(`<path d="M${ox+9} ${noseBot} L${ox+9} 14 Q${ox+cx} 5 ${ox+W-9} 14 L${ox+W-9} ${noseBot} Z" fill="#9fd9f0" stroke="#6bb8d6" stroke-width="0.8"/>`);
+    parts.push(`<rect x="${ox+cx-9}" y="3" width="18" height="3" rx="1.5" fill="#FFF3B0" stroke="#c9a200" stroke-width="0.7"/>`);
+    parts.push(`<g stroke="#FFD400" stroke-width="1.5" stroke-linecap="round" opacity="0.85"><line x1="${ox+cx-6}" y1="2" x2="${ox+cx-8}" y2="-2"/><line x1="${ox+cx}" y1="1.5" x2="${ox+cx}" y2="-4"/><line x1="${ox+cx+6}" y1="2" x2="${ox+cx+8}" y2="-2"/></g>`);
+    // voitures
+    for (let i = 0; i < n; i++) {
+      const top = NOSE_H + i * CAR_H, h = CAR_H;
+      parts.push(`<polygon points="${ox+W},${top+h*0.03} ${ox+W+DEPTH},${top-h*0.03} ${ox+W+DEPTH},${top+h*0.97} ${ox+W},${top+h*1.03}" fill="#d6dde0" stroke="#607d8b" stroke-width="1.2"/>`);
+      const innerTop = top + h*0.06, innerH = h*0.88, slot = innerH/3, ph = slot*0.5;
+      for (let di = 0; di < 3; di++) {
+        const cyy = innerTop + slot*di + slot/2, y0 = cyy - ph/2;
+        const dx0 = ox+W+DEPTH*0.2, dx1 = ox+W+DEPTH*0.8;
+        parts.push(`<polygon points="${dx0},${y0} ${dx1},${y0-DEPTH*0.06} ${dx1},${y0-DEPTH*0.06+ph} ${dx0},${y0+ph}" fill="#90a4ae" stroke="#455a64" stroke-width="1.5"/>`);
+        const gx0 = ox+W+DEPTH*0.30, gx1 = ox+W+DEPTH*0.70;
+        const gy0 = y0+ph*0.16, gy1 = y0-DEPTH*0.06+ph*0.16, gy2 = y0-DEPTH*0.06+ph*0.84, gy3 = y0+ph*0.84;
+        const r = 6;
+        parts.push(`<path d="M${gx0+r},${gy0} L${gx1-r},${gy1} Q${gx1},${gy1} ${gx1},${gy1+r} L${gx1},${gy2-r} Q${gx1},${gy2} ${gx1-r},${gy2} L${gx0+r},${gy3} Q${gx0},${gy3} ${gx0},${gy3-r} L${gx0},${gy0+r} Q${gx0},${gy0} ${gx0+r},${gy0} Z" fill="#9fd9f0" stroke="#6bb8d6" stroke-width="0.5"/>`);
+      }
+      parts.push(`<rect x="${ox+2}" y="${top+h*0.03}" width="${W-2}" height="${h*0.94}" rx="5" fill="#eceff1" stroke="#607d8b" stroke-width="1.2"/>`);
+      parts.push(`<rect x="${ox+4}" y="${top+h*0.06}" width="4" height="${h*0.88}" rx="2" fill="${lineColor}"/>`);
+      parts.push(`<rect x="${ox+W-8}" y="${top+h*0.06}" width="4" height="${h*0.88}" rx="2" fill="${lineColor}"/>`);
+      parts.push(`<text x="${ox+W/2}" y="${top+h*0.54}" text-anchor="middle" font-size="17" font-weight="900" fill="#546e7a" style="paint-order:stroke" stroke="#fff" stroke-width="1.8">${i+1}</text>`);
+      if (i < n-1) parts.push(`<line x1="${ox+4}" y1="${NOSE_H+(i+1)*CAR_H}" x2="${ox+W-2}" y2="${NOSE_H+(i+1)*CAR_H}" stroke="#607d8b" stroke-width="2.4" stroke-linecap="round"/>`);
+    }
+    // queue (arrondie vers l'extérieur), remontée pour coller à la dernière voiture, dessinée DERRIÈRE les voitures
+    const ty = NOSE_H + n*CAR_H - (CAR_H * 0.06 + 2);
+    const tailParts = [];
+    tailParts.push(`<path d="M${ox+2} ${ty} L${ox+2} ${ty+TAIL_H-12+ (CAR_H*0.06+2)} Q${ox+cx} ${ty+TAIL_H+(CAR_H*0.06+2)} ${ox+W} ${ty+TAIL_H-12+(CAR_H*0.06+2)} L${ox+W} ${ty} Z" fill="#aeb9bf" stroke="#607d8b" stroke-width="1.3"/>`);
+    tailParts.push(`<polygon points="${ox+W},${ty} ${ox+W+DEPTH},${ty-6} ${ox+W+DEPTH},${ty+TAIL_H-12+(CAR_H*0.06+2)} ${ox+W},${ty+TAIL_H-12+(CAR_H*0.06+2)}" fill="#9aa7ad" stroke="#607d8b" stroke-width="1"/>`);
+    const tyBot = ty+TAIL_H-13+(CAR_H*0.06+2);
+    tailParts.push(`<rect x="${ox+cx-12}" y="${tyBot}" width="5" height="3" rx="1.2" fill="#E2231A" opacity="0.8"/><rect x="${ox+cx+7}" y="${tyBot}" width="5" height="3" rx="1.2" fill="#E2231A" opacity="0.8"/>`);
+    // insérer la queue juste après le nez (donc derrière les voitures)
+    parts.splice(5, 0, ...tailParts);
+    return React.createElement("div", { style: { flexShrink: 0, marginTop: 0 }, dangerouslySetInnerHTML: { __html: `<svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" style="display:block;overflow:visible">${parts.join("")}</svg>` } });
+  }
   // === REVENU à l'ancien affichage : schéma train à gauche, panneaux à droite ===
   // Le calcul de trainDataOpposite est conservé en interne au cas où on changerait d'avis,
   // mais il n'est plus affiché à l'écran.
-  return /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 10px 18px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: 0 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: lineId === "1" ? {
-    width: CAR_W,
-    height: 30,
-    background: "linear-gradient(180deg, #b0bec5 0%, #607d8b 100%)",
-    borderRadius: "32px 32px 6px 6px",
-    border: "2px solid #263238",
-    borderBottom: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "inset 0 -3px 6px rgba(0,0,0,0.15)"
-  } : {
+  return /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 10px 18px" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "flex-start", gap: 0 } }, isL1 ? renderL1Train() : /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 } }, /* @__PURE__ */ React.createElement("div", { style: {
     width: CAR_W,
     height: 26,
     background: "#b0bec5",
@@ -3062,110 +3225,8 @@ function TrainDiagram({ trainData, trainDataOpposite, oppositeDirection, lineCol
   } })), cars.map((c) => {
     const g = carToGroup[c];
     const isEven = c % 2 === 0;
-    const doorColor = g ? g.type === "sortie" ? "#E53935" : "#F57C00" : "transparent";
+    const doorColor = g ? g.type === "sortie" ? "#003399" : "#F57C00" : "transparent";
     const hasDoor = !!g;
-    // === NOUVEAU RENDU V3 "moderne arrondi" pour la ligne 1 (test) ===
-    if (lineId === "1") {
-      const zoneActiveColor = g ? g.type === "sortie" ? "#E53935" : "#F57C00" : null;
-      const benchColor = zoneActiveColor || "#0d47a1";
-      const doorColorV3 = zoneActiveColor || "#90a4ae";
-      // Soufflet entre voitures (sauf avant la 1re)
-      const bellow = c === 1 ? null : /* @__PURE__ */ React.createElement("div", { key: "b" + c, style: {
-        position: "absolute",
-        top: -5,
-        left: -2,
-        right: -2,
-        height: 5,
-        background: "repeating-linear-gradient(90deg, #263238 0, #263238 2px, #90a4ae 2px, #90a4ae 5px)",
-        zIndex: 3
-      } });
-      return /* @__PURE__ */ React.createElement("div", { key: c, style: {
-        width: CAR_W,
-        height: CAR_H,
-        background: "linear-gradient(90deg, #cfd8dc 0%, #eceff1 15%, #eceff1 85%, #cfd8dc 100%)",
-        borderLeft: "2px solid #263238",
-        borderRight: "2px solid #263238",
-        borderTop: c === 1 ? "2px solid #263238" : "none",
-        marginTop: c === 1 ? 0 : 5,
-        position: "relative",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-        padding: "4px 8px"
-      } },
-        bellow,
-        // Numéro de voiture en grand, translucide, bien visible
-        /* @__PURE__ */ React.createElement("div", { style: {
-          position: "absolute",
-          inset: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 36,
-          fontWeight: 900,
-          color: "#263238",
-          opacity: 0.45,
-          letterSpacing: -1,
-          pointerEvents: "none",
-          zIndex: 0,
-          WebkitTextStroke: "0.4px #000",
-          textShadow: "0 0 0.5px rgba(0,0,0,0.6)"
-        } }, c),
-        // 3 zones empilées : chaque zone = rangée de sièges (paires aux 2 côtés) + porte sur chaque paroi
-        [0, 1, 2].map((zIdx) => {
-          return /* @__PURE__ */ React.createElement("div", { key: zIdx, style: {
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            zIndex: 1
-          } },
-            // Banquette gauche
-            /* @__PURE__ */ React.createElement("div", { style: {
-              width: 16,
-              height: 6,
-              background: zoneActiveColor
-                ? zoneActiveColor
-                : "linear-gradient(180deg, #B3E5FC 0%, #81D4FA 100%)",
-              borderRadius: 3,
-              boxShadow: "0 1px 1px rgba(0,0,0,0.1)"
-            } }),
-            // Banquette droite
-            /* @__PURE__ */ React.createElement("div", { style: {
-              width: 16,
-              height: 6,
-              background: zoneActiveColor
-                ? zoneActiveColor
-                : "linear-gradient(180deg, #B3E5FC 0%, #81D4FA 100%)",
-              borderRadius: 3,
-              boxShadow: "0 1px 1px rgba(0,0,0,0.1)"
-            } }),
-            // Porte gauche (battants verticaux sur la paroi)
-            /* @__PURE__ */ React.createElement("div", { style: {
-              position: "absolute",
-              left: -10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 5,
-              height: 14,
-              background: "linear-gradient(90deg, " + doorColorV3 + " 0%, #607d8b 50%, " + doorColorV3 + " 100%)",
-              borderRadius: 1
-            } }),
-            // Porte droite
-            /* @__PURE__ */ React.createElement("div", { style: {
-              position: "absolute",
-              right: -10,
-              top: "50%",
-              transform: "translateY(-50%)",
-              width: 5,
-              height: 14,
-              background: "linear-gradient(90deg, " + doorColorV3 + " 0%, #607d8b 50%, " + doorColorV3 + " 100%)",
-              borderRadius: 1
-            } })
-          );
-        })
-      );
-    }
     // === ANCIEN RENDU (toutes les autres lignes) ===
     return /* @__PURE__ */ React.createElement("div", { key: c, style: {
       width: CAR_W,
@@ -3201,15 +3262,15 @@ function TrainDiagram({ trainData, trainDataOpposite, oppositeDirection, lineCol
     } }), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, marginTop: 3 } }, /* @__PURE__ */ React.createElement("div", { style: {
       width: 11,
       height: 22,
-      background: hasDoor ? doorColor : "#ccc",
+      background: "#ccc",
       borderRadius: "5px 5px 3px 3px",
-      opacity: hasDoor ? 1 : 0.3
+      opacity: 0.45
     } }), /* @__PURE__ */ React.createElement("div", { style: {
       width: 11,
       height: 22,
-      background: hasDoor ? doorColor : "#ccc",
+      background: "#ccc",
       borderRadius: "5px 5px 3px 3px",
-      opacity: hasDoor ? 1 : 0.3
+      opacity: 0.45
     } })), /* @__PURE__ */ React.createElement("div", { style: {
       fontSize: 16,
       fontWeight: 900,
@@ -3220,15 +3281,15 @@ function TrainDiagram({ trainData, trainDataOpposite, oppositeDirection, lineCol
     } }, c), /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 4, marginBottom: 3 } }, /* @__PURE__ */ React.createElement("div", { style: {
       width: 11,
       height: 22,
-      background: hasDoor ? doorColor : "#ccc",
+      background: "#ccc",
       borderRadius: "3px 3px 5px 5px",
-      opacity: hasDoor ? 1 : 0.3
+      opacity: 0.45
     } }), /* @__PURE__ */ React.createElement("div", { style: {
       width: 11,
       height: 22,
-      background: hasDoor ? doorColor : "#ccc",
+      background: "#ccc",
       borderRadius: "3px 3px 5px 5px",
-      opacity: hasDoor ? 1 : 0.3
+      opacity: 0.45
     } })));
   }), /* @__PURE__ */ React.createElement("div", { style: {
     width: CAR_W,
@@ -3247,7 +3308,7 @@ function TrainDiagram({ trainData, trainDataOpposite, oppositeDirection, lineCol
     const isLast = g.voitures[g.voitures.length - 1] === c;
     const isOnly = g.voitures.length === 1;
     const isZoomed = zoomed === gId;
-    const bracketColor = "#E53935";
+    const bracketColor = g.type === "sortie" ? "#003399" : "#F57C00";
     return /* @__PURE__ */ React.createElement("div", { key: c, style: { height: CAR_H, display: "flex", alignItems: "stretch", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { width: 22, position: "relative", display: "flex", alignItems: "center" } }, !isOnly && /* @__PURE__ */ React.createElement("div", { style: {
       position: "absolute",
       left: 11,
@@ -3315,7 +3376,7 @@ function isCorrespondenceVisible(stationName, corrLineId, futurActifs) {
   if (matches.length === 0) return false;
   return matches.some(function(s) { return isStationActive(s, futurActifs); });
 }
-function buildGraph(futurActifs) {
+function buildGraph(futurActifs, pmrOnly) {
   // Le graphe utilise des noeuds "station|ligne" pour distinguer
   // la même station physique sur des lignes différentes.
   // Une correspondance = arête entre "station|ligneA" et "station|ligneB" (coût 3).
@@ -3323,10 +3384,29 @@ function buildGraph(futurActifs) {
   //
   // futurActifs.stations : { "Nom de station": true/false }
   // Une station avec futur: true n'est incluse que si futurActifs.stations[nom] === true.
+  //
+  // pmrOnly : si true, on EXCLUT toute station qui n'est pas formellement
+  // accessible PMR (statut true requis ; false ET inconnu/null = exclus,
+  // pour ne jamais proposer un trajet non garanti à une personne en fauteuil).
   var stations = (futurActifs && futurActifs.stations) || {};
   function isStationActive(stationObj) {
     if (!stationObj.futur) return true;
     return stations[stationObj.n] === true;
+  }
+  // Accessibilité PMR d'une station physique : accessible si AU MOINS une
+  // des lignes qui la desservent la déclare accessible.
+  function isStationAccessible(lineId, stationName) {
+    if (!pmrOnly) return true;
+    if (isStationPMR(lineId, stationName) === true) return true;
+    // Vérifier les autres lignes de cette station (via correspondances déclarées)
+    var allMaps = Object.assign({}, STATIONS, CABLE_STATIONS);
+    var lids = Object.keys(allMaps);
+    for (var li = 0; li < lids.length; li++) {
+      var lid = lids[li];
+      var found = (allMaps[lid] || []).some(function(s) { return s.n === stationName; });
+      if (found && isStationPMR(lid, stationName) === true) return true;
+    }
+    return false;
   }
   var graph = {};
   function ensureNode(key) { if (!graph[key]) graph[key] = []; }
@@ -3345,12 +3425,14 @@ function buildGraph(futurActifs) {
     for (var i = 0; i < stationsList.length; i++) {
       var s1 = stationsList[i];
       if (!isStationActive(s1)) continue;
+      if (!isStationAccessible(lineId, s1.n)) continue;
       // Chercher la prochaine station active dans la même branche
       for (var j = i + 1; j < stationsList.length; j++) {
         var s2 = stationsList[j];
         // Changement de branche : on s'arrête
         if (s1.branch && s2.branch && s1.branch !== s2.branch) break;
         if (!isStationActive(s2)) continue;
+        if (!isStationAccessible(lineId, s2.n)) continue;
         addTrajet(s1.n, s2.n, lineId);
         break;
       }
@@ -3360,12 +3442,14 @@ function buildGraph(futurActifs) {
   Object.keys(allLineStations).forEach(function(lineId) {
     allLineStations[lineId].filter(function(s) { return s.n; }).forEach(function(s) {
       if (!isStationActive(s)) return;
+      if (!isStationAccessible(lineId, s.n)) return;
       var corrs = (s.c || []).concat(s.walk || []);
       corrs.forEach(function(corrLine) {
         var corrSts = allLineStations[corrLine] || [];
         var corrSt = corrSts.find(function(cs) { return cs.n === s.n; });
         if (!corrSt) return;
         if (!isStationActive(corrSt)) return;
+        if (!isStationAccessible(corrLine, s.n)) return;
         var k1 = s.n + "|" + lineId, k2 = s.n + "|" + corrLine;
         ensureNode(k1); ensureNode(k2);
         if (!graph[k1].find(function(e) { return e.key === k2; })) {
@@ -3438,8 +3522,8 @@ function dijkstra(graph, start, end) {
   return null;
 }
 
-function findPath(start, end, viaList, futurActifs) {
-  var graph = buildGraph(futurActifs);
+function findPath(start, end, viaList, futurActifs, pmrOnly) {
+  var graph = buildGraph(futurActifs, pmrOnly);
   var waypoints = [start].concat(viaList.filter(function(v) { return v && v.trim(); })).concat([end]);
   var fullPath = [];
   for (var w = 0; w < waypoints.length - 1; w++) {
@@ -3476,13 +3560,28 @@ setProgress(96,'Chargement...');
 function getUniqueStations(futurActifs) {
   var seen = {};
   var result = [];
+  var linesByStation = {}; // nom -> set de toutes les lignes qui desservent la station
   var allStationMaps = [STATIONS, CABLE_STATIONS];
+  // 1er passage : recenser toutes les lignes par station
+  allStationMaps.forEach(function(stationsMap) {
+    Object.keys(stationsMap).forEach(function(lineId) {
+      (stationsMap[lineId] || []).forEach(function(st) {
+        if (!st.n) return;
+        if (!linesByStation[st.n]) linesByStation[st.n] = {};
+        linesByStation[st.n][lineId] = true;
+        // ajouter aussi les correspondances déclarées
+        (st.c || []).forEach(function(c) { linesByStation[st.n][c] = true; });
+        (st.walk || []).forEach(function(c) { linesByStation[st.n][c] = true; });
+      });
+    });
+  });
+  // 2e passage : construire la liste unique
   allStationMaps.forEach(function(stationsMap) {
     Object.keys(stationsMap).forEach(function(lineId) {
       (stationsMap[lineId] || []).forEach(function(st) {
         if (st.n && !seen[st.n] && isStationActive(st, futurActifs)) {
           seen[st.n] = true;
-          result.push({ name: st.n, corr: st.c || [] });
+          result.push({ name: st.n, corr: st.c || [], allLines: Object.keys(linesByStation[st.n] || {}) });
         }
       });
     });
@@ -3536,21 +3635,48 @@ function StationAutocomplete({ value, onChange, placeholder, inputStyle, futurAc
     }),
     open && suggestions.length > 0 && React.createElement("div", {
       style: {
-        position: "absolute", top: "100%", left: 0, right: 0,
-        background: "#fff", border: "2px solid #111",
-        borderRadius: 10, zIndex: 999, maxHeight: 220,
-        overflowY: "auto", boxShadow: "0 4px 12px rgba(0,0,0,0.15)"
+        position: "fixed", top: "auto", left: "50%",
+        transform: "translateX(-50%)",
+        marginTop: 6,
+        width: "min(360px, 92vw)",
+        background: "#f8f8f8", border: "2px solid #000",
+        borderRadius: 12, zIndex: 9999, maxHeight: "42vh",
+        overflowY: "auto", WebkitOverflowScrolling: "touch", touchAction: "pan-y",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
+      },
+      ref: function(el) {
+        if (!el) return;
+        // Positionner juste sous le champ, mais centré horizontalement sur l'écran
+        var input = el.parentElement && el.parentElement.querySelector("input");
+        if (input) {
+          var r = input.getBoundingClientRect();
+          el.style.top = (r.bottom) + "px";
+        }
       }
     }, suggestions.map(function(s, i) {
+      var corrLines = (s.allLines || []).slice().sort(function(a, b) {
+        var isNumA = !isNaN(parseInt(a)), isNumB = !isNaN(parseInt(b));
+        if (isNumA && isNumB) return parseInt(a) - parseInt(b);
+        if (isNumA) return -1;
+        if (isNumB) return 1;
+        return a.localeCompare(b);
+      });
       return React.createElement("div", {
         key: i,
         onMouseDown: function() { handleSelect(s.name); },
         style: {
-          padding: "11px 16px", cursor: "pointer",
-          borderBottom: i < suggestions.length-1 ? "1px solid #eee" : "none",
-          fontSize: 15, fontWeight: 600, color: "#111"
+          display: "flex", alignItems: "center", gap: 10,
+          background: "#f8f8f8", borderBottom: i < suggestions.length-1 ? "2px solid #ddd" : "none",
+          padding: "12px 14px", cursor: "pointer", textAlign: "left"
         }
-      }, s.name);
+      },
+        React.createElement("span", { style: { flex: 1, color: "#111", fontWeight: 700, fontSize: 15 } }, s.name),
+        React.createElement("div", { style: { display: "flex", gap: 3, flexShrink: 0, flexWrap: "wrap", maxWidth: 100, justifyContent: "flex-end" } },
+          corrLines.slice(0, 4).map(function(c, j) {
+            return React.createElement(Badge, { key: j, id: c, size: 20 });
+          })
+        )
+      );
     }))
   );
 }
@@ -3569,6 +3695,10 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
   var setDragPos = dragPosState[1]; var dragPos = dragPosState[0];
   var dragTextState = React.useState("");
   var setDragText = dragTextState[1]; var dragText = dragTextState[0];
+  var pmrState = React.useState(false);
+  var pmrOnly = pmrState[0]; var setPmrOnly = pmrState[1];
+  var expandedSegsState = React.useState({});
+  var expandedSegs = expandedSegsState[0]; var setExpandedSegs = expandedSegsState[1];
 
   var inputStyle = { width: "100%", padding: "11px 14px", border: "2px solid #111", borderRadius: 10, fontSize: 20, fontWeight: 900, outline: "none", boxSizing: "border-box", color: "#111", background: "#fff" };
 
@@ -3620,8 +3750,15 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
     if (!itiDepart.trim() || !itiArrivee.trim()) { setError("Renseignez le d\u00E9part et l'arriv\u00E9e."); return; }
     setLoading(true); setError(null);
     setTimeout(function() {
-      var path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes, futurActifs);
-      if (!path) { setError("Itin\u00E9raire introuvable. V\u00E9rifiez les noms de stations."); setLoading(false); return; }
+      var path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes, futurActifs, pmrOnly);
+      if (!path) {
+        if (pmrOnly) {
+          setError("Aucun trajet 100% accessible trouv\u00E9 entre ces stations. Les donn\u00E9es d'accessibilit\u00E9 sont encore incompl\u00E8tes sur certaines lignes : un trajet existe peut-\u00EAtre mais n'est pas encore confirm\u00E9 accessible.");
+        } else {
+          setError("Itin\u00E9raire introuvable. V\u00E9rifiez les noms de stations.");
+        }
+        setLoading(false); return;
+      }
       setItiResult(formatPath(path));
       setLoading(false);
     }, 50);
@@ -3676,10 +3813,43 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
           React.createElement("button", { onClick: function() { var tmp = itiDepart; setItiDepart(itiArrivee); setItiArrivee(tmp); }, style: { background: "none", border: "none", cursor: "pointer", fontSize: 22, display: "flex", alignItems: "center", justifyContent: "center", color: "#111", fontWeight: 900 } }, "\u21C5")
         ),
         React.createElement("div", { style: { marginBottom: 12 } },
-          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#c62828", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
+          React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: "#111", marginBottom: 6, textTransform: "uppercase" } }, "\u25CF Arriv\u00E9e"),
           React.createElement(StationAutocomplete, { value: itiArrivee, onChange: function(v) { setItiArrivee(v); }, placeholder: "Station d'arriv\u00E9e...", inputStyle: inputStyle, futurActifs: futurActifs })
         ),
         React.createElement("button", { onClick: addEtape, style: { width: "100%", padding: 10, background: "#fff", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 600, fontSize: 13, cursor: "pointer", marginBottom: 14 } }, "+ Ajouter une \u00E9tape"),
+        React.createElement("button", {
+          onClick: function() { setPmrOnly(function(v) { return !v; }); setError(null); },
+          "aria-label": "Trajet accessible aux personnes \u00E0 mobilit\u00E9 r\u00E9duite, " + (pmrOnly ? "activ\u00E9" : "d\u00E9sactiv\u00E9"),
+          style: {
+            width: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 14px",
+            background: pmrOnly ? "#e3f2fd" : "#fff",
+            border: "2px solid " + (pmrOnly ? "#1565C0" : "#ddd"),
+            borderRadius: 12,
+            cursor: "pointer",
+            marginBottom: 14,
+            textAlign: "left"
+          }
+        },
+          React.createElement("span", { style: { width: 30, height: 30, display: "inline-flex", flexShrink: 0 } }, PICTOS.pmr.svg),
+          React.createElement("span", { style: { flex: 1, fontWeight: 800, fontSize: 14, color: pmrOnly ? "#0d47a1" : "#333" } }, "Trajet accessible (PMR)"),
+          // Interrupteur visuel
+          React.createElement("span", { style: {
+            width: 46, height: 26, borderRadius: 13, flexShrink: 0,
+            background: pmrOnly ? "#1565C0" : "#ccc",
+            position: "relative", transition: "background 0.15s"
+          } },
+            React.createElement("span", { style: {
+              position: "absolute", top: 3, left: pmrOnly ? 23 : 3,
+              width: 20, height: 20, borderRadius: "50%", background: "#fff",
+              transition: "left 0.15s", boxShadow: "0 1px 3px rgba(0,0,0,0.3)"
+            } })
+          )
+        ),
+        pmrOnly && React.createElement("div", { style: { background: "#fff3e0", borderRadius: 10, padding: "9px 13px", color: "#e65100", fontSize: 12, fontWeight: 600, marginBottom: 12, lineHeight: 1.5 } }, "\u2139\uFE0F Seules les stations confirm\u00E9es accessibles sont propos\u00E9es. Les donn\u00E9es sont en cours de compl\u00E9tion sur l'ensemble du r\u00E9seau."),
         error && React.createElement("div", { style: { background: "#ffebee", borderRadius: 10, padding: "10px 14px", color: "#c00", fontSize: 13, fontWeight: 600, marginBottom: 12 } }, "\u26A0\uFE0F ", error),
         React.createElement("button", { onClick: calculer, disabled: loading, style: { width: "100%", padding: 14, background: loading ? "#999" : "#111", border: "none", borderRadius: 12, color: "#fff", fontWeight: 700, fontSize: 15, cursor: loading ? "default" : "pointer" } }, loading ? "Calcul..." : "Calculer l'itin\u00E9raire")
       )
@@ -3700,29 +3870,58 @@ function ItineraireScreen({ onClose, itiDepart, setItiDepart, itiArrivee, setIti
               )
             ),
             React.createElement("div", { style: { background: "#fff", borderRadius: 10, border: "1px solid #e0e0e0", overflow: "hidden" } },
-              seg.stations.map(function(st, j) {
-                var isFirst = j === 0, isLast = j === seg.stations.length - 1;
-                var isCorr = isLast && i < itiResult.length - 1;
-                var normSt = normStation(st);
-                var isDepart = i === 0 && j === 0;
-                var isArrivee = i === itiResult.length - 1 && isLast;
-                var isEtapeChoisie = itiEtapes.some(function(e) { return normStation(e) === normSt; });
-                // Couleurs et styles selon le type de station
-                var rowBg = isDepart ? "#e8f5e9" : isArrivee ? "#ffebee" : isEtapeChoisie ? "#e3f2fd" : (isFirst || isLast) ? lc + "20" : "#fff";
-                var dotBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : (isFirst || isLast) ? lc : "#ddd";
-                var dotSize = (isDepart || isArrivee || isEtapeChoisie) ? 13 : 9;
-                var borderLeft = isDepart ? "4px solid #2e7d32" : isArrivee ? "4px solid #c62828" : isEtapeChoisie ? "4px solid #1565C0" : "none";
-                var labelBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : null;
-                var labelText = isDepart ? "🟢 Départ" : isArrivee ? "🔴 Arrivée" : isEtapeChoisie ? "📍 Étape" : null;
-                return React.createElement("div", { key: j, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderBottom: j < seg.stations.length - 1 ? "1px solid #f5f5f5" : "none", background: rowBg, borderLeft: borderLeft } },
-                  React.createElement("div", { style: { width: dotSize, height: dotSize, borderRadius: "50%", background: dotBg, border: "2px solid " + (isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : lc), flexShrink: 0 } }),
-                  React.createElement("div", { style: { flex: 1 } },
-                    React.createElement("div", { style: { fontWeight: (isFirst || isLast || isEtapeChoisie) ? 700 : 400, fontSize: 13, color: "#111" } }, st),
-                    labelText && React.createElement("span", { style: { display: "inline-block", marginTop: 3, background: labelBg, color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 5, padding: "2px 7px" } }, labelText),
-                    isCorr && !isEtapeChoisie && !isDepart && !isArrivee && React.createElement("div", { style: { fontSize: 11, color: "#E65100", fontWeight: 600, marginTop: 2 } }, "\uD83D\uDD04 Correspondance \u2192 ligne " + itiResult[i+1].line)
-                  )
-                );
-              })
+              (function() {
+                var isOpen = !!expandedSegs[i];
+                var nbInter = seg.stations.length - 2; // arrêts intermédiaires
+                // Quelles stations afficher : si déplié OU segment court (<=2), toutes ; sinon première+dernière
+                var visibleIdx;
+                if (isOpen || seg.stations.length <= 2) {
+                  visibleIdx = seg.stations.map(function(_, j) { return j; });
+                } else {
+                  visibleIdx = [0, seg.stations.length - 1];
+                }
+                var rows = [];
+                visibleIdx.forEach(function(j, vi) {
+                  var st = seg.stations[j];
+                  var isFirst = j === 0, isLast = j === seg.stations.length - 1;
+                  var isCorr = isLast && i < itiResult.length - 1;
+                  var normSt = normStation(st);
+                  var isDepart = i === 0 && j === 0;
+                  var isArrivee = i === itiResult.length - 1 && isLast;
+                  var isEtapeChoisie = itiEtapes.some(function(e) { return normStation(e) === normSt; });
+                  var rowBg = isDepart ? "#e8f5e9" : isArrivee ? "#ffebee" : isEtapeChoisie ? "#e3f2fd" : (isFirst || isLast) ? lc + "20" : "#fff";
+                  var dotBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : (isFirst || isLast) ? lc : "#ddd";
+                  var dotSize = (isDepart || isArrivee || isEtapeChoisie) ? 13 : 9;
+                  var borderLeft = isDepart ? "4px solid #2e7d32" : isArrivee ? "4px solid #c62828" : isEtapeChoisie ? "4px solid #1565C0" : "none";
+                  var labelBg = isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : null;
+                  var labelText = isDepart ? "\uD83D\uDFE2 D\u00E9part" : isArrivee ? "\uD83D\uDD34 Arriv\u00E9e" : isEtapeChoisie ? "\uD83D\uDCCD \u00C9tape" : null;
+                  rows.push(React.createElement("div", { key: "s" + j, style: { display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderBottom: "1px solid #f5f5f5", background: rowBg, borderLeft: borderLeft } },
+                    React.createElement("div", { style: { width: dotSize, height: dotSize, borderRadius: "50%", background: dotBg, border: "2px solid " + (isDepart ? "#2e7d32" : isArrivee ? "#c62828" : isEtapeChoisie ? "#1565C0" : lc), flexShrink: 0 } }),
+                    React.createElement("div", { style: { flex: 1 } },
+                      React.createElement("div", { style: { fontWeight: (isFirst || isLast || isEtapeChoisie) ? 700 : 400, fontSize: 13, color: "#111" } }, st),
+                      labelText && React.createElement("span", { style: { display: "inline-block", marginTop: 3, background: labelBg, color: "#fff", fontSize: 11, fontWeight: 700, borderRadius: 5, padding: "2px 7px" } }, labelText),
+                      isCorr && !isEtapeChoisie && !isDepart && !isArrivee && React.createElement("div", { style: { fontSize: 11, color: "#E65100", fontWeight: 600, marginTop: 2 } }, "\uD83D\uDD04 Correspondance \u2192 ligne " + itiResult[i+1].line)
+                    )
+                  ));
+                  // Après la première station, si segment condensé : barre "X arrêts" dépliable
+                  if (vi === 0 && nbInter > 0 && !isOpen && seg.stations.length > 2) {
+                    rows.push(React.createElement("button", { key: "exp" + i, onClick: function() { setExpandedSegs(function(o) { var n = Object.assign({}, o); n[i] = true; return n; }); },
+                      style: { display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "7px 12px 7px 16px", background: "#fafafa", border: "none", borderBottom: "1px solid #f5f5f5", borderLeft: "2px dashed " + lc, cursor: "pointer", textAlign: "left" } },
+                      React.createElement("span", { style: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, border: "2px solid " + lc, borderRadius: 5, fontSize: 11, fontWeight: 900, color: lc, lineHeight: 1 } }, "\u25BC"),
+                      React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: "#666" } }, nbInter + " arr\u00EAt" + (nbInter > 1 ? "s" : "") + " interm\u00E9diaire" + (nbInter > 1 ? "s" : ""))
+                    ));
+                  }
+                });
+                // Si déplié, bouton pour replier
+                if (isOpen && seg.stations.length > 2) {
+                  rows.push(React.createElement("button", { key: "col" + i, onClick: function() { setExpandedSegs(function(o) { var n = Object.assign({}, o); delete n[i]; return n; }); },
+                    style: { display: "flex", alignItems: "center", gap: 8, width: "100%", padding: "7px 12px 7px 16px", background: "#fafafa", border: "none", cursor: "pointer", textAlign: "left" } },
+                    React.createElement("span", { style: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: 20, height: 20, border: "2px solid #999", borderRadius: 5, fontSize: 11, fontWeight: 900, color: "#999", lineHeight: 1 } }, "\u25B2"),
+                    React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: "#666" } }, "Masquer les arr\u00EAts")
+                  ));
+                }
+                return rows;
+              })()
             )
           );
         })
@@ -3916,6 +4115,7 @@ function App() {
   }, [lineVoitures]);
   const [showEditor, setShowEditor] = useState(false);
   const [showPhotoAI, setShowPhotoAI] = useState(false);
+  const [adminPmrFilter, setAdminPmrFilter] = useState(false);
   const [branch, setBranch] = useState(null);
   const [troncon15, setTroncon15] = useState(null);
   const [showStationEditor, setShowStationEditor] = useState(false);
@@ -3962,10 +4162,13 @@ function App() {
     localStorage.setItem('appScale', String(zoomLevel));
   }, [zoomLevel]);
   const [showItineraire, setShowItineraire] = useState(false);
+  const [homeTab, setHomeTab] = useState("metro");
   const [itiDepart, setItiDepart] = useState("");
   const [itiArrivee, setItiArrivee] = useState("");
   const [itiEtapes, setItiEtapes] = useState([]);
   const [itiResult, setItiResult] = useState(null);
+  const [homeItiExpanded, setHomeItiExpanded] = useState(false);
+  const [homePmrOnly, setHomePmrOnly] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showLoopInfo, setShowLoopInfo] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
@@ -4426,42 +4629,96 @@ function App() {
     display: "flex",
     flexDirection: "column",
     fontSize: 14
-  } }, screen === "home" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 20px 24px", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 20 } }, /* @__PURE__ */ React.createElement("svg", { width: "36", height: "36", viewBox: "0 0 52 52" }, /* @__PURE__ */ React.createElement("circle", { cx: "26", cy: "26", r: "26", fill: "#003F87" }), /* @__PURE__ */ React.createElement("circle", { cx: "26", cy: "26", r: "22", fill: "none", stroke: "#FFD700", strokeWidth: "2" }), /* @__PURE__ */ React.createElement(
-    "text",
-    {
-      x: "26",
-      y: "34",
-      textAnchor: "middle",
-      fill: "white",
-      fontSize: "26",
-      fontWeight: "900",
-      fontFamily: "Arial Black,sans-serif"
-    },
-    "M"
-  )), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon Paris Express")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 20, marginTop: 16, position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: {
+  } }, screen === "home" && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", alignItems: "center", padding: "32px 20px 24px", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 20 } }, (function() {
+    // === LOGO D1 : réseau rayonnant, fond bleu nuit dégradé, liseré laiton, ligne L15 ===
+    var L15 = "#B90845";
+    var SET = [
+      [-90, 19, "#FFC400", 3.4], [-48, 16, "#00C2B8", 2.9], [-12, 21, "#3D9BFF", 3.4],
+      [32, 14, "#B47CFF", 2.9], [72, 20, "#7CC900", 3.4], [128, 17, "#FF7AD5", 2.9],
+      [172, 21, "#FF9E2C", 3.4], [222, 14, "#2CE0C0", 2.9]
+    ];
+    var lines = [], glows = [], pts = [];
+    SET.forEach(function(b, i) {
+      var a = b[0] * Math.PI / 180, x = 32 + Math.cos(a) * b[1], y = 32 + Math.sin(a) * b[1];
+      lines.push(React.createElement("line", { key: "l" + i, x1: 32, y1: 32, x2: x.toFixed(1), y2: y.toFixed(1), stroke: "url(#ylg)", strokeWidth: 1.9, strokeLinecap: "round" }));
+      glows.push(React.createElement("circle", { key: "g" + i, cx: x.toFixed(1), cy: y.toFixed(1), r: b[3] + 2.2, fill: "url(#glg)" }));
+      pts.push(React.createElement("circle", { key: "p" + i, cx: x.toFixed(1), cy: y.toFixed(1), r: b[3], fill: b[2], stroke: "#fff", strokeWidth: 0.85 }));
+    });
+    var l15a = 100 * Math.PI / 180;
+    return React.createElement("svg", { width: "40", height: "40", viewBox: "0 0 64 64" },
+      React.createElement("defs", null,
+        React.createElement("radialGradient", { id: "bgg", cx: "50%", cy: "42%", r: "65%" },
+          React.createElement("stop", { offset: "0%", stopColor: "#1e3a66" }),
+          React.createElement("stop", { offset: "70%", stopColor: "#13284a" }),
+          React.createElement("stop", { offset: "100%", stopColor: "#0c1c38" })),
+        React.createElement("linearGradient", { id: "brassg", x1: "0", y1: "0", x2: "1", y2: "1" },
+          React.createElement("stop", { offset: "0%", stopColor: "#f3d488" }),
+          React.createElement("stop", { offset: "35%", stopColor: "#c9a227" }),
+          React.createElement("stop", { offset: "65%", stopColor: "#8a6d12" }),
+          React.createElement("stop", { offset: "100%", stopColor: "#e8c170" })),
+        React.createElement("linearGradient", { id: "ylg", x1: "0", y1: "0", x2: "1", y2: "1" },
+          React.createElement("stop", { offset: "0%", stopColor: "#FFE36B" }),
+          React.createElement("stop", { offset: "100%", stopColor: "#FFC400" })),
+        React.createElement("radialGradient", { id: "glg" },
+          React.createElement("stop", { offset: "0%", stopColor: "#fff", stopOpacity: "0.8" }),
+          React.createElement("stop", { offset: "100%", stopColor: "#fff", stopOpacity: "0" })),
+        React.createElement("radialGradient", { id: "coreg" },
+          React.createElement("stop", { offset: "0%", stopColor: "#fff7d6" }),
+          React.createElement("stop", { offset: "55%", stopColor: "#FFD400" }),
+          React.createElement("stop", { offset: "100%", stopColor: "#E8A200" }))
+      ),
+      React.createElement("circle", { cx: 32, cy: 32, r: 31, fill: "url(#bgg)", stroke: "url(#brassg)", strokeWidth: 2.5 }),
+      React.createElement("circle", { cx: 32, cy: 32, r: 27, fill: "none", stroke: L15, strokeWidth: 2.2 }),
+      React.createElement("circle", { cx: (32 + Math.cos(l15a) * 27).toFixed(1), cy: (32 + Math.sin(l15a) * 27).toFixed(1), r: 3, fill: L15, stroke: "#fff", strokeWidth: 1 }),
+      glows, lines, pts,
+      React.createElement("circle", { cx: 32, cy: 32, r: 6.5, fill: "url(#glg)" }),
+      React.createElement("circle", { cx: 32, cy: 32, r: 4.8, fill: "url(#coreg)", stroke: "#fff", strokeWidth: 1.1 })
+    );
+  })(), /* @__PURE__ */ React.createElement("div", { style: { fontSize: 28, fontWeight: 900, letterSpacing: 1, whiteSpace: "nowrap" } }, "Mon Paris Express")), /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 16, marginTop: 16, position: "relative", display: "flex", gap: 8 } },
+    // === Champ Départ (moitié gauche) — déclencheur du bloc itinéraire ===
+    /* @__PURE__ */ React.createElement("div", { onFocusCapture: () => setHomeItiExpanded(true), style: {
+      flex: 1, minWidth: 0,
+      display: "flex", alignItems: "center", gap: 6,
+      background: "#fff", border: `2px solid ${homeItiExpanded ? "#1a1a2e" : "#999"}`,
+      borderRadius: 14, padding: "10px 12px"
+    } },
+      /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, flexShrink: 0 } }, "\u{1F4CD}"),
+      /* @__PURE__ */ React.createElement(StationAutocomplete, {
+        value: itiDepart,
+        onChange: (v) => { setItiDepart(v); if (v) setHomeItiExpanded(true); },
+        placeholder: "D\xE9part...",
+        futurActifs: futurActifs,
+        inputStyle: { flex: 1, minWidth: 0, background: "none", border: "none", outline: "none", color: "#111", fontSize: 16, fontWeight: 900, width: "100%" }
+      })
+    ),
+    // === Barre de recherche (moitié droite) ===
+    /* @__PURE__ */ React.createElement("div", { style: {
+    flex: 1,
+    minWidth: 0,
     display: "flex",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
     background: "#ffffff",
     border: `2px solid ${searchFocused ? "#000" : "#999"}`,
     borderRadius: 14,
-    padding: "10px 14px",
+    padding: "10px 12px",
     transition: "all 0.2s"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 16, opacity: 0.5 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
+  } }, /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, opacity: 0.5, flexShrink: 0 } }, "\u{1F50D}"), /* @__PURE__ */ React.createElement(
     "input",
     {
       value: searchQuery,
       onChange: (e) => setSearchQuery(e.target.value),
       onFocus: (e) => { setSearchFocused(true); var v = e.target.value; e.target.value = ""; e.target.value = v; },
       onBlur: () => setTimeout(() => setSearchFocused(false), 200),
-      type: "search", placeholder: "Rechercher une station...", autoComplete: "off", "data-form-type": "other", autoCorrect: "off", autoCapitalize: "off", spellCheck: false, "data-form-type": "other",
+      type: "search", placeholder: "Station...", autoComplete: "off", "data-form-type": "other", autoCorrect: "off", autoCapitalize: "off", spellCheck: false, "data-form-type": "other",
       style: {
         flex: 1,
+        minWidth: 0,
         background: "none",
         border: "none",
         outline: "none",
         color: "#111",
-        fontSize: 20,
+        fontSize: 17,
         fontWeight: 900
       }
     }
@@ -4474,10 +4731,11 @@ function App() {
         background: "none",
         border: "none",
         color: "#555",
-        fontSize: 20,
+        fontSize: 18,
         cursor: "pointer",
         padding: 0,
-        lineHeight: 1
+        lineHeight: 1,
+        flexShrink: 0
       }
     },
     "\u232B"
@@ -4562,61 +4820,154 @@ function App() {
     padding: "16px",
     textAlign: "center",
     boxShadow: "0 8px 24px rgba(0,0,0,0.3)"
-  } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#888", fontSize: 13 } }, "Aucune station trouv\xE9e"))), [
-    { k: "metro", label: "M\xC9TRO", bg: "#0d1b2a" },
-    { k: "rer", label: "RER", bg: "#0d2a0d" },
-    { k: "tram", label: "TRAM", bg: "#2a1218" },
-    { k: "cable", label: "C\xC2BLE", bg: "#1a1a2a" }
-  ].map((t) => /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      key: t.k,
-      onClick: () => {
-        setTransport(t.k);
-        setScreen("lines");
+  } }, /* @__PURE__ */ React.createElement("span", { style: { color: "#888", fontSize: 13 } }, "Aucune station trouv\xE9e"))),
+    // === BLOC ITINÉRAIRE DÉPLIANT (visible après tap sur Départ) ===
+    homeItiExpanded && /* @__PURE__ */ React.createElement("div", { style: {
+      width: "100%", maxWidth: 360, marginBottom: 16,
+      background: "#fff", borderRadius: 16, padding: "12px 12px 14px",
+      border: "2px solid #1a1a2e", position: "relative"
+    } },
+      // Croix de fermeture
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: () => setHomeItiExpanded(false),
+        "aria-label": "Fermer l'itin\xE9raire",
+        style: { position: "absolute", top: 6, right: 8, background: "none", border: "none", fontSize: 22, fontWeight: 900, color: "#888", cursor: "pointer", lineHeight: 1, padding: 4 }
+      }, "\u2715"),
+      /* @__PURE__ */ React.createElement("div", { style: { fontSize: 13, fontWeight: 900, color: "#1a1a2e", marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.5 } }, "\u{1F4CD} Itin\xE9raire"),
+      // Champ Arrivée
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, background: "#f4f4f4", border: "2px solid #999", borderRadius: 12, padding: "10px 12px", marginBottom: 8 } },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 15, flexShrink: 0 } }, "\u{1F3C1}"),
+        /* @__PURE__ */ React.createElement(StationAutocomplete, {
+          value: itiArrivee,
+          onChange: (v) => setItiArrivee(v),
+          placeholder: "Arriv\xE9e...",
+          futurActifs: futurActifs,
+          inputStyle: { flex: 1, minWidth: 0, background: "none", border: "none", outline: "none", color: "#111", fontSize: 16, fontWeight: 900, width: "100%" }
+        })
+      ),
+      // Bouton inverser départ/arrivée
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", justifyContent: "center", marginBottom: 8 } },
+        /* @__PURE__ */ React.createElement("button", {
+          onClick: () => { const d = itiDepart; setItiDepart(itiArrivee); setItiArrivee(d); },
+          "aria-label": "Inverser d\xE9part et arriv\xE9e",
+          style: { background: "#eee", border: "2px solid #ccc", borderRadius: 10, padding: "4px 16px", fontSize: 18, cursor: "pointer", color: "#333" }
+        }, "\u21C5")
+      ),
+      // Étapes intermédiaires
+      itiEtapes.map((etape, i) => /* @__PURE__ */ React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 6, background: "#f4f4f4", border: "2px solid #bbb", borderRadius: 12, padding: "8px 12px", marginBottom: 8 } },
+        /* @__PURE__ */ React.createElement("span", { style: { fontSize: 13, flexShrink: 0 } }, "\u{1F535}"),
+        /* @__PURE__ */ React.createElement(StationAutocomplete, {
+          value: etape,
+          onChange: (v) => setItiEtapes((arr) => arr.map((x, xi) => xi === i ? v : x)),
+          placeholder: "\xC9tape...",
+          futurActifs: futurActifs,
+          inputStyle: { flex: 1, minWidth: 0, background: "none", border: "none", outline: "none", color: "#111", fontSize: 15, fontWeight: 800, width: "100%" }
+        }),
+        /* @__PURE__ */ React.createElement("button", { onClick: () => setItiEtapes((arr) => arr.filter((_, xi) => xi !== i)), style: { background: "none", border: "none", color: "#c00", fontSize: 18, cursor: "pointer", padding: 0, flexShrink: 0 } }, "\u2715")
+      )),
+      // + Ajouter une étape
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: () => setItiEtapes((arr) => [...arr, ""]),
+        style: { width: "100%", padding: 9, background: "none", border: "2px dashed #bbb", borderRadius: 10, color: "#666", fontWeight: 700, fontSize: 13, cursor: "pointer", marginBottom: 8 }
+      }, "+ Ajouter une \xE9tape"),
+      // Interrupteur PMR
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: () => setHomePmrOnly((v) => !v),
+        "aria-label": "Trajet accessible PMR, " + (homePmrOnly ? "activ\xE9" : "d\xE9sactiv\xE9"),
+        style: { width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: homePmrOnly ? "#e3f2fd" : "#fff", border: "2px solid " + (homePmrOnly ? "#1565C0" : "#ddd"), borderRadius: 12, cursor: "pointer", marginBottom: 10, textAlign: "left" }
       },
+        /* @__PURE__ */ React.createElement("span", { style: { width: 26, height: 26, display: "inline-flex", flexShrink: 0 } }, PICTOS.pmr.svg),
+        /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontWeight: 800, fontSize: 14, color: homePmrOnly ? "#0d47a1" : "#333" } }, "Trajet accessible (PMR)"),
+        /* @__PURE__ */ React.createElement("span", { style: { width: 42, height: 24, borderRadius: 12, flexShrink: 0, background: homePmrOnly ? "#1565C0" : "#ccc", position: "relative" } },
+          /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", top: 3, left: homePmrOnly ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", boxShadow: "0 1px 2px rgba(0,0,0,0.3)" } }))
+      ),
+      // Bouton Calculer
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: () => {
+          if (!itiDepart.trim() || !itiArrivee.trim()) return;
+          const path = findPath(itiDepart.trim(), itiArrivee.trim(), itiEtapes.filter((e) => e.trim()), futurActifs, homePmrOnly);
+          if (path) { setItiResult(formatPath(path)); setShowItineraire(true); }
+          else { setShowItineraire(true); }
+        },
+        style: { width: "100%", padding: "13px", background: "#1a1a2e", border: "none", borderRadius: 12, color: "#fff", fontWeight: 900, fontSize: 16, cursor: "pointer" }
+      }, "Calculer l'itin\xE9raire")
+    ),
+    // === Conteneur onglets + badges (att\u00e9nu\u00e9 quand l'itin\u00e9raire est ouvert) ===
+    /* @__PURE__ */ React.createElement("div", {
+      onClick: homeItiExpanded ? () => setHomeItiExpanded(false) : void 0,
       style: {
-        width: "100%",
-        maxWidth: 360,
-        background: t.bg,
-        border: "1px solid #333",
-        borderRadius: 14,
-        padding: "14px 16px",
-        marginBottom: 8,
-        cursor: "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-        textAlign: "left",
-        overflow: "hidden"
+        width: "100%", maxWidth: 360,
+        opacity: homeItiExpanded ? 0.35 : 1,
+        transition: "opacity 0.2s",
+        pointerEvents: homeItiExpanded ? "none" : "auto"
       }
     },
-    /* @__PURE__ */ React.createElement("div", { style: { fontSize: 20, fontWeight: 900, color: "#fff", letterSpacing: 2, flexShrink: 0 } }, t.label),
-    /* @__PURE__ */ React.createElement("div", { style: {
-      display: "flex",
-      gap: 4,
-      alignItems: "center",
-      flexShrink: 1,
-      justifyContent: "flex-end",
-      overflow: "hidden",
-      minWidth: 0
-    } }, (t.k === "metro" ? METRO_LINES : t.k === "rer" ? RER_LINES : t.k === "tram" ? TRAM_LINES : CABLE_LINES).slice(0, 5).map((l) => /* @__PURE__ */ React.createElement(Badge, { key: l.id, id: l.id, size: t.k === "tram" ? 26 : 30 })))
-  )), /* @__PURE__ */ React.createElement(
-    "button",
-    {
-      onClick: () => setShowItineraire(true),
-      style: {
-        width: "100%", maxWidth: 360, marginBottom: 10,
-        background: "#1a1a2e", border: "2px solid #333",
-        borderRadius: 14, padding: "12px 16px",
-        cursor: "pointer", display: "flex",
-        alignItems: "center", justifyContent: "center", gap: 10, color: "#fff"
-      }
-    },
-    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 20 } }, "\u{1F4CD}"),
-    /* @__PURE__ */ React.createElement("span", { style: { fontSize: 18, fontWeight: 900, letterSpacing: 0.5 } }, "Itin\xE9raire")
-  ), favorites.length > 0 && /* @__PURE__ */ React.createElement(
+    // === 4 ONGLETS : Métro / RER / Tram / Câble ===
+    /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, display: "flex", gap: 6, marginBottom: 16 } },
+      [
+        { k: "metro", label: "M\xC9TRO" },
+        { k: "rer", label: "RER" },
+        { k: "tram", label: "TRAM" },
+        { k: "cable", label: "C\xC2BLE" }
+      ].map((t) => /* @__PURE__ */ React.createElement("button", {
+        key: t.k,
+        onClick: () => setHomeTab(t.k),
+        style: {
+          flex: 1, minWidth: 0,
+          background: homeTab === t.k ? "#fff" : "transparent",
+          color: homeTab === t.k ? "#111" : "#aaa",
+          border: homeTab === t.k ? "2px solid #fff" : "2px solid #444",
+          borderRadius: 12,
+          padding: "10px 2px",
+          fontSize: 20,
+          fontWeight: 900,
+          cursor: "pointer",
+          transition: "all 0.15s"
+        }
+      }, t.label))
+    ),
+    // === GRILLE DE BADGES de l'onglet actif (cliquables) ===
+    /* @__PURE__ */ React.createElement("div", { style: { width: "100%", maxWidth: 360, marginBottom: 16 } },
+      /* @__PURE__ */ React.createElement("div", { style: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 } },
+        (homeTab === "metro" ? METRO_LINES : homeTab === "rer" ? RER_LINES : homeTab === "tram" ? TRAM_LINES : CABLE_LINES).map((l) => /* @__PURE__ */ React.createElement("button", {
+          key: l.id,
+          onClick: () => {
+            setTransport(homeTab);
+            setLineId(l.id);
+            setTroncon15(null);
+            setBranch(null);
+            setButtonOrder(null);
+            const needsDirectionScreen = l.id === "15" || homeTab === "rer";
+            if (needsDirectionScreen) {
+              setShowDir(true);
+            } else {
+              const lineStations = STATIONS[l.id] || CABLE_STATIONS[l.id] || [];
+              const firstBranch = lineStations.find((s) => s.branch);
+              if (firstBranch) {
+                setBranch(firstBranch.branch);
+                const branchStations = lineStations.filter((s) => s.branch === firstBranch.branch);
+                const firstBranchIdx = lineStations.findIndex((s) => s.branch === firstBranch.branch);
+                const firstForkIdx = lineStations.findIndex((s) => s.fork);
+                const term = (firstBranchIdx < firstForkIdx) ? branchStations[0] : branchStations[branchStations.length - 1];
+                if (term) setDirection(term.n);
+              } else {
+                const filtered = lineStations.filter((s) => !s.branch && !s.fork);
+                if (filtered[0]) setDirection(filtered[0].n);
+              }
+              setScreen("stations");
+            }
+          },
+          style: {
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 2,
+            opacity: l.future ? (isLineActive(l.id, futurActifs) ? 1 : 0.45) : 1,
+            position: "relative"
+          }
+        }, /* @__PURE__ */ React.createElement(Badge, { id: l.id, size: homeTab === "tram" ? 44 : 56 })))
+      )
+    )), favorites.length > 0 && /* @__PURE__ */ React.createElement(
     "button",
     {
       onClick: () => setScreen("favorites"),
@@ -4943,13 +5294,9 @@ function App() {
       display: "flex", alignItems: "center", justifyContent: "center" }
   }, "\u270F\uFE0F"),
   screen === "stations" && line && /* @__PURE__ */ React.createElement("div", { style: { flex: 1, display: "flex", flexDirection: "column", background: "#fff", color: "#111", minHeight: 0, overflow: "hidden", position: "relative" } }, /* @__PURE__ */ React.createElement("div", { style: { padding: "14px 16px 0", borderBottom: "1px solid #eee" } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12 } }, /* @__PURE__ */ React.createElement("button", { onClick: () => {
-    // Pour ligne 15 et RER : retour à l'écran de choix de direction
-    if (lineId === "15" || transport === "rer") {
-      setScreen("lines");
-      setShowDir(true);
-    } else {
-      setScreen("lines");
-    }
+    // Retour direct à l'accueil, avec l'onglet déjà positionné sur le bon mode
+    setShowDir(false);
+    setScreen("home");
   }, style: { background: "none", border: "none", fontSize: 44, fontWeight: 900, cursor: "pointer", color: "#111", padding: "4px 12px 4px 4px", minWidth: 52, minHeight: 52, lineHeight: 1 } }, "\u2039"), /* @__PURE__ */ React.createElement(Badge, { id: line.id, size: 30 }), /* @__PURE__ */ React.createElement(
     "div",
     { style: { fontWeight: 600, fontSize: 12, color: "#888" } },
@@ -5618,7 +5965,7 @@ function App() {
         background: "rgba(0,0,0,0.15)",
         border: "none",
         color: line.text || "#fff",
-        fontSize: 32,
+        fontSize: 34,
         cursor: "pointer",
         borderRadius: 8,
         width: 44,
@@ -5628,13 +5975,14 @@ function App() {
         justifyContent: "center",
         fontWeight: 900,
         lineHeight: 1,
+        flexShrink: 0,
         textShadow: line.text === "#000" ? "-1px -1px 0 rgba(255,255,255,0.95), 1px -1px 0 rgba(255,255,255,0.95), -1px 1px 0 rgba(255,255,255,0.95), 1px 1px 0 rgba(255,255,255,0.95)" : "-1px -1px 0 rgba(0,0,0,0.95), 1px -1px 0 rgba(0,0,0,0.95), -1px 1px 0 rgba(0,0,0,0.95), 1px 1px 0 rgba(0,0,0,0.95)"
       }
     },
     "\u2039"
   ), /* @__PURE__ */ React.createElement("div", { style: {
     fontWeight: 900,
-    fontSize: 22,
+    fontSize: 20,
     color: line.text || "#fff",
     flex: 1,
     textAlign: "center",
@@ -5648,12 +5996,11 @@ function App() {
         background: "rgba(0,0,0,0.15)",
         border: "none",
         fontSize: 28,
-        minWidth: 48,
-        minHeight: 48,
         cursor: "pointer",
         borderRadius: 8,
-        width: 34,
-        height: 34,
+        width: 44,
+        height: 44,
+        flexShrink: 0,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -5663,6 +6010,26 @@ function App() {
     },
     isFav ? "\u2B50" : "\u2606"
   )), (() => {
+    // Indicateur d'accessibilité PMR (sous le nom, dans le bandeau coloré)
+    const pmr = isStationPMR(lineId, station.n);
+    if (pmr !== true) return null; // on n'affiche que si on SAIT que c'est accessible
+    return /* @__PURE__ */ React.createElement("div", { style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      marginTop: 7
+    } },
+      /* @__PURE__ */ React.createElement("span", { style: { width: 22, height: 22, display: "inline-flex", flexShrink: 0 } }, PICTOS.pmr.svg),
+      /* @__PURE__ */ React.createElement("span", { style: {
+        fontSize: 12,
+        fontWeight: 800,
+        color: line.text || "#fff",
+        letterSpacing: 0.3,
+        textShadow: line.text === "#000" ? "-1px -1px 0 rgba(255,255,255,0.9), 1px 1px 0 rgba(255,255,255,0.9)" : "-1px -1px 0 rgba(0,0,0,0.9), 1px 1px 0 rgba(0,0,0,0.9)"
+      } }, "Station accessible")
+    );
+  })(), (() => {
     // Bouton direction sous le nom de la station
     // Affiche le terminus dans la direction actuelle, cliquable pour basculer
     if (!direction) return null;
@@ -5702,7 +6069,7 @@ function App() {
             gap: 8,
             width: "100%",
             padding: "5px 12px",
-            background: line.color,
+            background: tintDirection(line.color),
             border: "2px solid #000",
             borderRadius: 10,
             color: line.text || "#fff",
@@ -5716,8 +6083,10 @@ function App() {
             boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
           }
         },
-          /* @__PURE__ */ React.createElement("span", null, "\u2192 " + currentDir),
-          /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 900 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+          /* @__PURE__ */ React.createElement("span", { style: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "100%", position: "relative" } },
+            /* @__PURE__ */ React.createElement("span", null, currentDir),
+            /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", right: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, border: "2px solid currentColor", borderRadius: 5, fontSize: 12, fontWeight: 900, lineHeight: 1 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+          )
         ),
         showForkDirMenu && /* @__PURE__ */ React.createElement("div", { style: {
           position: "absolute",
@@ -5805,7 +6174,7 @@ function App() {
               gap: 8,
               width: "100%",
               padding: "5px 12px",
-              background: line.color,
+              background: tintDirection(line.color),
               border: "2px solid #000",
               borderRadius: 10,
               color: line.text || "#fff",
@@ -5819,8 +6188,10 @@ function App() {
               boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
             }
           },
-            /* @__PURE__ */ React.createElement("span", null, "\u2192 " + currentDir),
-            /* @__PURE__ */ React.createElement("span", { style: { fontSize: 14, fontWeight: 900 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+            /* @__PURE__ */ React.createElement("span", { style: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "100%", position: "relative" } },
+              /* @__PURE__ */ React.createElement("span", null, currentDir),
+              /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", right: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, border: "2px solid currentColor", borderRadius: 5, fontSize: 12, fontWeight: 900, lineHeight: 1 } }, showForkDirMenu ? "\u25B2" : "\u25BC")
+            )
           ),
           showForkDirMenu && /* @__PURE__ */ React.createElement("div", { style: {
             position: "absolute",
@@ -5931,7 +6302,7 @@ function App() {
           width: "calc(100% - 8px)",
           margin: "8px 4px 0",
           padding: "5px 12px",
-          background: line.color,
+          background: tintDirection(line.color),
           border: "2px solid #000",
           borderRadius: 10,
           color: line.text || "#fff",
@@ -5945,7 +6316,10 @@ function App() {
           boxShadow: "0 1px 3px rgba(0,0,0,0.25)"
         }
       },
-      "\u2192 " + currentLabel
+      /* @__PURE__ */ React.createElement("span", { style: { display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 0, width: "100%", position: "relative" } },
+        /* @__PURE__ */ React.createElement("span", null, currentLabel),
+        /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", right: 0, display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, border: "2px solid currentColor", borderRadius: 5, fontSize: 13, fontWeight: 900, lineHeight: 1 } }, "\u25BC")
+      )
     );
   })()), ((station.c || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs)) || (station.walk || []).some((c) => isCorrespondenceVisible(station.n, c, futurActifs))) && /* @__PURE__ */ React.createElement("div", { style: {
     background: "#fff",
@@ -6099,7 +6473,7 @@ function App() {
         style: {
           marginTop: 10,
           width: "100%",
-          background: line.color,
+          background: tintDirection(line.color),
           border: "none",
           borderRadius: 10,
           padding: 12,
@@ -7131,7 +7505,30 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
         )
       ),
       /* @__PURE__ */ React.createElement("div", { style: { color: "#999", fontSize: 12, marginBottom: 12 } }, "Touchez une station pour la modifier :"),
-      /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #ddd", borderRadius: 10, overflow: "hidden" } }, sts.filter((s) => !s.fork).map((st, i) => {
+      // Bouton bascule : afficher uniquement les stations PMR
+      /* @__PURE__ */ React.createElement("button", {
+        onClick: function() { setAdminPmrFilter(function(v) { return !v; }); },
+        style: {
+          width: "100%", display: "flex", alignItems: "center", gap: 10,
+          padding: "10px 12px", marginBottom: 12,
+          background: adminPmrFilter ? "#e3f2fd" : "#fff",
+          border: "2px solid " + (adminPmrFilter ? "#1565C0" : "#ddd"),
+          borderRadius: 10, cursor: "pointer", textAlign: "left"
+        }
+      },
+        /* @__PURE__ */ React.createElement("span", { style: { width: 26, height: 26, display: "inline-flex", flexShrink: 0 } }, PICTOS.pmr.svg),
+        /* @__PURE__ */ React.createElement("span", { style: { flex: 1, fontWeight: 800, fontSize: 13, color: adminPmrFilter ? "#0d47a1" : "#333" } }, adminPmrFilter ? "Stations PMR uniquement" : "Afficher stations PMR"),
+        /* @__PURE__ */ React.createElement("span", { style: { width: 42, height: 24, borderRadius: 12, flexShrink: 0, background: adminPmrFilter ? "#1565C0" : "#ccc", position: "relative", transition: "background 0.15s" } },
+          /* @__PURE__ */ React.createElement("span", { style: { position: "absolute", top: 3, left: adminPmrFilter ? 21 : 3, width: 18, height: 18, borderRadius: "50%", background: "#fff", transition: "left 0.15s", boxShadow: "0 1px 2px rgba(0,0,0,0.3)" } }))
+      ),
+      (() => {
+        // Compteur d'info quand le filtre est actif
+        if (!adminPmrFilter) return null;
+        const total = sts.filter((s) => s.n && !s.fork).length;
+        const accessibles = sts.filter((s) => s.n && !s.fork && isStationPMR(adminLineId, s.n) === true).length;
+        return /* @__PURE__ */ React.createElement("div", { style: { background: "#fff3e0", borderRadius: 8, padding: "8px 12px", marginBottom: 10, fontSize: 12, fontWeight: 600, color: "#e65100" } }, accessibles + " station" + (accessibles > 1 ? "s" : "") + " accessible" + (accessibles > 1 ? "s" : "") + " sur " + total + " (donn\u00E9es \u00E0 compl\u00E9ter)");
+      })(),
+      /* @__PURE__ */ React.createElement("div", { style: { background: "#fff", border: "1px solid #ddd", borderRadius: 10, overflow: "hidden" } }, sts.filter((s) => !s.fork).filter((s) => !adminPmrFilter || isStationPMR(adminLineId, s.n) === true).map((st, i) => {
       const edited = lineEdits[st.n];
       const tronconInactif = false;
       return /* @__PURE__ */ React.createElement(
@@ -7158,7 +7555,7 @@ adminUnlocked && adminScreen === "zoom" && React.createElement("div", { style: {
             opacity: tronconInactif ? 0.45 : 1
           }
         },
-        /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { color: edited ? "#2e7d32" : "#111", fontWeight: 700, fontSize: 14 } }, edited && edited.n || st.n), (() => {
+        /* @__PURE__ */ React.createElement("div", { style: { flex: 1 } }, /* @__PURE__ */ React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6 } }, isStationPMR(adminLineId, st.n) === true && /* @__PURE__ */ React.createElement("span", { style: { width: 18, height: 18, display: "inline-flex", flexShrink: 0 } }, PICTOS.pmr.svg), /* @__PURE__ */ React.createElement("span", { style: { color: edited ? "#2e7d32" : "#111", fontWeight: 700, fontSize: 14 } }, edited && edited.n || st.n)), (() => {
           const c = (edited == null ? void 0 : edited.c) !== void 0 ? edited.c : st.c || [];
           return c.length > 0 ? /* @__PURE__ */ React.createElement("div", { style: { display: "flex", gap: 3, marginTop: 4, flexWrap: "wrap" } }, c.map((x, j) => /* @__PURE__ */ React.createElement(Badge, { key: j, id: x, size: 16 }))) : null;
         })()),
